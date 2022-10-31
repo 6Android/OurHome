@@ -1,4 +1,4 @@
-package com.ssafy.ourhome.screens
+package com.ssafy.ourhome.screens.question
 
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable

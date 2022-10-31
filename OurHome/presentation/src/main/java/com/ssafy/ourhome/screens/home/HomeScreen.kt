@@ -1,4 +1,4 @@
-package com.ssafy.ourhome.screens
+package com.ssafy.ourhome.screens.home
 
 import androidx.compose.material.Button
 import androidx.compose.material.Text

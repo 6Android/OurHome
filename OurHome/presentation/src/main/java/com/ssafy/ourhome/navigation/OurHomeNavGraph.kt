@@ -5,6 +5,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.ssafy.ourhome.screens.*
+import com.ssafy.ourhome.screens.album.AlbumScreen
+import com.ssafy.ourhome.screens.home.HomeScreen
+import com.ssafy.ourhome.screens.mypage.MyPageScreen
+import com.ssafy.ourhome.screens.question.QuestionScreen
 
 
 @Composable
