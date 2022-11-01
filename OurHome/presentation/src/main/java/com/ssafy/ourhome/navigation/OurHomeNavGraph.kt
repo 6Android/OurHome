@@ -4,16 +4,17 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.ssafy.ourhome.screens.*
+import com.ssafy.ourhome.screens.NextScreen
 import com.ssafy.ourhome.screens.album.AlbumScreen
 import com.ssafy.ourhome.screens.home.HomeScreen
 import com.ssafy.ourhome.screens.login.LoginScreen
+import com.ssafy.ourhome.screens.login.join.JoinEmailScreen
 import com.ssafy.ourhome.screens.mypage.MyPageScreen
 import com.ssafy.ourhome.screens.question.QuestionScreen
 
 
 @Composable
-fun OurHomeNavGraph(navController: NavHostController){
+fun OurHomeNavGraph(navController: NavHostController) {
     NavHost(
         navController = navController,
         startDestination = OurHomeScreens.LoginScreen.name
@@ -37,6 +38,10 @@ fun OurHomeNavGraph(navController: NavHostController){
 
         composable(OurHomeScreens.LoginScreen.name) {
             LoginScreen(navController = navController)
+        }
+
+        composable(OurHomeScreens.JoinEmailScreen.name) {
+            JoinEmailScreen(navController = navController)
         }
 
     }

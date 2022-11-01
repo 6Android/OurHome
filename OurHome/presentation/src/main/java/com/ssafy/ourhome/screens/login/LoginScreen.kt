@@ -27,6 +27,7 @@ import com.ssafy.ourhome.R
 import com.ssafy.ourhome.components.RoundedButton
 import com.ssafy.ourhome.components.TextInput
 import com.ssafy.ourhome.navigation.BottomNavItem
+import com.ssafy.ourhome.navigation.OurHomeScreens
 
 @Preview(showBackground = true)
 @Composable
@@ -83,10 +84,11 @@ fun LoginScreen(navController: NavController = NavController(LocalContext.curren
                 modifier = Modifier
                     .clickable {
                         // todo: 회원가입 클릭
+                        navController.navigate(OurHomeScreens.JoinEmailScreen.name)
                     }
                     .padding(8.dp),
                 text = "회원가입",
-                style = MaterialTheme.typography.subtitle2,
+                style = MaterialTheme.typography.body2,
                 color = Color.Gray
             )
             Spacer(modifier = Modifier.height(48.dp))
