@@ -85,7 +85,7 @@ val Typography = Typography(
     button = TextStyle(
         fontFamily = nanum,
         fontWeight = FontWeight.Bold,
-        fontSize = 14.sp,
+        fontSize = 16.sp,
         letterSpacing = 1.25.sp
     ),
     caption = TextStyle(
