@@ -9,6 +9,7 @@ import com.ssafy.ourhome.screens.album.AlbumScreen
 import com.ssafy.ourhome.screens.home.HomeScreen
 import com.ssafy.ourhome.screens.login.LoginScreen
 import com.ssafy.ourhome.screens.login.join.JoinEmailScreen
+import com.ssafy.ourhome.screens.login.join.JoinPasswordScreen
 import com.ssafy.ourhome.screens.mypage.MyPageScreen
 import com.ssafy.ourhome.screens.question.QuestionScreen
 
@@ -42,6 +43,10 @@ fun OurHomeNavGraph(navController: NavHostController) {
 
         composable(OurHomeScreens.JoinEmailScreen.name) {
             JoinEmailScreen(navController = navController)
+        }
+
+        composable(OurHomeScreens.JoinPasswordScreen.name) {
+            JoinPasswordScreen(navController = navController)
         }
 
     }
