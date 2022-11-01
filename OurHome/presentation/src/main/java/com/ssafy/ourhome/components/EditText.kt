@@ -7,8 +7,8 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.ThumbUp
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -95,13 +95,16 @@ fun PasswordInput(
     passwordState: MutableState<String>,
     labelId: String,
     enabled: Boolean,
-    passwordVisibility: MutableState<Boolean>,
+    passwordVisibility: MutableState<Boolean>? = null,
     imeAction: ImeAction = ImeAction.Done,
     onAction: KeyboardActions = KeyboardActions.Default,
 ) {
 
-    val visualTransformation = if (passwordVisibility.value) VisualTransformation.None else
-        PasswordVisualTransformation()
+    val visualTransformation = passwordVisibility?.let {
+        if (it.value) VisualTransformation.None else
+            PasswordVisualTransformation()
+    } ?: PasswordVisualTransformation()
+
     TextField(
         value = passwordState.value,
         onValueChange = {
@@ -119,7 +122,11 @@ fun PasswordInput(
             imeAction = imeAction
         ),
         visualTransformation = visualTransformation,
-        trailingIcon = { PasswordVisibility(passwordVisibility = passwordVisibility) },
+        trailingIcon = {
+            passwordVisibility?.let {
+                PasswordVisibility(passwordVisibility = it)
+            }
+        },
         keyboardActions = onAction,
         colors = TextFieldDefaults.textFieldColors(
             backgroundColor = Color.Transparent
@@ -134,8 +141,9 @@ fun PasswordVisibility(passwordVisibility: MutableState<Boolean>) {
     IconButton(
         onClick = { passwordVisibility.value = !visible }) {
         Icon(
-            imageVector = Icons.Default.ThumbUp, contentDescription = "",
-            tint = Color.Black
+            imageVector = if (visible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+            contentDescription = "",
+            tint = Color.Gray
         )
     }
 }

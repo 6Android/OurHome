@@ -4,11 +4,25 @@ import java.lang.IllegalStateException
 
 enum class OurHomeScreens {
 
-    NextScreen;
+    NextScreen,
+    LoginScreen,
+    JoinEmailScreen,
+    JoinPasswordScreen,
+    JoinNickNameScreen,
+    QuestionListScreen,
+    PetDetailScreen,
+    QuestionDetailScreen;
 
     companion object {
         fun fromRoute(route: String?): OurHomeScreens = when (route?.substringBefore("/")) {
             NextScreen.name -> NextScreen
+            LoginScreen.name -> LoginScreen
+            JoinEmailScreen.name -> JoinEmailScreen
+            JoinPasswordScreen.name -> JoinPasswordScreen
+            JoinNickNameScreen.name -> JoinNickNameScreen
+            QuestionListScreen.name -> QuestionListScreen
+            PetDetailScreen.name -> PetDetailScreen
+            QuestionDetailScreen.name -> QuestionDetailScreen
 
             else -> throw IllegalStateException("Route $route is not recognized")
         }
