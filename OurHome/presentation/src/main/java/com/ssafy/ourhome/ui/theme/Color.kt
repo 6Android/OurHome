@@ -8,3 +8,10 @@ val Purple700 = Color(0xFF3700B3)
 val Teal200 = Color(0xFF03DAC5)
 
 val MainColor = Color(0xFFFF924B)
+
+// 초록
+val Green = Color(0xFF00B383)
+// 회색
+val Gray = Color(0xFF8F8F8F)
+// 남색
+val Black = Color(0xFF222B45)
