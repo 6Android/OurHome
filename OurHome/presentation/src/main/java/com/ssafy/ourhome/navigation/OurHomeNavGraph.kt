@@ -14,7 +14,6 @@ import com.ssafy.ourhome.screens.login.LoginScreen
 import com.ssafy.ourhome.screens.login.join.JoinEmailScreen
 import com.ssafy.ourhome.screens.login.join.JoinNickNameScreen
 import com.ssafy.ourhome.screens.login.join.JoinPasswordScreen
-import com.ssafy.ourhome.screens.mypage.MyPageScreen
 import com.ssafy.ourhome.screens.question.QuestionDetailScreen
 import com.ssafy.ourhome.screens.question.QuestionListScreen
 import com.ssafy.ourhome.screens.question.QuestionScreen
