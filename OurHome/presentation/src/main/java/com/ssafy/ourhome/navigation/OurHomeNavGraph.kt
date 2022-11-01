@@ -7,6 +7,7 @@ import androidx.navigation.compose.composable
 import com.ssafy.ourhome.screens.*
 import com.ssafy.ourhome.screens.album.AlbumScreen
 import com.ssafy.ourhome.screens.home.HomeScreen
+import com.ssafy.ourhome.screens.login.LoginScreen
 import com.ssafy.ourhome.screens.mypage.MyPageScreen
 import com.ssafy.ourhome.screens.question.QuestionScreen
 
@@ -15,7 +16,7 @@ import com.ssafy.ourhome.screens.question.QuestionScreen
 fun OurHomeNavGraph(navController: NavHostController){
     NavHost(
         navController = navController,
-        startDestination = BottomNavItem.Home.screenRoute
+        startDestination = OurHomeScreens.LoginScreen.name
     ) {
         composable(BottomNavItem.Home.screenRoute) {
             HomeScreen(navController = navController)
@@ -34,6 +35,9 @@ fun OurHomeNavGraph(navController: NavHostController){
             NextScreen(navController = navController)
         }
 
+        composable(OurHomeScreens.LoginScreen.name) {
+            LoginScreen(navController = navController)
+        }
 
     }
 }
