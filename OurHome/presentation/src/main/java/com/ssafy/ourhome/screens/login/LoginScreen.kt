@@ -1,6 +1,5 @@
 package com.ssafy.ourhome.screens.login
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -18,17 +17,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.ssafy.ourhome.R
 import com.ssafy.ourhome.components.RoundedButton
 import com.ssafy.ourhome.components.TextInput
+import com.ssafy.ourhome.navigation.BottomNavItem
+import com.ssafy.ourhome.navigation.OurHomeScreens
 
 @Preview(showBackground = true)
 @Composable
-fun LoginScreen() {
+fun LoginScreen(navController: NavController = NavController(LocalContext.current)) {
     var idState = remember {
         mutableStateOf("")
     }
@@ -74,16 +77,18 @@ fun LoginScreen() {
                     .height(48.dp), label = "로그인"
             ) {
                 // todo: 로그인 클릭
+                navController.navigate(BottomNavItem.Home.screenRoute)
             }
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 modifier = Modifier
                     .clickable {
                         // todo: 회원가입 클릭
+                        navController.navigate(OurHomeScreens.JoinEmailScreen.name)
                     }
                     .padding(8.dp),
                 text = "회원가입",
-                style = MaterialTheme.typography.subtitle2,
+                style = MaterialTheme.typography.body2,
                 color = Color.Gray
             )
             Spacer(modifier = Modifier.height(48.dp))
