@@ -15,6 +15,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.ssafy.ourhome.components.MainAppBar
 import com.ssafy.ourhome.components.PasswordInput
+import com.ssafy.ourhome.navigation.OurHomeScreens
+import com.ssafy.ourhome.utils.JOIN_PASSWORD
 
 
 @Composable
@@ -50,19 +52,35 @@ fun JoinPasswordScreen(navController: NavController = NavController(LocalContext
                 Spacer(modifier = Modifier.height(48.dp))
 
                 /** 비밀번호 입력창 */
-                PasswordInput(passwordState = passwordState, labelId = "비밀번호", enabled = true, imeAction = ImeAction.Next)
+                PasswordInput(
+                    passwordState = passwordState,
+                    labelId = "비밀번호",
+                    enabled = true,
+                    imeAction = ImeAction.Next
+                )
 
                 /** 비밀번호 확인창 */
-                PasswordInput(passwordState = passwordConfirmState, labelId = "비밀번호 확인", enabled = true, imeAction = ImeAction.Next, onAction = KeyboardActions(onNext = {
-                    // todo: 다음 버튼
-                }))
+                PasswordInput(
+                    passwordState = passwordConfirmState,
+                    labelId = "비밀번호 확인",
+                    enabled = true,
+                    imeAction = ImeAction.Next,
+                    onAction = KeyboardActions(onNext = {
+                        // todo: 다음 버튼
+                        navigateToNickNameScreen(navController)
+                    })
+                )
             }
         }
 
         /** 다음 버튼 */
         NextButton(title = "다음") {
             // todo: 다음 버튼
-
+            navigateToNickNameScreen(navController)
         }
     }
+}
+
+fun navigateToNickNameScreen(navController: NavController) {
+    navController.navigate(OurHomeScreens.JoinNickNameScreen.name + "/$JOIN_PASSWORD")
 }

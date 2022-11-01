@@ -31,6 +31,7 @@ import com.ssafy.ourhome.components.PasswordInput
 import com.ssafy.ourhome.components.RoundedButton
 import com.ssafy.ourhome.navigation.BottomNavItem
 import com.ssafy.ourhome.navigation.OurHomeScreens
+import com.ssafy.ourhome.utils.LOGIN
 
 @Preview(showBackground = true)
 @Composable
@@ -70,6 +71,7 @@ fun LoginScreen(navController: NavController = NavController(LocalContext.curren
             /** 소셜 로그인 버튼 */
             SocialLogin {
                 // todo: 닉네임 화면으로 이동
+                navController.navigate(OurHomeScreens.JoinNickNameScreen.name + "/$LOGIN")
             }
         }
     }
