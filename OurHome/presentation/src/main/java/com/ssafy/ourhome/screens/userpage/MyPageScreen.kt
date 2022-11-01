@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -15,17 +16,17 @@ import com.ssafy.ourhome.ui.theme.OurHomeTheme
 import com.ssafy.ourhome.utils.SETTING_ICON
 
 @Composable
-fun UserPageScreen(navController: NavController){
-    Your()
+fun MyPageScreen(navController: NavController) {
+    My()
 }
 
 @Preview(showBackground = true)
 @Composable
-private fun Your(){
+private fun My(){
     OurHomeTheme {
         Column() {
             MainAppBar(
-                title = "유저 페이지",
+                title = "마이페이지",
                 backIconEnable = false,
                 icon = painterResource(id = SETTING_ICON)
             )
@@ -37,7 +38,7 @@ private fun Your(){
                     userName = "한상엽",
                     userEmail = "super7615@naver.com",
                     userPhone = "010-1234-5678",
-                    isMyPage = false,
+                    isMyPage = true,
                     isManager = true
                 )
 
@@ -50,3 +51,6 @@ private fun Your(){
         }
     }
 }
+
+
+
