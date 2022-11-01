@@ -74,14 +74,12 @@ fun LoginScreen() {
                     .height(48.dp), label = "로그인"
             ) {
                 // todo: 로그인 클릭
-                Log.d("LoginScreen", "로그인 클릭")
             }
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 modifier = Modifier
                     .clickable {
                         // todo: 회원가입 클릭
-                        Log.d("LoginScreen", "회원가입 클릭")
                     }
                     .padding(8.dp),
                 text = "회원가입",
@@ -99,21 +97,18 @@ fun LoginScreen() {
                     painterResource(id = R.drawable.ic_google)
                 ) {
                     // todo: 구글 로그인
-                    Log.d("LoginScreen", "구글 로그인")
                 }
                 SocialLoginButton(
                     painterResource =
                     painterResource(id = R.drawable.ic_facebook)
                 ) {
                     // todo: 페이스북 로그인
-                    Log.d("LoginScreen", "페이스북 클릭")
                 }
                 SocialLoginButton(
                     painterResource =
                     painterResource(id = R.drawable.ic_twiter)
                 ) {
                     // todo: 트위터 로그인
-                    Log.d("LoginScreen", "트위터 클릭")
                 }
             }
 
