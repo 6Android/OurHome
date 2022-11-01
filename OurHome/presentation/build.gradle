@@ -78,4 +78,7 @@ dependencies {
 
     // Coil
     implementation("io.coil-kt:coil-compose:2.2.2")
+
+    //material icons - use with caution!
+    implementation "androidx.compose.material:material-icons-extended:$compose_ui_version"
 }
