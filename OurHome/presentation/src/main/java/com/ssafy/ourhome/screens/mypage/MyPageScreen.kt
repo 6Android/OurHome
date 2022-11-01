@@ -16,7 +16,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -24,9 +28,7 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.ssafy.ourhome.R
 import com.ssafy.ourhome.components.MainAppBar
-import com.ssafy.ourhome.ui.theme.BirthDayColor
-import com.ssafy.ourhome.ui.theme.MBTIColor
-import com.ssafy.ourhome.ui.theme.OurHomeTheme
+import com.ssafy.ourhome.ui.theme.*
 import com.ssafy.ourhome.utils.SETTING_ICON
 
 @Composable
@@ -70,8 +72,8 @@ private fun UserColorCardList() {
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        BirthDayCard("1111")
-        BirthDayCard("1111")
+        BirthDayCard("1997.12.14")
+        BloodTypeCard(content = "Rh+ O")
         MBTICard("ENFP")
     }
 }
@@ -125,14 +127,138 @@ private fun UserCommonCardList(
 private fun BirthDayCard(
     content: String,
 ) {
+    val year = content.split(".")[0]
+    val month = content.split(".")[1]
+    val day = content.split(".")[2]
+
+    val numberSpanStyle = SpanStyle(
+
+        color = Color.White,
+        fontFamily = hannar,
+        fontSize = 20.sp,
+        fontWeight = FontWeight.Bold
+    )
+    val textSpanStyle = SpanStyle(
+        color = Color.White,
+        fontFamily = hannar,
+        fontSize = 14.sp,
+        fontWeight = FontWeight.Bold
+    )
+
+
     Card(
         modifier = Modifier
             .size(110.dp)
             .clip(RoundedCornerShape(8.dp)),
         backgroundColor = BirthDayColor
     ) {
-        Box() {
-            
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = 10.dp, bottom = 4.dp, start = 10.dp, end = 10.dp)
+        ) {
+            Text(
+                text = "생일", style = MaterialTheme.typography.body1.copy(
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold
+                ), modifier = Modifier.align(Alignment.TopStart)
+            )
+
+            Column(
+                modifier = Modifier.align(Alignment.BottomEnd),
+                horizontalAlignment = Alignment.End
+            ) {
+                Text(
+                    text = "${year}년", style = MaterialTheme.typography.body1.copy(
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold
+                    )
+                )
+                Text(text = buildAnnotatedString {
+
+                    withStyle(
+                        style = numberSpanStyle
+                    ) {
+                        append(month)
+
+                    }
+                    withStyle(
+                        style = textSpanStyle
+                    ) {
+                        append("월 ")
+                    }
+                    withStyle(
+                        style = numberSpanStyle
+                    ) {
+                        append(day)
+                    }
+                    withStyle(
+                        style = textSpanStyle
+                    ) {
+                        append("일")
+                    }
+                })
+            }
+
+        }
+    }
+}
+
+@Composable
+private fun BloodTypeCard(
+    content: String
+) {
+
+    val rh = content.split(" ")[0]
+    val type = content.split(" ")[1]
+    Card(
+        modifier = Modifier
+            .size(110.dp)
+            .clip(RoundedCornerShape(8.dp)),
+        backgroundColor = BloodTypeColor
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = 10.dp, bottom = 4.dp, start = 10.dp, end = 10.dp)
+        ) {
+            Text(
+                text = "혈액형",
+                modifier = Modifier.align(Alignment.TopStart),
+                style = MaterialTheme.typography.body1.copy(
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold
+                )
+            )
+            Text(
+                text = buildAnnotatedString {
+
+                    withStyle(
+                        style = SpanStyle(
+                            color = Color.White,
+                            fontFamily = hannar,
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Normal
+                        )
+                    ) {
+                        append("$rh ")
+
+                    }
+                    withStyle(
+                        style = SpanStyle(
+                            color = Color.White,
+                            fontFamily = hannar,
+                            fontSize = 32.sp,
+                            fontWeight = FontWeight.Normal
+                        )
+                    ) {
+                        append(type)
+                    }
+
+                },
+                modifier = Modifier.align(Alignment.BottomEnd),
+                style = MaterialTheme.typography.h5.copy(color = Color.White)
+            )
         }
     }
 }
@@ -148,14 +274,23 @@ private fun MBTICard(
         backgroundColor = MBTIColor
     ) {
         Box(
-            modifier = Modifier.fillMaxSize().padding(top = 10.dp, bottom = 4.dp, start = 10.dp, end = 10.dp)
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = 10.dp, bottom = 4.dp, start = 10.dp, end = 10.dp)
         ) {
-            Text(text = "MBTI",
+            Text(
+                text = "MBTI",
                 modifier = Modifier.align(Alignment.TopStart),
-            style = MaterialTheme.typography.body1.copy(color = Color.White, fontWeight = FontWeight.Bold))
-            Text(text = content,
+                style = MaterialTheme.typography.body1.copy(
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold
+                )
+            )
+            Text(
+                text = content,
                 modifier = Modifier.align(Alignment.BottomEnd),
-                style = MaterialTheme.typography.h5.copy(color = Color.White))
+                style = MaterialTheme.typography.h5.copy(color = Color.White)
+            )
         }
     }
 }
