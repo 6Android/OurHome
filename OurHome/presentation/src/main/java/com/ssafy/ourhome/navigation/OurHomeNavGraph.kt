@@ -2,13 +2,16 @@ package com.ssafy.ourhome.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.navArgument
 import com.ssafy.ourhome.screens.NextScreen
 import com.ssafy.ourhome.screens.album.AlbumScreen
 import com.ssafy.ourhome.screens.home.HomeScreen
 import com.ssafy.ourhome.screens.login.LoginScreen
 import com.ssafy.ourhome.screens.login.join.JoinEmailScreen
+import com.ssafy.ourhome.screens.login.join.JoinNickNameScreen
 import com.ssafy.ourhome.screens.login.join.JoinPasswordScreen
 import com.ssafy.ourhome.screens.mypage.MyPageScreen
 import com.ssafy.ourhome.screens.question.QuestionScreen
@@ -49,5 +52,16 @@ fun OurHomeNavGraph(navController: NavHostController) {
             JoinPasswordScreen(navController = navController)
         }
 
+        composable(
+            "${OurHomeScreens.JoinNickNameScreen.name}/{prev_type}",
+            arguments = listOf(navArgument("prev_type") {
+                type = NavType.StringType
+            })
+        ) { backStackEntry ->
+            backStackEntry.arguments?.getString("prev_type").let {
+
+                JoinNickNameScreen(navController = navController, prev_type = it.toString())
+            }
+        }
     }
 }
