@@ -14,7 +14,10 @@ import com.ssafy.ourhome.screens.login.join.JoinEmailScreen
 import com.ssafy.ourhome.screens.login.join.JoinNickNameScreen
 import com.ssafy.ourhome.screens.login.join.JoinPasswordScreen
 import com.ssafy.ourhome.screens.mypage.MyPageScreen
+import com.ssafy.ourhome.screens.question.QuestionDetailScreen
+import com.ssafy.ourhome.screens.question.QuestionListScreen
 import com.ssafy.ourhome.screens.question.QuestionScreen
+import com.ssafy.ourhome.screens.question.pet.PetDetailScreen
 
 
 @Composable
@@ -50,6 +53,18 @@ fun OurHomeNavGraph(navController: NavHostController) {
 
         composable(OurHomeScreens.JoinPasswordScreen.name) {
             JoinPasswordScreen(navController = navController)
+        }
+
+        composable(OurHomeScreens.QuestionListScreen.name){
+            QuestionListScreen(navController = navController)
+        }
+
+        composable(OurHomeScreens.QuestionDetailScreen.name){
+            QuestionDetailScreen(navController = navController)
+        }
+
+        composable(OurHomeScreens.PetDetailScreen.name){
+            PetDetailScreen(navController = navController)
         }
 
         composable(
