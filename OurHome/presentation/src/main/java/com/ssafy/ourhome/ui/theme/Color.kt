@@ -15,3 +15,8 @@ val Green = Color(0xFF00B383)
 val Gray = Color(0xFF8F8F8F)
 // 남색
 val Black = Color(0xFF222B45)
+
+
+val BirthDayColor = Color(0xFFF76808)
+val BloodTypeColor = Color(0xFF2A97FF)
+val MBTIColor = Color(0xFF5630FF)
