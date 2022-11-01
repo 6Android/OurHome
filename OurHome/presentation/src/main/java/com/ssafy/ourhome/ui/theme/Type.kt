@@ -9,11 +9,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.ssafy.ourhome.R
 
-private val hannar = FontFamily(
+val hannar = FontFamily(
     Font(R.font.hannar, FontWeight.Normal),
 )
 
-private val nanum = FontFamily(
+val nanum = FontFamily(
     Font(R.font.nanumsquareround_l, FontWeight.Light),
     Font(R.font.nanumsquareround_r, FontWeight.Normal),
     Font(R.font.nanumsquareround_b, FontWeight.Bold),
