@@ -9,6 +9,7 @@ import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
+import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -27,10 +28,13 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import com.ssafy.ourhome.R
+import com.ssafy.ourhome.components.MainAppBar
+import com.ssafy.ourhome.components.OurHomeSurface
 import com.ssafy.ourhome.navigation.OurHomeScreens
 import com.ssafy.ourhome.ui.theme.Gray
 import com.ssafy.ourhome.ui.theme.MainColor
 import com.ssafy.ourhome.ui.theme.nanum
+import com.ssafy.ourhome.utils.SETTING_ICON
 
 @Composable
 fun QuestionScreen(navController: NavController) {
@@ -38,42 +42,65 @@ fun QuestionScreen(navController: NavController) {
         rememberAsyncImagePainter("https://i.pinimg.com/222x/36/30/f7/3630f7d930f91e495d93c02833b4abfc.jpg")
     val scrollState = rememberScrollState()
 
+    Scaffold(topBar = { // TODO 세팅 아이콘 -> 채팅 아이콘
+        MainAppBar(title = "질문", backIconEnable = false, icon = painterResource(id = SETTING_ICON), onIconClick = {
+            navigateChatScreen(navController)
+        })
+    }) {
+        OurHomeSurface() {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp)
+                    .verticalScroll(scrollState)
+            ) {
+                CenterHorizontalColumn {
+
+                    PetSemiDetail(petName = "고라파덕", painter = painter, petLevel = "Lv. 2"){
+                        navController.navigate(OurHomeScreens.PetDetailScreen.name)
+                    }
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    TodayQuestion(questionNumber = "Q4. ", questionContent = "오늘 점심 뭐 드셨나요?")
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    ReplyQuestionButton(
+                        buttonWidth = 120, buttonHeight = 40, fontSize = 20,
+                        label = "답변 하기"
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(36.dp))
+
+                LastQuestionHeader(){
+                    navController.navigate(OurHomeScreens.QuestionListScreen.name)
+                }
+
+                QuestionLazyColumn(Modifier.height(260.dp))
+
+                Spacer(modifier = Modifier.height(12.dp))
+            }
+        }
+    }
+
+}
+
+/** 채팅 스크린 이동 **/
+fun navigateChatScreen(navController: NavController){
+    navController.navigate(OurHomeScreens.ChatScreen.name)
+}
+
+/** 중앙 정렬 Column **/
+@Composable
+fun CenterHorizontalColumn(content : @Composable() (ColumnScope.() -> Unit) ){
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp)
-            .verticalScroll(scrollState)
-    ) {
-        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 8.dp), horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-
-            PetDetail(petName = "고라파덕", painter = painter, petLevel = "Lv. 2")
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            TodayQuestion(questionNumber = "Q4. ", questionContent = "오늘 점심 뭐 드셨나요?")
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            ReplyQuestionButton(
-                buttonWidth = 120, buttonHeight = 40, fontSize = 20,
-                label = "답변 하기"
-            )
-        }
-
-        Spacer(modifier = Modifier.height(36.dp))
-
-        LastQuestionHeader(){
-            navController.navigate(OurHomeScreens.QuestionListScreen.name)
-        }
-
-        QuestionLazyColumn(Modifier.height(260.dp))
-
-        Spacer(modifier = Modifier.height(12.dp))
-    }
+                .padding(top = 16.dp), horizontalAlignment = Alignment.CenterHorizontally,
+        content = content
+    )
 }
 
 /** 오늘의 질문 내용 **/
@@ -104,27 +131,39 @@ private fun TodayQuestion(questionNumber: String, questionContent: String) {
     )
 }
 
-/** 펫 정보 (이름, 이미지, 레벨) **/
+/** 펫 정보 (이름, 이미지, 레벨), 클릭 시 펫 상헤 화면 이동 **/
 @Composable
-private fun PetDetail(petName: String, painter: AsyncImagePainter, petLevel: String) {
-    Text(
-        text = petName,
-        fontFamily = nanum,
-        fontWeight = FontWeight.Bold,
-        fontSize = 20.sp
-    )
+fun PetSemiDetail(petName: String, painter: AsyncImagePainter, petLevel: String, onClick: () -> Unit = {}) {
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        .clickable {
+            onClick.invoke()
+        }, horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(
+            text = petName,
+            fontFamily = nanum,
+            fontWeight = FontWeight.Bold,
+            fontSize = 20.sp
+        )
 
-    Image(
-        modifier = Modifier.size(250.dp),
-        painter = painter,
-        contentDescription = "펫 이미지"
-    )
-    Text(
-        text = petLevel,
-        fontFamily = nanum,
-        fontWeight = FontWeight.Bold,
-        fontSize = 16.sp
-    )
+        Spacer(modifier = Modifier.height(4.dp))
+
+        Image(
+            modifier = Modifier.size(250.dp),
+            painter = painter,
+            contentDescription = "펫 이미지"
+        )
+
+        Spacer(modifier = Modifier.height(4.dp))
+
+        Text(
+            text = petLevel,
+            fontFamily = nanum,
+            fontWeight = FontWeight.Bold,
+            fontSize = 16.sp
+        )
+    }
+
 }
 
 /** 지난 질문 헤더 **/

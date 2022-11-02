@@ -8,9 +8,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navArgument
 import com.ssafy.ourhome.screens.NextScreen
 import com.ssafy.ourhome.screens.album.AlbumScreen
+import com.ssafy.ourhome.screens.chat.ChatScreen
 import com.ssafy.ourhome.screens.home.HomeScreen
 import com.ssafy.ourhome.screens.userpage.MyPageScreen
 import com.ssafy.ourhome.screens.login.LoginScreen
+import com.ssafy.ourhome.screens.login.join.EnterHomeScreen
 import com.ssafy.ourhome.screens.login.join.JoinEmailScreen
 import com.ssafy.ourhome.screens.login.join.JoinNickNameScreen
 import com.ssafy.ourhome.screens.login.join.JoinPasswordScreen
@@ -69,6 +71,10 @@ fun OurHomeNavGraph(navController: NavHostController) {
             PetDetailScreen(navController = navController)
         }
 
+        composable(OurHomeScreens.ChatScreen.name){
+            ChatScreen(navController = navController)
+        }
+
         composable(
             "${OurHomeScreens.JoinNickNameScreen.name}/{prev_type}",
             arguments = listOf(navArgument("prev_type") {
@@ -87,6 +93,10 @@ fun OurHomeNavGraph(navController: NavHostController) {
 
         composable(OurHomeScreens.ManageFamilyScreen.name){
             ManageFamilyScreen(navController = navController)
+        }
+
+        composable(OurHomeScreens.EnterHomeScreen.name) {
+            EnterHomeScreen(navController = navController)
         }
     }
 }
