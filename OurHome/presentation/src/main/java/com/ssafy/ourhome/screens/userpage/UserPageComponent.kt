@@ -35,9 +35,11 @@ fun UserColorCardList() {
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        BirthDayCard("1997.12.14")
-        BloodTypeCard(content = "Rh+ O")
-        MBTICard("ENFP")
+        BirthDayCard(cardModifier = Modifier.weight(1f), content ="1997.12.14")
+        Spacer(modifier = Modifier.width(12.dp))
+        BloodTypeCard(cardModifier = Modifier.weight(1f), content = "Rh+ O")
+        Spacer(modifier = Modifier.width(12.dp))
+        MBTICard(cardModifier = Modifier.weight(1f), content ="ENFP")
     }
 }
 
@@ -88,6 +90,7 @@ fun UserCommonCardList(
 
 @Composable
 fun BirthDayCard(
+    cardModifier: Modifier = Modifier,
     content: String,
 ) {
     val year = content.split(".")[0]
@@ -110,7 +113,7 @@ fun BirthDayCard(
 
 
     Card(
-        modifier = Modifier
+        modifier = cardModifier
             .size(110.dp)
             .clip(RoundedCornerShape(8.dp)),
         backgroundColor = BirthDayColor
@@ -169,13 +172,14 @@ fun BirthDayCard(
 
 @Composable
 fun BloodTypeCard(
+    cardModifier: Modifier = Modifier,
     content: String
 ) {
 
     val rh = content.split(" ")[0]
     val type = content.split(" ")[1]
     Card(
-        modifier = Modifier
+        modifier = cardModifier
             .size(110.dp)
             .clip(RoundedCornerShape(8.dp)),
         backgroundColor = BloodTypeColor
@@ -228,10 +232,11 @@ fun BloodTypeCard(
 
 @Composable
 fun MBTICard(
+    cardModifier: Modifier = Modifier,
     content: String,
 ) {
     Card(
-        modifier = Modifier
+        modifier = cardModifier
             .size(110.dp)
             .clip(RoundedCornerShape(8.dp)),
         backgroundColor = MBTIColor
