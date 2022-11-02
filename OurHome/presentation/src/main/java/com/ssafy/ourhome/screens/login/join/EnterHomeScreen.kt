@@ -4,14 +4,14 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
@@ -20,14 +20,22 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import com.ssafy.ourhome.R
+import com.ssafy.ourhome.components.RoundedButton
+import com.ssafy.ourhome.components.TextInput
 import com.ssafy.ourhome.navigation.BottomNavItem
 import com.ssafy.ourhome.ui.theme.MainColor
 import com.ssafy.ourhome.ui.theme.OurHomeTheme
 
 @Composable
 fun EnterHomeScreen(navController: NavController) {
+
+    val visibleState = remember {
+        mutableStateOf(false)
+    }
+
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = Color.LightGray
@@ -59,7 +67,82 @@ fun EnterHomeScreen(navController: NavController) {
                 backgroundColor = MainColor
             ) {
                 // todo: 우리 집 코드 입력 다이얼로그 생성
+                visibleState.value = true
             }
+        }
+
+        /** 참여코드 다이얼로그 창 */
+        if (visibleState.value) {
+            EnterDialog(onDismissRequest = { visibleState.value = false }) {
+                // todo: 입주하기 버튼 클릭
+                navController.navigate(BottomNavItem.Home.screenRoute)
+            }
+        }
+    }
+}
+
+/** 참여코드 다이얼로그 창 */
+@Composable
+fun EnterDialog(
+    onDismissRequest: () -> Unit = {},
+    onEnterClick: (String) -> Unit = {}
+) {
+
+    Dialog(
+        onDismissRequest = onDismissRequest
+    ) {
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight(),
+            shape = RoundedCornerShape(16.dp),
+            color = Color.White
+        ) {
+            /** 참여코드 다이얼로그 내용 */
+            DialogContent(onEnterClick, onDismissRequest)
+        }
+    }
+}
+
+/** 참여코드 다이얼로그 내용 */
+@Composable
+fun DialogContent(onEnterClick: (String) -> Unit, onDismissRequest: () -> Unit) {
+
+    val codeState = remember {
+        mutableStateOf("")
+    }
+
+    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(16.dp)) {
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            /** 다이얼로그 헤더 */
+            Text(text = "우리집 코드를\n입력해주세요", style = MaterialTheme.typography.h5)
+
+            /** 다이얼로그 닫기 버튼 */
+            Icon(
+                modifier = Modifier
+                    .offset(y = 10.dp)
+                    .clickable { onDismissRequest() },
+                imageVector = Icons.Default.Close,
+                contentDescription = "close"
+            )
+        }
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        /** 참여코드 입력창 */
+        TextInput(valueState = codeState, labelId = "코드", enabled = true)
+
+        Spacer(modifier = Modifier.height(60.dp))
+
+        /** 입주하기 버튼 */
+        RoundedButton(modifier = Modifier.fillMaxWidth(), label = "입주하기") {
+            onEnterClick(codeState.value)
         }
     }
 }
