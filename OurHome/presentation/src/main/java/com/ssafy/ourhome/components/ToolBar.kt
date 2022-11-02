@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun MainAppBar(
-    title: String = "타이틀",
+    title: String,
     backIconEnable: Boolean = true,
     icon: Painter? = null,
     onBackClick: () -> Unit = {},

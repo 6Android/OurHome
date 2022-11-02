@@ -9,11 +9,11 @@ import androidx.navigation.compose.navArgument
 import com.ssafy.ourhome.screens.NextScreen
 import com.ssafy.ourhome.screens.album.AlbumScreen
 import com.ssafy.ourhome.screens.home.HomeScreen
+import com.ssafy.ourhome.screens.userpage.MyPageScreen
 import com.ssafy.ourhome.screens.login.LoginScreen
 import com.ssafy.ourhome.screens.login.join.JoinEmailScreen
 import com.ssafy.ourhome.screens.login.join.JoinNickNameScreen
 import com.ssafy.ourhome.screens.login.join.JoinPasswordScreen
-import com.ssafy.ourhome.screens.mypage.MyPageScreen
 import com.ssafy.ourhome.screens.question.QuestionDetailScreen
 import com.ssafy.ourhome.screens.question.QuestionListScreen
 import com.ssafy.ourhome.screens.question.QuestionScreen
