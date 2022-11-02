@@ -12,7 +12,8 @@ enum class OurHomeScreens {
     QuestionListScreen,
     PetDetailScreen,
     QuestionDetailScreen,
-    ChatScreen;
+    ChatScreen,
+    EnterHomeScreen;
 
     companion object {
         fun fromRoute(route: String?): OurHomeScreens = when (route?.substringBefore("/")) {
@@ -25,6 +26,7 @@ enum class OurHomeScreens {
             PetDetailScreen.name -> PetDetailScreen
             QuestionDetailScreen.name -> QuestionDetailScreen
             ChatScreen.name -> ChatScreen
+            EnterHomeScreen.name -> EnterHomeScreen
 
             else -> throw IllegalStateException("Route $route is not recognized")
         }

@@ -16,6 +16,7 @@ import androidx.navigation.NavController
 import com.ssafy.ourhome.components.MainAppBar
 import com.ssafy.ourhome.components.TextInput
 import com.ssafy.ourhome.navigation.BottomNavItem
+import com.ssafy.ourhome.navigation.OurHomeScreens
 import com.ssafy.ourhome.utils.JOIN_PASSWORD
 
 @Composable
@@ -72,5 +73,5 @@ fun JoinNickNameScreen(
 }
 
 fun navigateToHomeScreen(navController: NavController) {
-    navController.navigate(BottomNavItem.Home.screenRoute)
+    navController.navigate(OurHomeScreens.EnterHomeScreen.name)
 }

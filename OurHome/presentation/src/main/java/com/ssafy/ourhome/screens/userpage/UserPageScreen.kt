@@ -4,33 +4,42 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.ssafy.ourhome.components.MainAppBar
+import com.ssafy.ourhome.components.OurHomeSurface
 import com.ssafy.ourhome.ui.theme.OurHomeTheme
 import com.ssafy.ourhome.utils.SETTING_ICON
 
 @Composable
-fun UserPageScreen(navController: NavController){
-    Your()
-}
+fun UserPageScreen(navController: NavController = NavController(LocalContext.current)){
+    val scrollState = rememberScrollState()
 
-@Preview(showBackground = true)
-@Composable
-private fun Your(){
-    OurHomeTheme {
-        Column() {
-            MainAppBar(
-                title = "유저 페이지",
-                backIconEnable = false,
-                icon = painterResource(id = SETTING_ICON)
-            )
+    Scaffold(topBar = {
+        MainAppBar(
+            title = "상대방 페이지",
+            backIconEnable = true,
+            icon = painterResource(id = SETTING_ICON),
+            onBackClick = {
+                navController.popBackStack()
+            }
+        )
+    }) {
+
+        // TODO : 데이터 통신
+        OurHomeSurface {
             Column(
-                modifier = Modifier.padding(horizontal = 16.dp)
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .verticalScroll(scrollState)
             ) {
                 Spacer(modifier = Modifier.padding(top = 16.dp))
                 UserInfoCard(
@@ -48,5 +57,13 @@ private fun Your(){
                 UserCommonCardList("안드로이드 개발자", "운동", "달리기")
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun UserPagePreview(){
+    OurHomeTheme {
+        UserPageScreen()
     }
 }
