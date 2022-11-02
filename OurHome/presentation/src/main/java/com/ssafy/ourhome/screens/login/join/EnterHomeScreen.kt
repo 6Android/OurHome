@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import com.ssafy.ourhome.R
+import com.ssafy.ourhome.components.OurHomeSurface
 import com.ssafy.ourhome.components.RoundedButton
 import com.ssafy.ourhome.components.TextInput
 import com.ssafy.ourhome.navigation.BottomNavItem
@@ -36,12 +37,11 @@ fun EnterHomeScreen(navController: NavController) {
         mutableStateOf(false)
     }
 
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = Color.LightGray
-    ) {
+    OurHomeSurface {
         Column(
-            modifier = Modifier.padding(32.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(32.dp),
             verticalArrangement = Arrangement.SpaceEvenly
         ) {
             /** 우리 집 생성 카드 */
