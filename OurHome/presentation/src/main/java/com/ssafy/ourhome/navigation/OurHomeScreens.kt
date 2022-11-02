@@ -12,6 +12,8 @@ enum class OurHomeScreens {
     QuestionListScreen,
     PetDetailScreen,
     QuestionDetailScreen,
+    SettingScreen,
+    ManageFamilyScreen,
     ChatScreen,
     EnterHomeScreen;
 
@@ -25,9 +27,10 @@ enum class OurHomeScreens {
             QuestionListScreen.name -> QuestionListScreen
             PetDetailScreen.name -> PetDetailScreen
             QuestionDetailScreen.name -> QuestionDetailScreen
+            SettingScreen.name -> SettingScreen
+            ManageFamilyScreen.name -> ManageFamilyScreen
             ChatScreen.name -> ChatScreen
             EnterHomeScreen.name -> EnterHomeScreen
-
             else -> throw IllegalStateException("Route $route is not recognized")
         }
     }

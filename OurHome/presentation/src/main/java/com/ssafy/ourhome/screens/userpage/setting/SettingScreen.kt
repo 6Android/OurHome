@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.ssafy.ourhome.components.MainAppBar
 import com.ssafy.ourhome.components.OurHomeSurface
+import com.ssafy.ourhome.navigation.OurHomeScreens
 import com.ssafy.ourhome.ui.theme.MainColor
 import com.ssafy.ourhome.ui.theme.OurHomeTheme
 
@@ -40,14 +41,14 @@ fun SettingScreen(navController: NavController = NavController(LocalContext.curr
         OurHomeSurface() {
             Column(
                 modifier = Modifier
-                    .padding(horizontal = 16.dp)
+                    .padding(horizontal = 24.dp)
                     .verticalScroll(scrollState)
             ) {
                 Spacer(modifier = Modifier.height(20.dp))
                 TextWithSwitch(title = "위치 공유 허용", isChecked = switchChecked)
 
                 Spacer(modifier = Modifier.height(42.dp))
-                OurHomeSetting(code = "4FJK2L")
+                OurHomeSetting(code = "4FJK2L",navController)
 
                 Spacer(modifier = Modifier.height(42.dp))
                 Support()
@@ -57,7 +58,7 @@ fun SettingScreen(navController: NavController = NavController(LocalContext.curr
 
                 }
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(32.dp))
                 ClickableText("회원탈퇴"){
 
                 }
@@ -68,7 +69,8 @@ fun SettingScreen(navController: NavController = NavController(LocalContext.curr
 
 @Composable
 private fun OurHomeSetting(
-    code: String
+    code: String,
+    navController: NavController
 ){
     TextHeader(title = "가족 설정")
     Spacer(modifier = Modifier.height(26.dp))
@@ -80,11 +82,11 @@ private fun OurHomeSetting(
         TextWithCode(title = "우리집 코드", code = code) {
 
         }
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(32.dp))
         TextWithNext(title = "가족 관리") {
-
+            navController.navigate(OurHomeScreens.ManageFamilyScreen.name)
         }
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(32.dp))
         TextWithNext(title = "가족 끊기") {
 
         }
@@ -117,7 +119,7 @@ private fun Support(){
         TextWithNext(title = "이용 약관") {
 
         }
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(32.dp))
         TextWithNext(title = "문의 보내기") {
 
         }

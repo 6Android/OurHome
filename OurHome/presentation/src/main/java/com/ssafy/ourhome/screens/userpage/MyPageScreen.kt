@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.ssafy.ourhome.components.MainAppBar
 import com.ssafy.ourhome.components.OurHomeSurface
+import com.ssafy.ourhome.navigation.OurHomeScreens
 import com.ssafy.ourhome.ui.theme.OurHomeTheme
 import com.ssafy.ourhome.utils.SETTING_ICON
 
@@ -26,7 +27,10 @@ fun MyPageScreen(navController: NavController = NavController(LocalContext.curre
         MainAppBar(
             title = "마이페이지",
             backIconEnable = false,
-            icon = painterResource(id = SETTING_ICON)
+            icon = painterResource(id = SETTING_ICON),
+            onIconClick = {
+                navController.navigate(OurHomeScreens.SettingScreen.name)
+            }
         )
     }) {
 
