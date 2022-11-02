@@ -68,8 +68,10 @@ fun QuestionScreen(navController: NavController) {
 
                     ReplyQuestionButton(
                         buttonWidth = 120, buttonHeight = 40, fontSize = 20,
-                        label = "답변 하기"
-                    )
+                        label = "답변 하기",
+                        onClick = {
+                            navigateQuestionDetailScreen(navController)
+                    })
                 }
 
                 Spacer(modifier = Modifier.height(36.dp))
@@ -85,6 +87,10 @@ fun QuestionScreen(navController: NavController) {
         }
     }
 
+}
+
+fun navigateQuestionDetailScreen(navController: NavController){
+    navController.navigate(OurHomeScreens.QuestionDetailScreen.name)
 }
 
 /** 채팅 스크린 이동 **/
@@ -105,7 +111,7 @@ fun CenterHorizontalColumn(content : @Composable() (ColumnScope.() -> Unit) ){
 
 /** 오늘의 질문 내용 **/
 @Composable
-private fun TodayQuestion(questionNumber: String, questionContent: String) {
+fun TodayQuestion(questionNumber: String, questionContent: String) {
     Text(
         buildAnnotatedString {
             withStyle(

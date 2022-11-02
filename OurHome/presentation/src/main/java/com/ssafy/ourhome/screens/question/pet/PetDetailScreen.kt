@@ -92,7 +92,7 @@ fun PetDetailScreen(navController: NavController) {
 /** 가족 경험치 기여도 정보 리스트 **/
 @Composable
 fun FamilyExpLazyRow(familyContributeList: PieChartData){
-    LazyRow(modifier = Modifier){
+    LazyRow{
         items(familyContributeList.slices.size){
             FamilyExpLazyRowItem(familyContributeList.slices.get(it))
         }
