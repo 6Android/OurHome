@@ -11,6 +11,7 @@ import com.ssafy.ourhome.screens.album.AlbumScreen
 import com.ssafy.ourhome.screens.home.HomeScreen
 import com.ssafy.ourhome.screens.userpage.MyPageScreen
 import com.ssafy.ourhome.screens.login.LoginScreen
+import com.ssafy.ourhome.screens.login.join.EnterHomeScreen
 import com.ssafy.ourhome.screens.login.join.JoinEmailScreen
 import com.ssafy.ourhome.screens.login.join.JoinNickNameScreen
 import com.ssafy.ourhome.screens.login.join.JoinPasswordScreen
@@ -77,6 +78,10 @@ fun OurHomeNavGraph(navController: NavHostController) {
 
                 JoinNickNameScreen(navController = navController, prev_type = it.toString())
             }
+        }
+
+        composable(OurHomeScreens.EnterHomeScreen.name) {
+            EnterHomeScreen(navController = navController)
         }
     }
 }
