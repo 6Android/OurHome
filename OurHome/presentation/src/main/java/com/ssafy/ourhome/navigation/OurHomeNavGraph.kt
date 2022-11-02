@@ -8,6 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navArgument
 import com.ssafy.ourhome.screens.NextScreen
 import com.ssafy.ourhome.screens.album.AlbumScreen
+import com.ssafy.ourhome.screens.chat.ChatScreen
 import com.ssafy.ourhome.screens.home.HomeScreen
 import com.ssafy.ourhome.screens.userpage.MyPageScreen
 import com.ssafy.ourhome.screens.login.LoginScreen
@@ -65,6 +66,10 @@ fun OurHomeNavGraph(navController: NavHostController) {
 
         composable(OurHomeScreens.PetDetailScreen.name){
             PetDetailScreen(navController = navController)
+        }
+
+        composable(OurHomeScreens.ChatScreen.name){
+            ChatScreen(navController = navController)
         }
 
         composable(
