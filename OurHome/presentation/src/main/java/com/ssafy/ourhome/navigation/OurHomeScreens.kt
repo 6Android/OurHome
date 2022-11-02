@@ -12,6 +12,7 @@ enum class OurHomeScreens {
     QuestionListScreen,
     PetDetailScreen,
     QuestionDetailScreen,
+    ChatScreen,
     EnterHomeScreen;
 
     companion object {
@@ -24,6 +25,7 @@ enum class OurHomeScreens {
             QuestionListScreen.name -> QuestionListScreen
             PetDetailScreen.name -> PetDetailScreen
             QuestionDetailScreen.name -> QuestionDetailScreen
+            ChatScreen.name -> ChatScreen
             EnterHomeScreen.name -> EnterHomeScreen
 
             else -> throw IllegalStateException("Route $route is not recognized")
