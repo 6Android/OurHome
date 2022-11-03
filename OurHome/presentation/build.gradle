@@ -84,4 +84,7 @@ dependencies {
 
     // The compose calendar library
     implementation 'com.kizitonwose.calendar:compose:2.0.1'
+
+    // BottomSheetDialog-Compose
+    implementation "com.holix.android:bottomsheetdialog-compose:1.0.2"
 }

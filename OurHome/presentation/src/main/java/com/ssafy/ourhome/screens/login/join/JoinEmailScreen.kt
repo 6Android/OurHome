@@ -3,17 +3,18 @@ package com.ssafy.ourhome.screens.login.join
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.ssafy.ourhome.components.EmailInput
 import com.ssafy.ourhome.components.MainAppBar
+import com.ssafy.ourhome.components.OurHomeSurface
 import com.ssafy.ourhome.navigation.OurHomeScreens
 
 @Composable
@@ -23,7 +24,10 @@ fun JoinEmailScreen(navController: NavController = NavController(LocalContext.cu
         mutableStateOf("")
     }
 
-    Surface(modifier = Modifier.fillMaxSize()) {
+    OurHomeSurface(
+//        contentAlignment = Alignment.BottomCenter
+    ) {
+        //Surface(modifier = Modifier.fillMaxSize().background(Color.Transparent)) {
         Column(modifier = Modifier.fillMaxHeight()) {
 
             /** 툴바 */

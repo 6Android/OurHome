@@ -5,6 +5,7 @@ import android.util.Log
 import android.util.Log.d
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -32,14 +33,17 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.LiveData
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
+import com.holix.android.bottomsheetdialog.compose.BottomSheetDialog
+import com.holix.android.bottomsheetdialog.compose.BottomSheetDialogProperties
 import com.kizitonwose.calendar.compose.CalendarState
 import com.kizitonwose.calendar.compose.HorizontalCalendar
 import com.kizitonwose.calendar.compose.rememberCalendarState
 import com.kizitonwose.calendar.core.*
 import com.ssafy.ourhome.R
 import com.ssafy.ourhome.components.OurHomeSurface
-import com.ssafy.ourhome.ui.theme.MainColor
-import com.ssafy.ourhome.ui.theme.OurHomeTheme
+import com.ssafy.ourhome.ui.theme.*
+import com.ssafy.ourhome.utils.Schedule
+import com.ssafy.ourhome.utils.getSchedules
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
@@ -58,6 +62,9 @@ data class Person(
 fun HomeScreen(navController: NavController) {
 
     val scrollState = rememberScrollState()
+    val visibleBottomSheetState = remember {
+        mutableStateOf(false)
+    }
 
     /** 더미 데이터 */
     val url =
@@ -137,11 +144,15 @@ fun HomeScreen(navController: NavController) {
                 Spacer(modifier = Modifier.height(16.dp))
 
                 /** 달력 카드 */
-                CalendarCard(onAddScheduleClick = {
-                    // todo: 일정 추가 버튼 클릭
-                })
+                CalendarCard(visibleBottomSheetState = visibleBottomSheetState)
 
                 Spacer(modifier = Modifier.height(16.dp))
+
+                if(visibleBottomSheetState.value) {
+                    BottomSheet {
+                        visibleBottomSheetState.value = false
+                    }
+                }
             }
         }
     }
@@ -287,16 +298,87 @@ fun HomeCard(
     }
 }
 
+/** */
+@Composable
+fun BottomSheet(onDismissRequest : () -> Unit) {
+    BottomSheetDialog(
+        onDismissRequest = {
+            onDismissRequest()
+        },
+        properties = BottomSheetDialogProperties( )
+    ) {
+        // content
+        Surface(
+            modifier = Modifier.background(Color.White).padding(16.dp),
+            shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
+        ) {
+            TodayScheduleList()
+        }
+    }
+}
+
+/** 오늘 일정 리스트  **/
+@Composable
+fun TodayScheduleList(modifier: Modifier = Modifier, size: Int = 3) {
+    LazyColumn(modifier = modifier) {
+        items(size) {
+            TodayScheduleListItem()
+        }
+    }
+}
+
+/** 오늘 일정 리스트 아이템 **/
+@Composable
+fun TodayScheduleListItem(modifier: Modifier = Modifier.fillMaxWidth()) {
+    Card(
+        modifier = modifier.padding(vertical = 8.dp), elevation = 4.dp
+    ) {
+        Column(
+            modifier = modifier
+        ) {
+            Row(
+                modifier = modifier
+                    .padding(12.dp)
+            ) {
+                Image(
+                    modifier = Modifier.size(12.dp),
+                    painter = painterResource(id = R.drawable.img_calendar_circle),
+                    contentDescription = ""
+                )
+
+                Text(
+                    modifier = Modifier.padding(start = 8.dp),
+                    text = "2022.10.22",
+                    fontFamily = nanum,
+                    color = Gray,
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 12.sp
+                )
+            }
+
+            Text(
+                modifier = modifier
+                    .padding(start = 12.dp, bottom = 16.dp),
+                text = "Q3. 가족들에게 당신은 어떤 존재인가요?",
+                fontFamily = nanum,
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp
+            )
+        }
+    }
+
+}
+
 /** 달력 카드 */
 @Composable
 fun CalendarCard(
     modifier: Modifier = Modifier,
-    onAddScheduleClick: () -> Unit,
+    visibleBottomSheetState: MutableState<Boolean>
 ) {
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .height(480.dp)
+            .height(430.dp)
             .shadow(elevation = 2.dp, shape = RoundedCornerShape(16.dp))
     ) {
         Column(
@@ -305,7 +387,7 @@ fun CalendarCard(
         ) {
             Spacer(modifier = Modifier.height(16.dp))
             /** 달력 */
-            Calendar()
+            Calendar(visibleBottomSheetState)
 
             /**
             todo
@@ -322,7 +404,9 @@ fun CalendarCard(
 /** 달력 */
 @SuppressLint("UnrememberedMutableState")
 @Composable
-fun Calendar() {
+fun Calendar(
+    visibleBottomSheetState: MutableState<Boolean>
+) {
     val currentMonth = remember { YearMonth.now() }
     val startMonth = remember { currentMonth.minusMonths(500) } // Adjust as needed
     val endMonth = remember { currentMonth.plusMonths(500) } // Adjust as needed
@@ -337,8 +421,16 @@ fun Calendar() {
     )
     val coroutineScope = rememberCoroutineScope()
     val visibleMonth = rememberFirstVisibleMonthAfterScroll(state)
-    LaunchedEffect(visibleMonth) {
-        selection = null
+
+    // 달력 스크롤 시 이전에 선택한 날짜 초기화
+//    LaunchedEffect(visibleMonth) {
+//        selection = null
+//    }
+
+    val map = mutableMapOf<String, List<Schedule>>()
+
+    visibleMonth.let {
+        map.putAll(getSchedules(it).groupBy { schedule -> schedule.date })
     }
 
     CalendarTitle(
@@ -359,8 +451,13 @@ fun Calendar() {
     HorizontalCalendar(
         state = state,
         dayContent = { day ->
-            Day(day, isSelected = selection == day) { clickedDay ->
+            Day(
+                day = day,
+                isSelected = selection == day,
+                hasSchedule = map.containsKey("${day.date.year}-${day.date.monthValue}-${day.date.dayOfMonth}"),
+            ) { clickedDay ->
                 selection = clickedDay
+                visibleBottomSheetState.value = true
             }
         },
         monthHeader = {
@@ -441,7 +538,12 @@ fun DaysOfWeekTitle(daysOfWeek: List<DayOfWeek>) {
 
 /** 일 */
 @Composable
-fun Day(day: CalendarDay, isSelected: Boolean, onClick: (CalendarDay) -> Unit) {
+fun Day(
+    day: CalendarDay,
+    isSelected: Boolean,
+    hasSchedule: Boolean,
+    onClick: (CalendarDay) -> Unit
+) {
     Box(
         modifier = Modifier
             .aspectRatio(1f)
@@ -453,19 +555,29 @@ fun Day(day: CalendarDay, isSelected: Boolean, onClick: (CalendarDay) -> Unit) {
             ),
         contentAlignment = Alignment.Center
     ) {
-        Text(
-            text = day.date.dayOfMonth.toString(),
-            style = MaterialTheme.typography.body2,
-            color = if (day.position == DayPosition.MonthDate) {
+        val textColor = when (day.position) {
+            DayPosition.MonthDate ->
                 if (isSelected) {
                     Color.White
                 } else {
                     Color.Black
                 }
-            } else {
-                Color.LightGray
-            }
+            else -> Color.LightGray
+        }
+        Text(
+            text = day.date.dayOfMonth.toString(),
+            style = MaterialTheme.typography.body2,
+            color = textColor
         )
+        if (hasSchedule) {
+            Box(
+                modifier = Modifier
+                    .size(5.dp)
+                    .clip(shape = CircleShape)
+                    .background(Green)
+                    .align(alignment = Alignment.BottomCenter)
+            ) {  }
+        }
     }
 }
 
@@ -494,7 +606,7 @@ fun Month.displayText(short: Boolean = true): String {
 }
 
 /**
- Preview
+Preview
  */
 @Preview(showBackground = true)
 @Composable
@@ -503,53 +615,3 @@ fun PreviewHomeScreen() {
         HomeScreen(navController = NavController(LocalContext.current))
     }
 }
-
-
-
-/*
-/** 달력 */
-@SuppressLint("UnrememberedMutableState")
-@Composable
-fun Calendar() {
-    val currentMonth = remember { YearMonth.now() }
-    val startMonth = remember { currentMonth.minusMonths(100) } // Adjust as needed
-    val endMonth = remember { currentMonth.plusMonths(100) } // Adjust as needed
-    //val firstDayOfWeek = remember { firstDayOfWeekFromLocale() } // Available from the library
-    val daysOfWeek = daysOfWeek()
-    var selectedDate by remember { mutableStateOf<LocalDate?>(null) }
-
-    val state = rememberCalendarState(
-        startMonth = startMonth,
-        endMonth = endMonth,
-        firstVisibleMonth = currentMonth,
-        //firstDayOfWeek = firstDayOfWeek
-        firstDayOfWeek = daysOfWeek.first()
-    )
-
-    HorizontalCalendar(
-        state = state,
-        dayContent = { day ->
-            Day(day, isSelected = selectedDate == day.date) { day ->
-                selectedDate = if (selectedDate == day.date) null else day.date
-            }
-        },
-        monthHeader = {
-            DaysOfWeekTitle(daysOfWeek = daysOfWeek)
-        }
-    )
-
-//    Column() {
-//        DaysOfWeekTitle(daysOfWeek)
-//        Spacer(modifier = Modifier.height(16.dp))
-//        HorizontalCalendar(
-//            state = state,
-//            dayContent = { day ->
-//                Day(day, isSelected = selectedDate == day.date) { day ->
-//                    selectedDate = if (selectedDate == day.date) null else day.date
-//                }
-//            }
-//        )
-//    }
-}
-
- */
