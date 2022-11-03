@@ -20,6 +20,8 @@ import com.ssafy.ourhome.screens.question.QuestionDetailScreen
 import com.ssafy.ourhome.screens.question.QuestionListScreen
 import com.ssafy.ourhome.screens.question.QuestionScreen
 import com.ssafy.ourhome.screens.question.pet.PetDetailScreen
+import com.ssafy.ourhome.screens.userpage.setting.ManageFamilyScreen
+import com.ssafy.ourhome.screens.userpage.setting.SettingScreen
 
 
 @Composable
@@ -83,6 +85,14 @@ fun OurHomeNavGraph(navController: NavHostController) {
 
                 JoinNickNameScreen(navController = navController, prev_type = it.toString())
             }
+        }
+
+        composable(OurHomeScreens.SettingScreen.name){
+            SettingScreen(navController = navController)
+        }
+
+        composable(OurHomeScreens.ManageFamilyScreen.name){
+            ManageFamilyScreen(navController = navController)
         }
 
         composable(OurHomeScreens.EnterHomeScreen.name) {
