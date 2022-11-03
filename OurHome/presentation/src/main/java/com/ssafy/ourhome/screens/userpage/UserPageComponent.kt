@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
@@ -35,11 +36,11 @@ fun UserColorCardList() {
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        BirthDayCard(cardModifier = Modifier.weight(1f), content ="1997.12.14")
+        BirthDayCard(cardModifier = Modifier.weight(1f), content = "1997.12.14")
         Spacer(modifier = Modifier.width(12.dp))
         BloodTypeCard(cardModifier = Modifier.weight(1f), content = "Rh+ O")
         Spacer(modifier = Modifier.width(12.dp))
-        MBTICard(cardModifier = Modifier.weight(1f), content ="ENFP")
+        MBTICard(cardModifier = Modifier.weight(1f), content = "ENFP")
     }
 }
 
@@ -52,7 +53,7 @@ fun UserCommonCard(
         modifier = Modifier
             .fillMaxWidth()
             .height(80.dp)
-            .clip(RoundedCornerShape(8.dp)),
+            .shadow(elevation = 2.dp, shape = RoundedCornerShape(8.dp))
     ) {
         Box(
             modifier = Modifier
@@ -115,8 +116,8 @@ fun BirthDayCard(
     Card(
         modifier = cardModifier
             .size(110.dp)
-            .clip(RoundedCornerShape(8.dp)),
-        backgroundColor = BirthDayColor
+            .shadow(elevation = 2.dp, shape = RoundedCornerShape(8.dp)),
+        backgroundColor = BirthDayColor,
     ) {
         Box(
             modifier = Modifier
@@ -181,8 +182,8 @@ fun BloodTypeCard(
     Card(
         modifier = cardModifier
             .size(110.dp)
-            .clip(RoundedCornerShape(8.dp)),
-        backgroundColor = BloodTypeColor
+            .shadow(elevation = 2.dp, shape = RoundedCornerShape(8.dp)),
+        backgroundColor = BloodTypeColor,
     ) {
         Box(
             modifier = Modifier
@@ -238,8 +239,9 @@ fun MBTICard(
     Card(
         modifier = cardModifier
             .size(110.dp)
-            .clip(RoundedCornerShape(8.dp)),
-        backgroundColor = MBTIColor
+            .shadow(elevation = 2.dp, shape = RoundedCornerShape(8.dp)),
+        backgroundColor = MBTIColor,
+
     ) {
         Box(
             modifier = Modifier
@@ -275,7 +277,7 @@ fun UserInfoCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp)),
+            .shadow(elevation = 2.dp, shape = RoundedCornerShape(16.dp)),
         backgroundColor = Color.White
     ) {
         Column(
