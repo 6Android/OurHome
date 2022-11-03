@@ -14,3 +14,4 @@
 .cxx
 local.properties
 /.idea/
+/presentation/src/main/res/values/api_key.xml
