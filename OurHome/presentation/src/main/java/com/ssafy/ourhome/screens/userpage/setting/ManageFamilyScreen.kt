@@ -54,7 +54,8 @@ fun ManageFamilyScreen(navController: NavController = NavController(LocalContext
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 items(items = tmp) { user ->
                     FamilyManageItem(user)
@@ -125,30 +126,11 @@ fun FamilyManageItem(
                     ) {
                         //TODO : 가족 내보내기 클릭이벤트
                     }
-
-//                    Button(
-//                        onClick = {},
-//                        Modifier
-//                            .weight(1f)
-//                            .padding(end = 8.dp)
-//                    ) {
-//                        Text(text = "가족장 위임", style = MaterialTheme.typography.caption)
-//                    }
-//                    Button(
-//                        onClick = {},
-//                        Modifier
-//                            .weight(1f)
-//                            .padding(start = 8.dp),
-//                        colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFD9D9D9), contentColor = Color.Red)
-//                    ) {
-//                        Text(text = "가족 내보내기", style = MaterialTheme.typography.caption)
-//
                 }
             }
 
         }
     }
-    Spacer(modifier = Modifier.height(12.dp))
 }
 
 
