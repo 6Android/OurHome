@@ -13,6 +13,8 @@ val MainColor = Color(0xFFFF924B)
 val Green = Color(0xFF00B383)
 // 회색
 val Gray = Color(0xFF8F8F8F)
+// 밝은 회색
+val LightGray = Color(0xFFECECEC)
 // 남색
 val Black = Color(0xFF222B45)
 
