@@ -22,54 +22,63 @@ val nanum = FontFamily(
 
 // Set of Material typography styles to start with
 val Typography = Typography(
+
+    /** FontWeight는 Normal **/
     h1 = TextStyle(
-        fontFamily = hannar,
+        fontFamily = nanum,
         fontWeight = FontWeight.Normal,
-        fontSize = 96.sp,
+        fontSize = 40.sp,
         letterSpacing = (-1.5).sp
     ),
     h2 = TextStyle(
-        fontFamily = hannar,
+        fontFamily = nanum,
         fontWeight = FontWeight.Normal,
-        fontSize = 60.sp,
+        fontSize = 34.sp,
         letterSpacing = (-0.5).sp
     ),
     h3 = TextStyle(
-        fontFamily = hannar,
+        fontFamily = nanum,
         fontWeight = FontWeight.Normal,
-        fontSize = 48.sp,
+        fontSize = 28.sp,
         letterSpacing = 0.sp
     ),
     h4 = TextStyle(
-        fontFamily = hannar,
+        fontFamily = nanum,
         fontWeight = FontWeight.Normal,
-        fontSize = 34.sp,
+        fontSize = 24.sp,
         letterSpacing = 0.25.sp
     ),
     h5 = TextStyle(
+        fontFamily = nanum,
+        fontWeight = FontWeight.Normal,
+        fontSize = 22.sp,
+        letterSpacing = 0.sp
+    ),
+    h6 = TextStyle(
+        fontFamily = nanum,
+        fontWeight = FontWeight.Normal,
+        fontSize = 18.sp,
+        letterSpacing = 0.15.sp
+    ),
+
+
+
+    /** 한나 **/
+    subtitle1 = TextStyle(
         fontFamily = hannar,
         fontWeight = FontWeight.Normal,
         fontSize = 24.sp,
         letterSpacing = 0.sp
     ),
-    h6 = TextStyle(
+    subtitle2 = TextStyle(
         fontFamily = hannar,
         fontWeight = FontWeight.Normal,
         fontSize = 20.sp,
         letterSpacing = 0.15.sp
     ),
-    subtitle1 = TextStyle(
-        fontFamily = hannar,
-        fontWeight = FontWeight.Normal,
-        fontSize = 16.sp,
-        letterSpacing = 0.15.sp
-    ),
-    subtitle2 = TextStyle(
-        fontFamily = hannar,
-        fontWeight = FontWeight.Normal,
-        fontSize = 14.sp,
-        letterSpacing = 0.1.sp
-    ),
+
+
+
     body1 = TextStyle(
         fontFamily = nanum,
         fontWeight = FontWeight.Normal,
@@ -82,6 +91,8 @@ val Typography = Typography(
         fontSize = 14.sp,
         letterSpacing = 0.25.sp
     ),
+
+
     button = TextStyle(
         fontFamily = nanum,
         fontWeight = FontWeight.Bold,
