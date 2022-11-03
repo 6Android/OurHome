@@ -14,6 +14,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -29,9 +30,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
+import com.kizitonwose.calendar.compose.HorizontalCalendar
+import com.kizitonwose.calendar.compose.rememberCalendarState
+import com.kizitonwose.calendar.core.CalendarDay
+import com.kizitonwose.calendar.core.firstDayOfWeekFromLocale
 import com.ssafy.ourhome.R
 import com.ssafy.ourhome.components.OurHomeSurface
 import com.ssafy.ourhome.ui.theme.OurHomeTheme
+import java.time.YearMonth
 
 
 data class Person(
@@ -81,10 +87,11 @@ fun HomeScreen(navController: NavController) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(16.dp)
+                    .padding(horizontal = 16.dp)
                     .verticalScroll(scrollState),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
+                Spacer(modifier = Modifier.height(16.dp))
                 Row(
                     modifier = Modifier
                         .fillMaxWidth(),
@@ -123,6 +130,8 @@ fun HomeScreen(navController: NavController) {
                 CalendarCard(onAddScheduleClick = {
                     // todo: 일정 추가 버튼 클릭
                 })
+
+                Spacer(modifier = Modifier.height(16.dp))
             }
         }
     }
@@ -302,7 +311,58 @@ fun CalendarCard(
             }
 
             Spacer(modifier = Modifier.height(12.dp))
+
+            /** 달력 */
+            Calendar()
+
+            /**
+            todo
+            월화수목 금토일 넣기
+            오늘 날짜 표시하기 (2022년 10월)
+            < > 버튼 누르면 달력 이동
+            날짜 누르면 바텀sheet으로 해당하는 날짜의 일정 뜸
+            이번달 일 색만 검은색 나머지는 회색
+             */
         }
+    }
+}
+
+/** 달력 */
+@Composable
+fun Calendar() {
+    val currentMonth = remember { YearMonth.now() }
+    val startMonth = remember { currentMonth.minusMonths(100) } // Adjust as needed
+    val endMonth = remember { currentMonth.plusMonths(100) } // Adjust as needed
+    val firstDayOfWeek = remember { firstDayOfWeekFromLocale() } // Available from the library
+
+    val state = rememberCalendarState(
+        startMonth = startMonth,
+        endMonth = endMonth,
+        firstVisibleMonth = currentMonth,
+        firstDayOfWeek = firstDayOfWeek
+    )
+
+    HorizontalCalendar(
+        state = state,
+        dayContent = { Day(it) }
+    )
+
+//    If you need a vertical calendar.
+//    VerticalCalendar(
+//        state = state,
+//        dayContent = { Day(it) }
+//    )
+}
+
+/** 일 */
+@Composable
+fun Day(day: CalendarDay) {
+    Box(
+        modifier = Modifier
+            .aspectRatio(1f), // This is important for square sizing!
+        contentAlignment = Alignment.Center
+    ) {
+        Text(text = day.date.dayOfMonth.toString(), style = MaterialTheme.typography.body2)
     }
 }
 

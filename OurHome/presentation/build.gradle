@@ -81,4 +81,7 @@ dependencies {
 
     //material icons - use with caution!
     implementation "androidx.compose.material:material-icons-extended:$compose_ui_version"
+
+    // The compose calendar library
+    implementation 'com.kizitonwose.calendar:compose:2.0.1'
 }
