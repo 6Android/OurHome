@@ -121,7 +121,7 @@ fun DialogContent(onEnterClick: (String) -> Unit, onDismissRequest: () -> Unit) 
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             /** 다이얼로그 헤더 */
-            Text(text = "우리집 코드를\n입력해주세요", style = MaterialTheme.typography.h5)
+            Text(text = "우리집 코드를\n입력해주세요", style = MaterialTheme.typography.subtitle1)
 
             /** 다이얼로그 닫기 버튼 */
             Icon(
@@ -171,11 +171,11 @@ fun EnterHomeCard(
                 .fillMaxWidth()
                 .padding(24.dp)
         ) {
-            Text(text = title, style = MaterialTheme.typography.h5.copy(color = titleColor))
+            Text(text = title, style = MaterialTheme.typography.subtitle1.copy(color = titleColor))
             Spacer(modifier = Modifier.height(12.dp))
             Text(
                 text = content,
-                style = MaterialTheme.typography.body1.copy(
+                style = MaterialTheme.typography.body2.copy(
                     color = contentColor,
                     lineHeight = 24.sp
                 )

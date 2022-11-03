@@ -45,7 +45,7 @@ fun JoinNickNameScreen(
                 Text(
                     modifier = Modifier.padding(start = 10.dp),
                     text = "닉네임을 입력해주세요!",
-                    style = MaterialTheme.typography.h5
+                    style = MaterialTheme.typography.subtitle1
                 )
 
                 Spacer(modifier = Modifier.height(48.dp))

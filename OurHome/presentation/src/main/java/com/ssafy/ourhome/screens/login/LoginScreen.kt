@@ -138,7 +138,7 @@ private fun Login(
             .fillMaxWidth()
             .padding(start = 10.dp),
         text = "로그인",
-        style = MaterialTheme.typography.h5
+        style = MaterialTheme.typography.subtitle1
     )
     EmailInput(emailState = idState, labelId = "아이디", enabled = true)
     PasswordInput(
@@ -174,7 +174,7 @@ private fun Logo() {
     Text(
         text = "가족들과 함께\n추억을 남겨보세요!",
         textAlign = TextAlign.Center,
-        style = MaterialTheme.typography.h6
+        style = MaterialTheme.typography.subtitle2
     )
     Spacer(modifier = Modifier.height(32.dp))
 }

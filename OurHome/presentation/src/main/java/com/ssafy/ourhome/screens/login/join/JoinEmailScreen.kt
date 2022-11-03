@@ -40,7 +40,7 @@ fun JoinEmailScreen(navController: NavController = NavController(LocalContext.cu
                 Text(
                     modifier = Modifier.padding(start = 10.dp),
                     text = "이메일 아이디를\n입력해주세요!",
-                    style = MaterialTheme.typography.h5
+                    style = MaterialTheme.typography.subtitle1
                 )
 
                 Spacer(modifier = Modifier.height(48.dp))

@@ -90,7 +90,8 @@ fun HomeScreen(navController: NavController) {
                         .fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    // todo: 가족위치
+
+                    /** 가족위치 카드 */
                     HomeCard(
                         modifier = Modifier.weight(1f),
                         title = "가족위치",
@@ -99,12 +100,12 @@ fun HomeScreen(navController: NavController) {
                             id = R.drawable.ic_map
                         )
                     ) {
-
+                        // todo: 가족위치 클릭
                     }
 
                     Spacer(modifier = Modifier.width(16.dp))
 
-                    // todo: 초대하기
+                    /** 초대하기 카드 */
                     HomeCard(
                         modifier = Modifier.weight(1f),
                         title = "초대하기",
@@ -113,12 +114,15 @@ fun HomeScreen(navController: NavController) {
                             id = R.drawable.ic_invite
                         )
                     ) {
-
+                        // todo: 초대하기 클릭
                     }
                 }
                 Spacer(modifier = Modifier.height(16.dp))
-                // todo: 달력
-                CalendarCard(onAddScheduleClick = {})
+
+                /** 달력 카드 */
+                CalendarCard(onAddScheduleClick = {
+                    // todo: 일정 추가 버튼 클릭
+                })
             }
         }
     }
@@ -136,8 +140,11 @@ private fun HomeToolBar(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
+
         /** 로고 */
         Row(verticalAlignment = Alignment.CenterVertically) {
+
+            /** 로고 아이콘 */
             Icon(
                 modifier = Modifier.size(32.dp),
                 imageVector = Icons.Default.Home,
@@ -145,16 +152,20 @@ private fun HomeToolBar(
                 contentDescription = "icon home"
             )
             Spacer(modifier = Modifier.width(8.dp))
+
+            /** 앱 이름 */
             Text(
                 modifier = Modifier.offset(y = (-2).dp),
                 text = "우리집",
-                style = MaterialTheme.typography.h5.copy(color = Color.White)
+                style = MaterialTheme.typography.subtitle1.copy(color = Color.White)
             )
         }
 
         /** 채팅 아이콘 */
         Icon(
-            modifier = Modifier.size(32.dp).clickable { onChatClick() },
+            modifier = Modifier
+                .size(32.dp)
+                .clickable { onChatClick() },
             painter = painterResource(id = R.drawable.ic_chat_white),
             contentDescription = "icon chat",
             tint = Color.White
@@ -186,6 +197,8 @@ private fun PersonList(personList: ArrayList<Person>) {
 @Composable
 private fun PersonListItem(item: Person) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
+
+        /** 프사 */
         Image(
             modifier = Modifier
                 .size(64.dp)
@@ -195,6 +208,8 @@ private fun PersonListItem(item: Person) {
             contentDescription = "Profile Image"
         )
         Spacer(modifier = Modifier.height(12.dp))
+
+        /** 이름 */
         Text(
             text = item.name,
             style = MaterialTheme.typography.caption.copy(
@@ -224,22 +239,27 @@ fun HomeCard(
             modifier = Modifier
                 .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
         ) {
-            Text(text = title, style = MaterialTheme.typography.h6)
+            /** 헤더 */
+            Text(text = title, style = MaterialTheme.typography.subtitle2)
             Spacer(modifier = Modifier.height(12.dp))
+
+            /** 내용 */
             Text(
                 text = content,
                 style = MaterialTheme.typography.body2.copy(
-                    lineHeight = 24.sp,
+                    lineHeight = 20.sp,
                     color = Color.Gray
                 )
             )
             Spacer(modifier = Modifier.height(16.dp))
+
+            /** 아이콘 */
             Box(
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.BottomEnd
             ) {
                 Image(
-                    modifier = Modifier.size(48.dp),
+                    modifier = Modifier.size(40.dp),
                     painter = image,
                     contentDescription = "logo"
                 )
@@ -248,6 +268,7 @@ fun HomeCard(
     }
 }
 
+/** 달력 카드 */
 @Composable
 fun CalendarCard(
     modifier: Modifier = Modifier,
@@ -267,9 +288,15 @@ fun CalendarCard(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(text = "공유 일정", style = MaterialTheme.typography.h6)
+
+                /** 헤더 */
+                Text(text = "공유 일정", style = MaterialTheme.typography.subtitle2)
+
+                /** 일정 추가 아이콘 */
                 Icon(
-                    modifier = Modifier.size(32.dp).clickable { onAddScheduleClick() },
+                    modifier = Modifier
+                        .size(32.dp)
+                        .clickable { onAddScheduleClick() },
                     imageVector = Icons.Default.Add, contentDescription = "일정 추가"
                 )
             }
