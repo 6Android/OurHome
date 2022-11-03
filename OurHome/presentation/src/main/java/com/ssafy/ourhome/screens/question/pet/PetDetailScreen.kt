@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -57,6 +58,9 @@ fun PetDetailScreen(navController: NavController) {
                     .padding(horizontal = 16.dp)
                     .verticalScroll(scrollState)
             ) {
+
+                Spacer(modifier = Modifier.height(16.dp))
+
                 CenterHorizontalColumn{
 
                     PetDetail(petName = "고라파덕", painter = painter, petLevel = "Lv. 2",
@@ -80,7 +84,7 @@ fun PetDetailScreen(navController: NavController) {
                 
                 FamilyExpLazyRow(familyContributeList)
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(16.dp))
             }
         }
 
@@ -110,9 +114,8 @@ fun FamilyExpLazyRowItem(familyContributeList: Slice){
             .background(familyContributeList.color))
 
         Text(text = familyContributeList.name,
-            fontFamily = nanum,
-            fontWeight = FontWeight.Normal,
-            fontSize = 14.sp
+            style = MaterialTheme.typography.body2
+
         )
         
         Spacer(modifier = Modifier.width(8.dp))
@@ -140,9 +143,7 @@ fun PetExp() {
     Row(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = "경험치",
-            fontFamily = nanum,
-            fontWeight = FontWeight.ExtraBold,
-            fontSize = 24.sp
+            style = MaterialTheme.typography.h4.copy(fontWeight = FontWeight.ExtraBold)
         )
 
         Spacer(modifier = Modifier.width(12.dp))
@@ -252,9 +253,7 @@ fun customProgressBar(progress: Int) {
 fun PetDetail(petName: String, painter: AsyncImagePainter, petLevel: String, petDescription: String, petQuest: String) {
     Text(
         text = petName,
-        fontFamily = nanum,
-        fontWeight = FontWeight.Bold,
-        fontSize = 20.sp
+        style = MaterialTheme.typography.h5.copy(fontWeight = FontWeight.Bold)
     )
 
     Spacer(modifier = Modifier.height(4.dp))
@@ -269,18 +268,15 @@ fun PetDetail(petName: String, painter: AsyncImagePainter, petLevel: String, pet
 
     Text(
         text = petLevel,
-        fontFamily = nanum,
-        fontWeight = FontWeight.Bold,
-        fontSize = 16.sp
+        style = MaterialTheme.typography.body1.copy(fontWeight = FontWeight.Bold)
+
     )
 
     Spacer(modifier = Modifier.height(16.dp))
 
     Text(
         text = petDescription,
-        fontFamily = nanum,
-        fontWeight = FontWeight.Normal,
-        fontSize = 14.sp,
+        style = MaterialTheme.typography.body2,
         textAlign = TextAlign.Center
     )
 
@@ -288,8 +284,6 @@ fun PetDetail(petName: String, painter: AsyncImagePainter, petLevel: String, pet
 
     Text(
         text = petQuest,
-        fontFamily = nanum,
-        fontWeight = FontWeight.Normal,
-        fontSize = 14.sp
+        style = MaterialTheme.typography.body2
     )
 }

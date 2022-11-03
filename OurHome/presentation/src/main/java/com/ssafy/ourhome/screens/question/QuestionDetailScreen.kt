@@ -42,8 +42,10 @@ fun QuestionDetailScreen(navController: NavController){
         OurHomeSurface {
             Column(modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp)
+                .padding(horizontal = 16.dp)
                 .verticalScroll(scrollState)) {
+
+                Spacer(modifier = Modifier.height(16.dp))
 
                 TodayQuestion(questionNumber = "Q4. ", questionContent = "오늘 점심 뭐 드셨나요?")
 
@@ -57,9 +59,11 @@ fun QuestionDetailScreen(navController: NavController){
                     .fillMaxWidth()
                     .height(1.dp), color = Gray)
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
                 FamilyAnswer()
+
+                Spacer(modifier = Modifier.height(16.dp))
 
             }
 
@@ -75,10 +79,8 @@ fun FamilyAnswer(){
     val painter =
         rememberAsyncImagePainter("https://i.pinimg.com/222x/36/30/f7/3630f7d930f91e495d93c02833b4abfc.jpg")
 
-    LazyColumn(modifier = Modifier.height(600.dp)){
+    LazyColumn(modifier = Modifier.height(600.dp), verticalArrangement = Arrangement.spacedBy(16.dp)){
         items(3){
-
-            Spacer(modifier = Modifier.height(8.dp))
 
             FamilyAnswerItem(painter = painter, name = "아빠",
                 content = "순대국밥 먹었습니다.순대국밥 먹었습니다.순대국밥 먹었습니다." +
@@ -86,14 +88,6 @@ fun FamilyAnswer(){
                         "순대국밥 먹었습니다.순대국밥 먹었습니다.순대국밥 먹었습니다.순대국밥 먹었습니다." +
                         "순대국밥 먹었습니다.순대국밥 먹었습니다.순대국밥 먹었습니다.순대국밥 먹었습니다." +
                         "순대국밥 먹었습니다.순대국밥 먹었습니다.순대국밥 먹었습니다.")
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            FamilyAnswerItem(painter = painter, name = "엄마",
-                content = "쭈꾸미 먹었유")
-
-            Spacer(modifier = Modifier.height(8.dp))
-
 
         }
 
@@ -119,11 +113,13 @@ fun FamilyAnswerItem(painter: AsyncImagePainter, name: String, content: String){
 
             Spacer(modifier = Modifier.width(16.dp))
 
-            Text(text = name, fontFamily = nanum, fontWeight = FontWeight.Bold
-                , fontSize = 20.sp)
+            Text(text = name, style = MaterialTheme.typography.h5.copy(
+                    fontWeight = FontWeight.Bold))
         }
         
-        Text(modifier = Modifier.padding(16.dp), text = content)
+        Text(modifier = Modifier.padding(16.dp), text = content,
+            style = MaterialTheme.typography.body2
+        )
         
         Spacer(modifier = Modifier.height(12.dp))
     }
@@ -167,14 +163,12 @@ fun ShowTextSize(myAnswerState: MutableState<String>){
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
 
         Text(text = myAnswerState.value.length.toString(),
-        fontFamily = nanum,
-        color = Gray,
-        fontSize = 12.sp)
+            style = MaterialTheme.typography.caption.copy(color = Gray)
+        )
 
         Text(text = "/ 200",
-            fontFamily = nanum,
-            color = Gray,
-            fontSize = 12.sp)
+            style = MaterialTheme.typography.caption.copy(color = Gray)
+        )
 
     }
 
@@ -220,11 +214,7 @@ fun SmallRoundedButton(){
                 .width(52.dp)
                 .heightIn(28.dp)
                 .clickable {
-                    if (addState.value) { // TODO 등록 이벤트
-                        addState.value = false
-                    } else {   // TODO 수정 이벤트
-                        addState.value = true
-                    }
+                    addState.value = !addState.value
                 },
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
@@ -235,12 +225,7 @@ fun SmallRoundedButton(){
                     "등록"
                  }else{
                     "수정"
-                }, style = TextStyle(
-                    fontFamily = nanum,
-                    fontWeight = FontWeight.ExtraBold,
-                    fontSize = 16.sp,
-                    letterSpacing = 0.15.sp
-                )
+                }, style = MaterialTheme.typography.body1.copy(fontWeight = FontWeight.ExtraBold)
             )
         }
     }

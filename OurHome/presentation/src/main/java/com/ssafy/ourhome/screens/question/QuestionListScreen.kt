@@ -22,8 +22,15 @@ fun QuestionListScreen(navController: NavController){
         })
     }) {
         OurHomeSurface() {
-            Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+            Column(modifier = Modifier.padding(horizontal = 16.dp))
+            {
+                //QuestionLazyColumn 에 위아래 패딩 8dp 있어서 8dp만
+                Spacer(modifier = Modifier.height(8.dp))
+
                 QuestionLazyColumn(size = 30)
+
+                Spacer(modifier = Modifier.height(8.dp))
+
             }
         }
     }
