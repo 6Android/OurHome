@@ -158,7 +158,7 @@ private fun Login(
         onClick()
 
     }
-    Spacer(modifier = Modifier.height(8.dp))
+    Spacer(modifier = Modifier.height(20.dp))
 }
 
 /** 우리집 로고, 타이틀 */
