@@ -1,11 +1,9 @@
 package com.ssafy.ourhome.screens.home.map
 
-import android.util.Log
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -20,16 +18,30 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
 import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.maps.android.compose.*
+import com.holix.android.bottomsheetdialog.compose.BottomSheetDialog
+import com.holix.android.bottomsheetdialog.compose.BottomSheetDialogProperties
+import com.ssafy.ourhome.R
 import com.ssafy.ourhome.components.OurHomeSurface
 import com.ssafy.ourhome.ui.theme.OurHomeTheme
+
+// TODO : 임시 유저 파일
+data class tmpUser(
+    val imageUrl: String,
+    val nickname: String,
+    val lastUpdated: Long
+)
 
 @Composable
 fun MapScreen(navController: NavController = NavController(LocalContext.current)) {
@@ -39,26 +51,29 @@ fun MapScreen(navController: NavController = NavController(LocalContext.current)
         LatLng(37.715133, 126.734086),
         LatLng(36.715133, 128.734086),
         LatLng(35.715133, 139.734086),
-        // 경도, 위도 1도가 약 110km.
+    )
+    val familyList = listOf(
+        tmpUser("default", "아빠", System.currentTimeMillis() - 1000),
+        tmpUser("default", "엄마", System.currentTimeMillis() - 100000),
+        tmpUser("default", "누나", System.currentTimeMillis() - 20000000000)
     )
 
     var width = 0
     var height = 0
 
-    val cameraPositionState = rememberCameraPositionState {
-
-//        var startLat = 0.0
-//        var startLng = 0.0
-//        for(i in list){
-//            startLat += i.latitude
-//            startLng += i.longitude
-//        }
-//        startLat /= list.size
-//        startLng /= list.size
-
-//        position = CameraPosition.fromLatLngZoom(LatLng(37.715133,126.734086), 5f)
-
+    // 맵 처음 초기화 여부
+    val initState = remember {
+        mutableStateOf(false)
     }
+
+    val visibleBottomSheetState = remember {
+        mutableStateOf(false)
+    }
+
+    val cameraPositionState = rememberCameraPositionState {
+        position = CameraPosition.fromLatLngZoom(LatLng(37.715133, 126.734086), 10f)
+    }
+
     var mapProperties by remember {
         mutableStateOf(
             MapProperties(isMyLocationEnabled = true)
@@ -95,14 +110,18 @@ fun MapScreen(navController: NavController = NavController(LocalContext.current)
                 bounds.include(polyline)
             }
 
-            cameraPositionState.move(
-                CameraUpdateFactory.newLatLngBounds(
-                    bounds.build(),
-                    width,
-                    height,
-                    (height * 0.05f).toInt()
+            // 맨 처음 초기화 때만 모든 가족이 보이도록 위치를 갱신한다.
+            if (!initState.value) {
+                cameraPositionState.move(
+                    CameraUpdateFactory.newLatLngBounds(
+                        bounds.build(),
+                        width,
+                        height,
+                        (height * 0.05f).toInt()
+                    )
                 )
-            )
+                initState.value = true
+            }
         }
 
         MapBackButton(navController)
@@ -110,12 +129,136 @@ fun MapScreen(navController: NavController = NavController(LocalContext.current)
         IconWithButton(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .padding(bottom = 20.dp),
+                .padding(bottom = 20.dp)
+                .clickable {
+                    visibleBottomSheetState.value = true
+                },
             icon = Icons.Default.List,
             title = "가족 목록"
         )
+
+        /** 바텀 시트 */
+        if (visibleBottomSheetState.value) {
+            BottomSheet(familyList) {
+                visibleBottomSheetState.value = false
+            }
+        }
     }
 }
+
+/** 바텀 시트 */
+@Composable
+fun BottomSheet(list: List<tmpUser>, onDismissRequest: () -> Unit) {
+    BottomSheetDialog(
+        onDismissRequest = {
+            onDismissRequest()
+        },
+        properties = BottomSheetDialogProperties()
+    ) {
+        // content
+        Surface(
+            modifier = Modifier,
+            shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+
+                Spacer(modifier = Modifier.height(20.dp))
+                // 가족이 없을 때
+                if (list.isEmpty()) {
+
+                } else {
+                    UserListView(list)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun UserListView(list: List<tmpUser>) {
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 12.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        items(items = list) { user ->
+            Row(
+                Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                UserImage(
+                    modifier = Modifier.weight(2f),
+                    imageUrl = user.imageUrl
+                )
+                Text(
+                    text = user.nickname,
+                    modifier = Modifier
+                        .weight(5f)
+                        .padding(horizontal = 32.dp),
+                    style = MaterialTheme.typography.h6.copy(fontWeight = FontWeight.Bold)
+                )
+                Column(modifier = Modifier.weight(3f),
+                horizontalAlignment = Alignment.End,
+                verticalArrangement = Arrangement.Center) {
+                    Text(
+                        text = "마지막 업데이트",
+                        style = MaterialTheme.typography.body2.copy(fontSize = 10.sp)
+                    )
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = positionUpdateFormatter(user.lastUpdated),
+                        style = MaterialTheme.typography.body2
+                    )
+                }
+            }
+        }
+    }
+}
+
+fun positionUpdateFormatter(
+    lastUpdated: Long
+): String {
+
+    val curTime = System.currentTimeMillis()
+    val returnTime = curTime - lastUpdated
+
+    // 초, 분, 시, 일 (99일이 지나면 99일로 표기)
+    return if (returnTime / (1000) < 60) {
+        "${returnTime / (1000)} 초 전"
+    } else if (returnTime / (1000 * 60) < 60) {
+        "${returnTime / (1000 * 60)} 분 전"
+    } else if (returnTime / (1000 * 60) < 1440) {
+        "${(returnTime / (1000 * 60 * 60))} 시간 전"
+    } else {
+        if((returnTime / (1000 * 60 * 60 * 24)) > 99){
+            "99 일 전"
+        }else {
+            "${(returnTime / (1000 * 60 * 60 * 24))} 일 전"
+        }
+    }
+}
+
+@Composable
+private fun UserImage(
+    modifier: Modifier = Modifier,
+    imageUrl: String
+) {
+    Image(
+        modifier = modifier
+            .size(100.dp)
+            .clip(CircleShape),
+        painter =
+        if (imageUrl == "default") painterResource(R.drawable.img_default_user)
+        else rememberAsyncImagePainter(imageUrl),
+        contentDescription = "Profile Image"
+    )
+}
+
 
 @Composable
 private fun IconWithButton(
@@ -123,21 +266,22 @@ private fun IconWithButton(
     icon: ImageVector,
     title: String
 ) {
-    Row(modifier = modifier
-        .clip(shape = RoundedCornerShape(24.dp))
-        .background(Color.White)
-        .border(border = BorderStroke(2.dp, Color.Black), shape = RoundedCornerShape(24.dp))
-        .clickable {
-            Log.d("test5", "IconWithButton: ")
-        }
-        .padding(horizontal = 20.dp, vertical = 12.dp),
+    Row(
+        modifier = modifier
+            .clip(shape = RoundedCornerShape(24.dp))
+            .background(Color.White)
+            .border(border = BorderStroke(2.dp, Color.Black), shape = RoundedCornerShape(24.dp))
+            .padding(horizontal = 20.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     )
     {
         Icon(imageVector = icon, contentDescription = "Icon")
         Spacer(modifier = Modifier.width(4.dp))
-        Text(text = title, style = MaterialTheme.typography.body2.copy(fontWeight = FontWeight.Bold))
+        Text(
+            text = title,
+            style = MaterialTheme.typography.body2.copy(fontWeight = FontWeight.Bold)
+        )
     }
 }
 
