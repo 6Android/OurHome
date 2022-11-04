@@ -12,12 +12,12 @@ fun getSchedules(yearMonth: YearMonth) : List<Schedule>  {
     when(yearMonth.month.value) {
         11 -> return listOf(
             Schedule(
-                date = "2022-11-03",
+                date = "2022-11-3",
                 title = "외식",
                 content = ""
             ),
             Schedule(
-                date = "2022-11-03",
+                date = "2022-11-3",
                 title = "가족사진",
                 content = "가족사진 촬영하기"
             ),

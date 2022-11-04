@@ -1,8 +1,6 @@
 package com.ssafy.ourhome.screens.home
 
 import android.annotation.SuppressLint
-import android.util.Log
-import android.util.Log.d
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -30,7 +28,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.LiveData
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.holix.android.bottomsheetdialog.compose.BottomSheetDialog
@@ -47,7 +44,6 @@ import com.ssafy.ourhome.utils.getSchedules
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
-import java.time.LocalDate
 import java.time.Month
 import java.time.YearMonth
 import java.time.format.TextStyle
@@ -65,6 +61,10 @@ fun HomeScreen(navController: NavController) {
     val visibleBottomSheetState = remember {
         mutableStateOf(false)
     }
+
+    /** 달력에 필요한 데이터 */
+    var selection = remember { mutableStateOf<CalendarDay?>(null) }
+    val map = mutableMapOf<String, List<Schedule>>()
 
     /** 더미 데이터 */
     val url =
@@ -144,12 +144,21 @@ fun HomeScreen(navController: NavController) {
                 Spacer(modifier = Modifier.height(16.dp))
 
                 /** 달력 카드 */
-                CalendarCard(visibleBottomSheetState = visibleBottomSheetState)
+                CalendarCard(
+                    visibleBottomSheetState = visibleBottomSheetState,
+                    selection = selection,
+                    map = map
+                )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                if(visibleBottomSheetState.value) {
-                    BottomSheet {
+                if (visibleBottomSheetState.value) {
+                    BottomSheet(
+                        map.getOrDefault(
+                            "${selection.value!!.date.year}-${selection.value!!.date.monthValue}-${selection.value!!.date.dayOfMonth}",
+                            emptyList()
+                        )
+                    ) {
                         visibleBottomSheetState.value = false
                     }
                 }
@@ -300,36 +309,38 @@ fun HomeCard(
 
 /** */
 @Composable
-fun BottomSheet(onDismissRequest : () -> Unit) {
+fun BottomSheet(list: List<Schedule>, onDismissRequest: () -> Unit) {
     BottomSheetDialog(
         onDismissRequest = {
             onDismissRequest()
         },
-        properties = BottomSheetDialogProperties( )
+        properties = BottomSheetDialogProperties()
     ) {
         // content
         Surface(
-            modifier = Modifier.background(Color.White).padding(16.dp),
+            modifier = Modifier
+                .background(Color.White)
+                .padding(16.dp),
             shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
         ) {
-            TodayScheduleList()
+            TodayScheduleList(list = list)
         }
     }
 }
 
 /** 오늘 일정 리스트  **/
 @Composable
-fun TodayScheduleList(modifier: Modifier = Modifier, size: Int = 3) {
+fun TodayScheduleList(modifier: Modifier = Modifier, list: List<Schedule>) {
     LazyColumn(modifier = modifier) {
-        items(size) {
-            TodayScheduleListItem()
+        items(list) { item ->
+            TodayScheduleListItem(schedule = item)
         }
     }
 }
 
 /** 오늘 일정 리스트 아이템 **/
 @Composable
-fun TodayScheduleListItem(modifier: Modifier = Modifier.fillMaxWidth()) {
+fun TodayScheduleListItem(modifier: Modifier = Modifier.fillMaxWidth(), schedule: Schedule) {
     Card(
         modifier = modifier.padding(vertical = 8.dp), elevation = 4.dp
     ) {
@@ -348,7 +359,7 @@ fun TodayScheduleListItem(modifier: Modifier = Modifier.fillMaxWidth()) {
 
                 Text(
                     modifier = Modifier.padding(start = 8.dp),
-                    text = "2022.10.22",
+                    text = schedule.date,
                     fontFamily = nanum,
                     color = Gray,
                     fontWeight = FontWeight.Normal,
@@ -359,7 +370,7 @@ fun TodayScheduleListItem(modifier: Modifier = Modifier.fillMaxWidth()) {
             Text(
                 modifier = modifier
                     .padding(start = 12.dp, bottom = 16.dp),
-                text = "Q3. 가족들에게 당신은 어떤 존재인가요?",
+                text = schedule.title,
                 fontFamily = nanum,
                 fontWeight = FontWeight.Bold,
                 fontSize = 16.sp
@@ -373,7 +384,9 @@ fun TodayScheduleListItem(modifier: Modifier = Modifier.fillMaxWidth()) {
 @Composable
 fun CalendarCard(
     modifier: Modifier = Modifier,
-    visibleBottomSheetState: MutableState<Boolean>
+    visibleBottomSheetState: MutableState<Boolean>,
+    selection: MutableState<CalendarDay?>,
+    map: MutableMap<String, List<Schedule>>
 ) {
     Card(
         modifier = modifier
@@ -387,7 +400,11 @@ fun CalendarCard(
         ) {
             Spacer(modifier = Modifier.height(16.dp))
             /** 달력 */
-            Calendar(visibleBottomSheetState)
+            Calendar(
+                visibleBottomSheetState = visibleBottomSheetState,
+                selection = selection,
+                map = map
+            )
 
             /**
             todo
@@ -405,12 +422,13 @@ fun CalendarCard(
 @SuppressLint("UnrememberedMutableState")
 @Composable
 fun Calendar(
-    visibleBottomSheetState: MutableState<Boolean>
+    visibleBottomSheetState: MutableState<Boolean>,
+    selection: MutableState<CalendarDay?>,
+    map: MutableMap<String, List<Schedule>>
 ) {
     val currentMonth = remember { YearMonth.now() }
     val startMonth = remember { currentMonth.minusMonths(500) } // Adjust as needed
     val endMonth = remember { currentMonth.plusMonths(500) } // Adjust as needed
-    var selection by remember { mutableStateOf<CalendarDay?>(null) }
     val daysOfWeek = remember { daysOfWeek() }
 
     val state = rememberCalendarState(
@@ -426,8 +444,6 @@ fun Calendar(
 //    LaunchedEffect(visibleMonth) {
 //        selection = null
 //    }
-
-    val map = mutableMapOf<String, List<Schedule>>()
 
     visibleMonth.let {
         map.putAll(getSchedules(it).groupBy { schedule -> schedule.date })
@@ -453,10 +469,10 @@ fun Calendar(
         dayContent = { day ->
             Day(
                 day = day,
-                isSelected = selection == day,
+                isSelected = selection.value == day,
                 hasSchedule = map.containsKey("${day.date.year}-${day.date.monthValue}-${day.date.dayOfMonth}"),
             ) { clickedDay ->
-                selection = clickedDay
+                selection.value = clickedDay
                 visibleBottomSheetState.value = true
             }
         },
@@ -576,7 +592,7 @@ fun Day(
                     .clip(shape = CircleShape)
                     .background(Green)
                     .align(alignment = Alignment.BottomCenter)
-            ) {  }
+            ) { }
         }
     }
 }
