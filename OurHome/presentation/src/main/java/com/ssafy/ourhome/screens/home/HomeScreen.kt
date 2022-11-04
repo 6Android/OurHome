@@ -152,6 +152,7 @@ fun HomeScreen(navController: NavController) {
 
                 Spacer(modifier = Modifier.height(16.dp))
 
+                /** 바텀 시트 */
                 if (visibleBottomSheetState.value) {
                     BottomSheet(
                         map.getOrDefault(
@@ -307,7 +308,7 @@ fun HomeCard(
     }
 }
 
-/** */
+/** 바텀 시트 */
 @Composable
 fun BottomSheet(list: List<Schedule>, onDismissRequest: () -> Unit) {
     BottomSheetDialog(
@@ -318,14 +319,101 @@ fun BottomSheet(list: List<Schedule>, onDismissRequest: () -> Unit) {
     ) {
         // content
         Surface(
-            modifier = Modifier
-                .background(Color.White)
-                .padding(16.dp),
             shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
         ) {
-            TodayScheduleList(list = list)
+            Column(
+                modifier = Modifier
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                /** 바텀 시트 스크롤 바 */
+                Box(
+                    modifier = Modifier
+                        .width(40.dp)
+                        .height(3.dp)
+                        .background(Color.LightGray),
+                ) {
+
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                /** 일정이 없을 경우 */
+                if (list.isEmpty()) {
+                    NoScheduleItem()
+                }
+                /** 있을 경우 */
+                else {
+                    ScheduleList(list)
+                }
+            }
         }
     }
+}
+
+/** 일정이 있을 경우 바텀시트 */
+@Composable
+private fun ScheduleList(list: List<Schedule>) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        /** 바텀 시트 헤더 */
+        Text(text = "오늘의 일정", style = MaterialTheme.typography.subtitle2)
+
+        /** 바텀 시트 일정 추가 */
+        Text(
+            modifier = Modifier.clickable {
+                // todo: 일정 추가 화면으로 이동
+            },
+            text = "일정 추가",
+            style = MaterialTheme.typography.body2.copy(
+                color = Color.Gray,
+                fontWeight = FontWeight.Bold
+            )
+        )
+    }
+
+    Spacer(modifier = Modifier.height(16.dp))
+
+    /** 바텀 시트 일정 리스트 */
+    TodayScheduleList(list = list)
+}
+
+/** 일정이 없을 경우 바텀시트 */
+@Composable
+private fun NoScheduleItem() {
+    /** 헤더 */
+    Text(
+        text = "등록된 일정이 없습니다",
+        style = MaterialTheme.typography.subtitle2
+    )
+
+    Spacer(modifier = Modifier.height(16.dp))
+
+    /** 달력 이미지 */
+    Image(
+        modifier = Modifier
+            .size(112.dp)
+            .clickable {
+                // todo: 일정 추가 화면으로 이동
+            },
+        painter = painterResource(id = R.drawable.ic_calendar_add),
+        contentDescription = "calendar add"
+    )
+
+    Spacer(modifier = Modifier.height(16.dp))
+
+    /** 내용 */
+    Text(
+        text = "가족과 함께하는 일정을 추가해보세요!",
+        textAlign = TextAlign.Center,
+        style = MaterialTheme.typography.body1.copy(fontWeight = FontWeight.Bold),
+    )
+    Spacer(modifier = Modifier.height(16.dp))
 }
 
 /** 오늘 일정 리스트  **/
@@ -342,10 +430,14 @@ fun TodayScheduleList(modifier: Modifier = Modifier, list: List<Schedule>) {
 @Composable
 fun TodayScheduleListItem(modifier: Modifier = Modifier.fillMaxWidth(), schedule: Schedule) {
     Card(
-        modifier = modifier.padding(vertical = 8.dp), elevation = 4.dp
+        modifier = modifier
+            .padding(vertical = 8.dp)
+            .shadow(elevation = 2.dp, shape = RoundedCornerShape(8.dp))
     ) {
         Column(
-            modifier = modifier
+            modifier = modifier.clickable {
+                // todo: 일정 상세로 이동
+            }
         ) {
             Row(
                 modifier = modifier
