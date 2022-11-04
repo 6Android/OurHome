@@ -33,6 +33,7 @@ import com.holix.android.bottomsheetdialog.compose.BottomSheetDialogProperties
 import com.kizitonwose.calendar.core.CalendarDay
 import com.ssafy.ourhome.R
 import com.ssafy.ourhome.components.OurHomeSurface
+import com.ssafy.ourhome.navigation.OurHomeScreens
 import com.ssafy.ourhome.ui.theme.OurHomeTheme
 import com.ssafy.ourhome.utils.Schedule
 
@@ -142,10 +143,11 @@ fun HomeScreen(navController: NavController) {
                 /** 바텀 시트 */
                 if (visibleBottomSheetState.value) {
                     BottomSheet(
-                        map.getOrDefault(
+                        list = map.getOrDefault(
                             "${selection.value!!.date.year}-${selection.value!!.date.monthValue}-${selection.value!!.date.dayOfMonth}",
                             emptyList()
-                        )
+                        ),
+                        onAddScheduleClick = { moveToAddScheduleScreen(navController) }
                     ) {
                         visibleBottomSheetState.value = false
                     }
@@ -297,7 +299,11 @@ fun HomeCard(
 
 /** 바텀 시트 */
 @Composable
-fun BottomSheet(list: List<Schedule>, onDismissRequest: () -> Unit) {
+fun BottomSheet(
+    list: List<Schedule>,
+    onAddScheduleClick: () -> Unit,
+    onDismissRequest: () -> Unit
+) {
     BottomSheetDialog(
         onDismissRequest = {
             onDismissRequest()
@@ -327,11 +333,11 @@ fun BottomSheet(list: List<Schedule>, onDismissRequest: () -> Unit) {
 
                 /** 일정이 없을 경우 */
                 if (list.isEmpty()) {
-                    NoScheduleItem()
+                    NoScheduleItem(onAddScheduleClick = onAddScheduleClick)
                 }
                 /** 있을 경우 */
                 else {
-                    ScheduleList(list)
+                    ScheduleList(list = list, onAddScheduleClick = onAddScheduleClick)
                 }
             }
         }
@@ -340,7 +346,7 @@ fun BottomSheet(list: List<Schedule>, onDismissRequest: () -> Unit) {
 
 /** 일정이 있을 경우 바텀시트 */
 @Composable
-private fun ScheduleList(list: List<Schedule>) {
+private fun ScheduleList(list: List<Schedule>, onAddScheduleClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -354,7 +360,8 @@ private fun ScheduleList(list: List<Schedule>) {
         /** 바텀 시트 일정 추가 */
         Text(
             modifier = Modifier.clickable {
-                // todo: 일정 추가 화면으로 이동
+                // 일정 추가 화면으로 이동
+                onAddScheduleClick()
             },
             text = "일정 추가",
             style = MaterialTheme.typography.body2.copy(
@@ -372,7 +379,7 @@ private fun ScheduleList(list: List<Schedule>) {
 
 /** 일정이 없을 경우 바텀시트 */
 @Composable
-private fun NoScheduleItem() {
+private fun NoScheduleItem(onAddScheduleClick: () -> Unit) {
     /** 헤더 */
     Text(
         text = "등록된 일정이 없습니다",
@@ -386,7 +393,8 @@ private fun NoScheduleItem() {
         modifier = Modifier
             .size(112.dp)
             .clickable {
-                // todo: 일정 추가 화면으로 이동
+                // 일정 추가 화면으로 이동
+                onAddScheduleClick()
             },
         painter = painterResource(id = R.drawable.ic_calendar_add),
         contentDescription = "calendar add"
@@ -401,6 +409,11 @@ private fun NoScheduleItem() {
         style = MaterialTheme.typography.body1.copy(fontWeight = FontWeight.Bold),
     )
     Spacer(modifier = Modifier.height(16.dp))
+}
+
+/** 일정 추가 화면으로 가는 함수 */
+fun moveToAddScheduleScreen(navController: NavController) {
+    navController.navigate(OurHomeScreens.AddScheduleScreen.name)
 }
 
 /**
