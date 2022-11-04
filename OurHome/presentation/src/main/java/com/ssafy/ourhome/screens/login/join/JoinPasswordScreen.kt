@@ -14,6 +14,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.ssafy.ourhome.components.MainAppBar
+import com.ssafy.ourhome.components.OurHomeSurface
 import com.ssafy.ourhome.components.PasswordInput
 import com.ssafy.ourhome.navigation.OurHomeScreens
 import com.ssafy.ourhome.utils.JOIN_PASSWORD
@@ -29,9 +30,10 @@ fun JoinPasswordScreen(navController: NavController = NavController(LocalContext
         mutableStateOf("")
     }
 
-    Surface(modifier = Modifier.fillMaxSize()) {
+    OurHomeSurface {
         Column(modifier = Modifier.fillMaxHeight()) {
 
+            /** 툴바 */
             /** 툴바 */
             MainAppBar(title = "회원가입", onBackClick = { navController.popBackStack() })
 
@@ -40,7 +42,10 @@ fun JoinPasswordScreen(navController: NavController = NavController(LocalContext
             Column(modifier = Modifier.padding(horizontal = 24.dp)) {
 
                 /** 인디케이터 */
+                /** 인디케이터 */
                 JoinIndicator(step = 2)
+
+                /** 헤더 */
 
                 /** 헤더 */
                 Text(
@@ -52,12 +57,16 @@ fun JoinPasswordScreen(navController: NavController = NavController(LocalContext
                 Spacer(modifier = Modifier.height(48.dp))
 
                 /** 비밀번호 입력창 */
+
+                /** 비밀번호 입력창 */
                 PasswordInput(
                     passwordState = passwordState,
                     labelId = "비밀번호",
                     enabled = true,
                     imeAction = ImeAction.Next
                 )
+
+                /** 비밀번호 확인창 */
 
                 /** 비밀번호 확인창 */
                 PasswordInput(
@@ -72,6 +81,8 @@ fun JoinPasswordScreen(navController: NavController = NavController(LocalContext
                 )
             }
         }
+
+        /** 다음 버튼 */
 
         /** 다음 버튼 */
         NextButton(title = "다음") {

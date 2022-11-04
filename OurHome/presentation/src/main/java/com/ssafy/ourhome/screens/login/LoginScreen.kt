@@ -26,7 +26,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.ssafy.ourhome.R
+import com.ssafy.ourhome.StatusBarColorUpdateEffect
 import com.ssafy.ourhome.components.EmailInput
+import com.ssafy.ourhome.components.OurHomeSurface
 import com.ssafy.ourhome.components.PasswordInput
 import com.ssafy.ourhome.components.RoundedButton
 import com.ssafy.ourhome.navigation.BottomNavItem
@@ -47,7 +49,7 @@ fun LoginScreen(navController: NavController = NavController(LocalContext.curren
     }
     val scrollState = rememberScrollState()
 
-    Surface(modifier = Modifier.fillMaxSize()) {
+    OurHomeSurface {
         Column(
             modifier = Modifier
                 .padding(horizontal = 24.dp)

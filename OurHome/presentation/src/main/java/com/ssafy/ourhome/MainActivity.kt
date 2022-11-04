@@ -27,6 +27,7 @@ import androidx.navigation.compose.rememberNavController
 import com.ssafy.ourhome.navigation.BottomNavItem
 import com.ssafy.ourhome.navigation.BottomNavigation
 import com.ssafy.ourhome.navigation.OurHomeNavGraph
+import com.ssafy.ourhome.navigation.OurHomeScreens
 import com.ssafy.ourhome.ui.theme.MainColor
 import com.ssafy.ourhome.ui.theme.OurHomeTheme
 import com.ssafy.ourhome.utils.findActivity
@@ -78,6 +79,10 @@ fun MyApp() {
                 // Hide BottomBar and TopBar
                 bottomBarState.value = true
                 StatusBarColorUpdateEffect(Color.White, true)
+            }
+            "${OurHomeScreens.LoginScreen.name}" -> {
+                bottomBarState.value = false
+                StatusBarColorUpdateEffect(Color(0xFFF8F8FB), true)
             }
             else -> {
                 bottomBarState.value = false

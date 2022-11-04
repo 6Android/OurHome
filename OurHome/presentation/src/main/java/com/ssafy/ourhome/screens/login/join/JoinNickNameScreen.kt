@@ -14,6 +14,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.ssafy.ourhome.components.MainAppBar
+import com.ssafy.ourhome.components.OurHomeSurface
 import com.ssafy.ourhome.components.TextInput
 import com.ssafy.ourhome.navigation.BottomNavItem
 import com.ssafy.ourhome.navigation.OurHomeScreens
@@ -28,7 +29,7 @@ fun JoinNickNameScreen(
         mutableStateOf("")
     }
 
-    Surface(modifier = Modifier.fillMaxSize()) {
+    OurHomeSurface {
         Column(modifier = Modifier.fillMaxHeight()) {
 
             /** 툴바 */
