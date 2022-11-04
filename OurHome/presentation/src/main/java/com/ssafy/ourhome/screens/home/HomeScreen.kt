@@ -35,12 +35,10 @@ import com.ssafy.ourhome.R
 import com.ssafy.ourhome.components.OurHomeSurface
 import com.ssafy.ourhome.navigation.OurHomeScreens
 import com.ssafy.ourhome.ui.theme.OurHomeTheme
+import com.ssafy.ourhome.utils.Person
 import com.ssafy.ourhome.utils.Schedule
+import com.ssafy.ourhome.utils.personList
 
-
-data class Person(
-    val imgUrl: String, val name: String
-)
 
 @Composable
 fun HomeScreen(navController: NavController) {
@@ -53,13 +51,6 @@ fun HomeScreen(navController: NavController) {
     /** 달력에 필요한 데이터 */
     var selection = remember { mutableStateOf<CalendarDay?>(null) }
     val map = mutableMapOf<String, List<Schedule>>()
-
-    /** 더미 데이터 */
-    val url =
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQvGknHPBUegusBb26NtSy4y47-yxr2Q_-Hwg&usqp=CAU"
-    val person = Person(url, "아이유")
-    val personList = arrayListOf(person, person, person, person)
-    /** 더미 데이터 */
 
     Scaffold(topBar = {
 

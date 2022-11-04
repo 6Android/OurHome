@@ -22,7 +22,6 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -33,25 +32,14 @@ import com.squaredem.composecalendar.ComposeCalendar
 import com.ssafy.ourhome.components.MainAppBar
 import com.ssafy.ourhome.components.OurHomeSurface
 import com.ssafy.ourhome.components.TextInput
+import com.ssafy.ourhome.navigation.OurHomeScreens
 import com.ssafy.ourhome.ui.theme.OurHomeTheme
+import com.ssafy.ourhome.utils.Person
+import com.ssafy.ourhome.utils.personList
 import java.time.LocalDate
-
-/** 더미 데이터 */
-data class Person(
-    val imgUrl: String, val name: String
-)
 
 @Composable
 fun AddScheduleScreen(navController: NavController) {
-
-    /** 더미 데이터 */
-    val url =
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRxZScLkNntCccfde87I4ZcUM45MzxUb9FcmA&usqp=CAU"
-    val person = Person(url, "유지니")
-    val personList = arrayListOf(person, person, person,person,person)
-
-    /** 더미 데이터 */
-
     val showDialog = rememberSaveable { mutableStateOf(false) }
     val titleState = remember {
         mutableStateOf("")
@@ -68,8 +56,10 @@ fun AddScheduleScreen(navController: NavController) {
             title = "일정 추가",
             backIconEnable = true,
             icon = rememberVectorPainter(Icons.Default.Check),
+            onBackClick = { navController.popBackStack() },
             onIconClick = {
                 // todo: 일정 추가 버튼 클릭시
+
             })
     }) {
         OurHomeSurface() {
@@ -99,7 +89,11 @@ fun AddScheduleScreen(navController: NavController) {
                             modifier = Modifier
                                 .padding(16.dp)
                         ) {
-                            Text(modifier = Modifier.offset(x = 8.dp),text = "날짜", style = MaterialTheme.typography.subtitle2)
+                            Text(
+                                modifier = Modifier.offset(x = 8.dp),
+                                text = "날짜",
+                                style = MaterialTheme.typography.subtitle2
+                            )
                             Button(
                                 border = BorderStroke(width = 2.dp, color = Color.LightGray),
                                 colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
@@ -114,7 +108,11 @@ fun AddScheduleScreen(navController: NavController) {
                             Spacer(modifier = Modifier.height(16.dp))
 
                             /** 제목 */
-                            Text(modifier = Modifier.offset(x = 8.dp), text = "제목", style = MaterialTheme.typography.subtitle2)
+                            Text(
+                                modifier = Modifier.offset(x = 8.dp),
+                                text = "제목",
+                                style = MaterialTheme.typography.subtitle2
+                            )
                             TextInput(
                                 valueState = titleState,
                                 placeholder = "제목을 입력해주세요",
@@ -124,7 +122,11 @@ fun AddScheduleScreen(navController: NavController) {
                             Spacer(modifier = Modifier.height(16.dp))
 
                             /** 내용 */
-                            Text(modifier = Modifier.offset(x = 8.dp), text = "내용", style = MaterialTheme.typography.subtitle2)
+                            Text(
+                                modifier = Modifier.offset(x = 8.dp),
+                                text = "내용",
+                                style = MaterialTheme.typography.subtitle2
+                            )
                             TextInput(
                                 valueState = contentState,
                                 labelId = "간단한 내용을 작성해주세요.",
@@ -134,12 +136,18 @@ fun AddScheduleScreen(navController: NavController) {
                             Spacer(modifier = Modifier.height(16.dp))
 
                             /** 함께하는 가족들 */
-                            Text(modifier = Modifier.offset(x = 8.dp), text = "함께하는 가족들", style = MaterialTheme.typography.subtitle2)
+                            Text(
+                                modifier = Modifier.offset(x = 8.dp),
+                                text = "함께하는 가족들",
+                                style = MaterialTheme.typography.subtitle2
+                            )
                         }
 
                         Spacer(modifier = Modifier.height(8.dp))
 
-                        PersonList(personList = personList)
+                        PersonList(personList = personList) {
+                            navController.navigate(OurHomeScreens.AddMemberScreen.name)
+                        }
                     }
                 }
 
@@ -165,40 +173,41 @@ fun AddScheduleScreen(navController: NavController) {
 
 /** 함께하는 가족들 리스트 */
 @Composable
-private fun PersonList(personList: ArrayList<Person>) {
-        Row {
-            LazyRow(
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                item {
-                    Spacer(modifier = Modifier.width(8.dp))
-                }
-                items(items = personList, itemContent = { item ->
+private fun PersonList(personList: ArrayList<Person>, onAddClick: () -> Unit) {
+    Row {
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            item {
+                Spacer(modifier = Modifier.width(8.dp))
+            }
+            items(items = personList, itemContent = { item ->
 
-                    /** 구성원 리스트 아이템 */
-                    PersonListItem(item)
-                })
+                /** 구성원 리스트 아이템 */
+                PersonListItem(item)
+            })
 
-                item {
-                    /** 가족 추가 버튼 */
-                    Icon(
-                        modifier = Modifier
-                            .size(64.dp)
-                            .border(width = 1.dp, color = Color.Gray, shape = CircleShape)
-                            .clip(CircleShape)
-                            .clickable {
-                                // todo: 가족 구성원 추가 화면으로 이동
-                            }
-                            .padding(12.dp),
-                        painter = rememberVectorPainter(Icons.Default.Add),
-                        tint = Color.Gray,
-                        contentDescription = "Profile Image"
-                    )
+            item {
+                /** 가족 추가 버튼 */
+                Icon(
+                    modifier = Modifier
+                        .size(64.dp)
+                        .border(width = 1.dp, color = Color.Gray, shape = CircleShape)
+                        .clip(CircleShape)
+                        .clickable {
+                            // todo: 가족 구성원 추가 화면으로 이동
+                            onAddClick()
+                        }
+                        .padding(12.dp),
+                    painter = rememberVectorPainter(Icons.Default.Add),
+                    tint = Color.Gray,
+                    contentDescription = "Profile Image"
+                )
 
-                    Spacer(modifier = Modifier.width(16.dp))
-                }
+                Spacer(modifier = Modifier.width(16.dp))
             }
         }
+    }
 }
 
 /** 함께하는 가족들 리스트 아이템 */

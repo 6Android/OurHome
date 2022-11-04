@@ -10,6 +10,7 @@ import com.ssafy.ourhome.screens.NextScreen
 import com.ssafy.ourhome.screens.album.AlbumScreen
 import com.ssafy.ourhome.screens.chat.ChatScreen
 import com.ssafy.ourhome.screens.home.HomeScreen
+import com.ssafy.ourhome.screens.home.schedule.AddMemberScreen
 import com.ssafy.ourhome.screens.home.schedule.AddScheduleScreen
 import com.ssafy.ourhome.screens.userpage.MyPageScreen
 import com.ssafy.ourhome.screens.login.LoginScreen
@@ -102,6 +103,10 @@ fun OurHomeNavGraph(navController: NavHostController) {
 
         composable(OurHomeScreens.AddScheduleScreen.name) {
             AddScheduleScreen(navController = navController)
+        }
+
+        composable(OurHomeScreens.AddMemberScreen.name) {
+            AddMemberScreen(navController = navController)
         }
     }
 }
