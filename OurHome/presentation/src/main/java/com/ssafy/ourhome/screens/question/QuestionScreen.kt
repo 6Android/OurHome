@@ -8,10 +8,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Card
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -54,6 +51,8 @@ fun QuestionScreen(navController: NavController) {
                     .padding(horizontal = 16.dp)
                     .verticalScroll(scrollState)
             ) {
+                Spacer(modifier = Modifier.height(16.dp))
+
                 CenterHorizontalColumn {
 
                     PetSemiDetail(petName = "고라파덕", painter = painter, petLevel = "Lv. 2"){
@@ -68,8 +67,10 @@ fun QuestionScreen(navController: NavController) {
 
                     ReplyQuestionButton(
                         buttonWidth = 120, buttonHeight = 40, fontSize = 20,
-                        label = "답변 하기"
-                    )
+                        label = "답변 하기",
+                        onClick = {
+                            navigateQuestionDetailScreen(navController)
+                        })
                 }
 
                 Spacer(modifier = Modifier.height(36.dp))
@@ -80,11 +81,14 @@ fun QuestionScreen(navController: NavController) {
 
                 QuestionLazyColumn(Modifier.height(260.dp))
 
-                Spacer(modifier = Modifier.height(12.dp))
-            }
+                Spacer(modifier = Modifier.height(16.dp))            }
         }
     }
 
+}
+
+fun navigateQuestionDetailScreen(navController: NavController){
+    navController.navigate(OurHomeScreens.QuestionDetailScreen.name)
 }
 
 /** 채팅 스크린 이동 **/
@@ -96,16 +100,15 @@ fun navigateChatScreen(navController: NavController){
 @Composable
 fun CenterHorizontalColumn(content : @Composable() (ColumnScope.() -> Unit) ){
     Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 16.dp), horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally,
         content = content
     )
 }
 
 /** 오늘의 질문 내용 **/
 @Composable
-private fun TodayQuestion(questionNumber: String, questionContent: String) {
+fun TodayQuestion(questionNumber: String, questionContent: String) {
     Text(
         buildAnnotatedString {
             withStyle(
@@ -141,9 +144,7 @@ fun PetSemiDetail(petName: String, painter: AsyncImagePainter, petLevel: String,
         }, horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
             text = petName,
-            fontFamily = nanum,
-            fontWeight = FontWeight.Bold,
-            fontSize = 20.sp
+            style = MaterialTheme.typography.h5.copy(fontWeight = FontWeight.Bold)
         )
 
         Spacer(modifier = Modifier.height(4.dp))
@@ -158,9 +159,7 @@ fun PetSemiDetail(petName: String, painter: AsyncImagePainter, petLevel: String,
 
         Text(
             text = petLevel,
-            fontFamily = nanum,
-            fontWeight = FontWeight.Bold,
-            fontSize = 16.sp
+            style = MaterialTheme.typography.body1.copy(fontWeight = FontWeight.Bold)
         )
     }
 
@@ -173,14 +172,13 @@ fun LastQuestionHeader(onClick: () -> Unit = {}) {
         modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.Bottom
     ) {
-        Text("지난 질문", fontFamily = nanum, fontWeight = FontWeight.Bold, fontSize = 20.sp)
+        Text("지난 질문", style = MaterialTheme.typography.h5.copy(fontWeight = FontWeight.Bold))
 
         Text(
             "더보기",
             modifier = Modifier.clickable(onClick = onClick),
-            fontFamily = nanum,
-            color = Gray,
-            fontWeight = FontWeight.Normal
+            style = MaterialTheme.typography.body2,
+            color = Gray
         )
     }
 }
@@ -199,7 +197,7 @@ fun QuestionLazyColumn(modifier: Modifier = Modifier, size: Int = 3) {
 @Composable
 fun QuestionItem(modifier: Modifier = Modifier.fillMaxWidth()) {
     Card(
-        modifier = modifier.padding(vertical = 8.dp), elevation = 4.dp
+        modifier = modifier.padding(vertical = 8.dp), elevation = 2.dp
     ) {
         Column(
             modifier = modifier
@@ -217,10 +215,8 @@ fun QuestionItem(modifier: Modifier = Modifier.fillMaxWidth()) {
                 Text(
                     modifier = Modifier.padding(start = 8.dp),
                     text = "2022.10.22",
-                    fontFamily = nanum,
-                    color = Gray,
-                    fontWeight = FontWeight.Normal,
-                    fontSize = 12.sp
+                    style = MaterialTheme.typography.caption.copy(fontWeight = FontWeight.Normal, letterSpacing = 0.sp),
+                    color = Gray
                 )
             }
 
@@ -228,9 +224,7 @@ fun QuestionItem(modifier: Modifier = Modifier.fillMaxWidth()) {
                 modifier = modifier
                     .padding(start = 12.dp, bottom = 16.dp),
                 text = "Q3. 가족들에게 당신은 어떤 존재인가요?",
-                fontFamily = nanum,
-                fontWeight = FontWeight.Bold,
-                fontSize = 16.sp
+                style = MaterialTheme.typography.body1.copy(fontWeight = FontWeight.Bold)
             )
         }
     }

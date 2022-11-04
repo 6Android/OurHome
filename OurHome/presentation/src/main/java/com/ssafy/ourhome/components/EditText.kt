@@ -9,12 +9,14 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -25,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ssafy.ourhome.ui.theme.OurHomeTheme
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun TextInput(
     modifier: Modifier = Modifier,
@@ -36,6 +39,8 @@ fun TextInput(
     imeAction: ImeAction = ImeAction.Next,
     onAction: KeyboardActions = KeyboardActions.Default
 ) {
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val focusRequester by remember { mutableStateOf(FocusRequester()) }
 
     TextField(
         value = valueState.value,
@@ -48,7 +53,13 @@ fun TextInput(
         ),
         modifier = modifier
             .padding(bottom = 10.dp, start = 10.dp, end = 10.dp)
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .focusRequester(focusRequester = focusRequester)
+            .onFocusChanged {
+                if (!it.hasFocus) {
+                    keyboardController?.hide()
+                }
+            },
         enabled = enabled,
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType, imeAction = imeAction),
         keyboardActions = onAction,
@@ -58,6 +69,7 @@ fun TextInput(
     )
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun EmailInput(
     modifier: Modifier = Modifier,
@@ -68,6 +80,9 @@ fun EmailInput(
     imeAction: ImeAction = ImeAction.Next,
     onAction: KeyboardActions = KeyboardActions.Default
 ) {
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val focusRequester by remember { mutableStateOf(FocusRequester()) }
+
     TextField(
         value = emailState.value,
         onValueChange = { emailState.value = it },
@@ -79,7 +94,13 @@ fun EmailInput(
         ),
         modifier = modifier
             .padding(bottom = 10.dp, start = 10.dp, end = 10.dp)
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .focusRequester(focusRequester = focusRequester)
+            .onFocusChanged {
+                if (!it.hasFocus) {
+                    keyboardController?.hide()
+                }
+            },
         enabled = enabled,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = imeAction),
         keyboardActions = onAction,
@@ -89,6 +110,7 @@ fun EmailInput(
     )
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun PasswordInput(
     modifier: Modifier = Modifier,
@@ -99,6 +121,8 @@ fun PasswordInput(
     imeAction: ImeAction = ImeAction.Done,
     onAction: KeyboardActions = KeyboardActions.Default,
 ) {
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val focusRequester by remember { mutableStateOf(FocusRequester()) }
 
     val visualTransformation = passwordVisibility?.let {
         if (it.value) VisualTransformation.None else
@@ -115,7 +139,13 @@ fun PasswordInput(
         textStyle = TextStyle(fontSize = 18.sp, color = MaterialTheme.colors.onBackground),
         modifier = modifier
             .padding(bottom = 10.dp, start = 10.dp, end = 10.dp)
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .focusRequester(focusRequester = focusRequester)
+            .onFocusChanged {
+                if (!it.hasFocus) {
+                    keyboardController?.hide()
+                }
+            },
         enabled = enabled,
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Password,
