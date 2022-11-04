@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
+import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -17,6 +18,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -32,7 +34,8 @@ import com.ssafy.ourhome.ui.theme.OurHomeTheme
 fun TextInput(
     modifier: Modifier = Modifier,
     valueState: MutableState<String>,
-    labelId: String,
+    labelId: String? = null,
+    placeholder: String? = null,
     enabled: Boolean,
     isSingleLine: Boolean = true,
     keyboardType: KeyboardType = KeyboardType.Text,
@@ -45,7 +48,8 @@ fun TextInput(
     TextField(
         value = valueState.value,
         onValueChange = { valueState.value = it },
-        label = { Text(text = labelId, style = MaterialTheme.typography.body1) },
+        label = labelId?.let {{ Text(text = it, style = MaterialTheme.typography.body1)}},
+        placeholder = placeholder?.let{{ Text(text = it, style = MaterialTheme.typography.body1)}},
         singleLine = isSingleLine,
         textStyle = TextStyle(
             fontSize = 18.sp,

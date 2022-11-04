@@ -308,7 +308,9 @@ fun BottomSheet(
         onDismissRequest = {
             onDismissRequest()
         },
-        properties = BottomSheetDialogProperties()
+        properties = BottomSheetDialogProperties(
+
+        )
     ) {
         // content
         Surface(
@@ -339,6 +341,8 @@ fun BottomSheet(
                 else {
                     ScheduleList(list = list, onAddScheduleClick = onAddScheduleClick)
                 }
+
+                Spacer(modifier = Modifier.height(32.dp))
             }
         }
     }
@@ -408,7 +412,6 @@ private fun NoScheduleItem(onAddScheduleClick: () -> Unit) {
         textAlign = TextAlign.Center,
         style = MaterialTheme.typography.body1.copy(fontWeight = FontWeight.Bold),
     )
-    Spacer(modifier = Modifier.height(16.dp))
 }
 
 /** 일정 추가 화면으로 가는 함수 */

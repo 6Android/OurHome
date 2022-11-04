@@ -23,7 +23,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.layout
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
@@ -31,6 +33,7 @@ import com.squaredem.composecalendar.ComposeCalendar
 import com.ssafy.ourhome.components.MainAppBar
 import com.ssafy.ourhome.components.OurHomeSurface
 import com.ssafy.ourhome.components.TextInput
+import com.ssafy.ourhome.ui.theme.OurHomeTheme
 import java.time.LocalDate
 
 /** 더미 데이터 */
@@ -45,7 +48,7 @@ fun AddScheduleScreen(navController: NavController) {
     val url =
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRxZScLkNntCccfde87I4ZcUM45MzxUb9FcmA&usqp=CAU"
     val person = Person(url, "유지니")
-    val personList = arrayListOf(person, person, person)
+    val personList = arrayListOf(person, person, person,person,person)
 
     /** 더미 데이터 */
 
@@ -70,26 +73,33 @@ fun AddScheduleScreen(navController: NavController) {
             })
     }) {
         OurHomeSurface() {
-            Column(modifier = Modifier.padding(24.dp)) {
-
+            Column(
+                modifier = Modifier.padding(
+                    top = 16.dp, start = 16.dp, end = 16.dp, bottom = 24.dp
+                )
+            ) {
                 /** 일정 추가 헤더 */
-                Text(text = "가족과 함께하는\n일정을 추가해보세요!", style = MaterialTheme.typography.subtitle1)
+                Text(
+                    modifier = Modifier.offset(x = 12.dp),
+                    text = "가족과 함께하는\n일정을 추가해보세요!",
+                    style = MaterialTheme.typography.subtitle1
+                )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
+                /** 일정 등록 카드 */
                 Card(
                     modifier = Modifier
                         .fillMaxSize()
                         .shadow(elevation = 2.dp, shape = RoundedCornerShape(16.dp))
                 ) {
-                    Column(
-                        modifier = Modifier
-                            .padding(16.dp)
-                    ) {
+                    Column {
                         /** 날짜 */
                         Column(
+                            modifier = Modifier
+                                .padding(16.dp)
                         ) {
-                            Text(text = "날짜", style = MaterialTheme.typography.subtitle2)
+                            Text(modifier = Modifier.offset(x = 8.dp),text = "날짜", style = MaterialTheme.typography.subtitle2)
                             Button(
                                 border = BorderStroke(width = 2.dp, color = Color.LightGray),
                                 colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
@@ -100,44 +110,32 @@ fun AddScheduleScreen(navController: NavController) {
                                     style = MaterialTheme.typography.body2.copy(fontWeight = FontWeight.Bold)
                                 )
                             }
-                        }
 
+                            Spacer(modifier = Modifier.height(16.dp))
 
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        /** 제목 */
-                        Column(
-                        ) {
-                            Text(text = "제목", style = MaterialTheme.typography.subtitle2)
+                            /** 제목 */
+                            Text(modifier = Modifier.offset(x = 8.dp), text = "제목", style = MaterialTheme.typography.subtitle2)
                             TextInput(
                                 valueState = titleState,
-                                labelId = "제목을 입력해주세요.",
+                                placeholder = "제목을 입력해주세요",
                                 enabled = true
                             )
+
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            /** 내용 */
+                            Text(modifier = Modifier.offset(x = 8.dp), text = "내용", style = MaterialTheme.typography.subtitle2)
+                            TextInput(
+                                valueState = contentState,
+                                labelId = "간단한 내용을 작성해주세요.",
+                                enabled = true
+                            )
+
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            /** 함께하는 가족들 */
+                            Text(modifier = Modifier.offset(x = 8.dp), text = "함께하는 가족들", style = MaterialTheme.typography.subtitle2)
                         }
-
-
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        /** 내용 */
-                        Text(text = "내용", style = MaterialTheme.typography.subtitle2)
-                        TextInput(
-                            valueState = contentState,
-                            labelId = "간단한 내용을 작성해주세요.",
-                            enabled = true
-                        )
-
-//                Spacer(modifier = Modifier.height(32.dp))
-//                Divider(
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .height(4.dp), color = Color.Gray
-//                )
-
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        /** 함께하는 가족들 */
-                        Text(text = "함께하는 가족들", style = MaterialTheme.typography.subtitle2)
 
                         Spacer(modifier = Modifier.height(8.dp))
 
@@ -168,34 +166,12 @@ fun AddScheduleScreen(navController: NavController) {
 /** 함께하는 가족들 리스트 */
 @Composable
 private fun PersonList(personList: ArrayList<Person>) {
-
-    val scrollState = rememberScrollState()
-
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentHeight()
-            .padding(horizontal = 12.dp)
-    ) {
-        Row(
-        ) {
+        Row {
             LazyRow(
-                modifier = Modifier
-                    .layout() { measurable, constraints ->
-                        val placeable = measurable.measure(
-                            constraints.copy(
-                                maxWidth = constraints.maxWidth + 52.dp.roundToPx(), //add the end padding 16.dp
-                            )
-                        )
-                        layout(placeable.width, placeable.height) {
-                            placeable.place(18.dp.roundToPx(), 0)
-                        }
-                    }
-                    .offset(x = (-18).dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 item {
-                    Spacer(modifier = Modifier.width(4.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
                 }
                 items(items = personList, itemContent = { item ->
 
@@ -205,17 +181,17 @@ private fun PersonList(personList: ArrayList<Person>) {
 
                 item {
                     /** 가족 추가 버튼 */
-                    Image(
+                    Icon(
                         modifier = Modifier
                             .size(64.dp)
-                            .border(width = 1.dp, color = Color.Black, shape = CircleShape)
+                            .border(width = 1.dp, color = Color.Gray, shape = CircleShape)
                             .clip(CircleShape)
                             .clickable {
                                 // todo: 가족 구성원 추가 화면으로 이동
                             }
                             .padding(12.dp),
-                        contentScale = ContentScale.Crop,
                         painter = rememberVectorPainter(Icons.Default.Add),
+                        tint = Color.Gray,
                         contentDescription = "Profile Image"
                     )
 
@@ -223,7 +199,6 @@ private fun PersonList(personList: ArrayList<Person>) {
                 }
             }
         }
-    }
 }
 
 /** 함께하는 가족들 리스트 아이템 */
@@ -231,15 +206,35 @@ private fun PersonList(personList: ArrayList<Person>) {
 private fun PersonListItem(item: Person) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
-        /** 프사 */
-        Image(
-            modifier = Modifier
-                .size(64.dp)
-                .clip(CircleShape),
-            contentScale = ContentScale.Crop,
-            painter = rememberAsyncImagePainter(item.imgUrl),
-            contentDescription = "Profile Image"
-        )
+        Box() {
+            /** 프사 */
+            Image(
+                modifier = Modifier
+                    .size(64.dp)
+                    .clip(CircleShape),
+                contentScale = ContentScale.Crop,
+                painter = rememberAsyncImagePainter(item.imgUrl),
+                contentDescription = "Profile Image"
+            )
+
+            /** 가족 구성원 삭제 버튼 */
+            Image(
+                modifier = Modifier
+                    .size(20.dp)
+                    .clip(CircleShape)
+                    .border(width = 1.dp, color = Color.Black, shape = CircleShape)
+                    .clickable {
+                        // todo: 가족 구성원 추가 화면으로 이동
+                    }
+                    .background(Color.White)
+                    .padding(2.dp)
+                    .align(Alignment.TopEnd),
+                contentScale = ContentScale.Crop,
+                painter = rememberVectorPainter(Icons.Default.Close),
+                contentDescription = "Profile Image"
+            )
+        }
+
 
         Spacer(modifier = Modifier.height(12.dp))
 
@@ -252,20 +247,12 @@ private fun PersonListItem(item: Person) {
             )
         )
     }
+}
 
-    /** 가족 구성원 삭제 버튼 */
-    Box() {
-        Image(
-            modifier = Modifier
-                .size(12.dp)
-                .border(width = 1.dp, color = Color.Black, shape = CircleShape)
-                .clip(CircleShape)
-                .clickable {
-                    // todo: 가족 구성원 추가 화면으로 이동
-                },
-            contentScale = ContentScale.Crop,
-            painter = rememberVectorPainter(Icons.Default.Close),
-            contentDescription = "Profile Image"
-        )
+@Preview(showBackground = true)
+@Composable
+fun PrevAddScheduleScreen() {
+    OurHomeTheme {
+        AddScheduleScreen(navController = NavController(LocalContext.current))
     }
 }
