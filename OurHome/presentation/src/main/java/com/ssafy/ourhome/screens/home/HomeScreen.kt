@@ -1,19 +1,17 @@
 package com.ssafy.ourhome.screens.home
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,14 +22,19 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
+import com.holix.android.bottomsheetdialog.compose.BottomSheetDialog
+import com.holix.android.bottomsheetdialog.compose.BottomSheetDialogProperties
+import com.kizitonwose.calendar.core.CalendarDay
 import com.ssafy.ourhome.R
 import com.ssafy.ourhome.components.OurHomeSurface
 import com.ssafy.ourhome.ui.theme.OurHomeTheme
+import com.ssafy.ourhome.utils.Schedule
 
 
 data class Person(
@@ -42,6 +45,13 @@ data class Person(
 fun HomeScreen(navController: NavController) {
 
     val scrollState = rememberScrollState()
+    val visibleBottomSheetState = remember {
+        mutableStateOf(false)
+    }
+
+    /** 달력에 필요한 데이터 */
+    var selection = remember { mutableStateOf<CalendarDay?>(null) }
+    val map = mutableMapOf<String, List<Schedule>>()
 
     /** 더미 데이터 */
     val url =
@@ -81,16 +91,18 @@ fun HomeScreen(navController: NavController) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(16.dp)
+                    .padding(horizontal = 16.dp)
                     .verticalScroll(scrollState),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
+                Spacer(modifier = Modifier.height(16.dp))
                 Row(
                     modifier = Modifier
                         .fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    // todo: 가족위치
+
+                    /** 가족위치 카드 */
                     HomeCard(
                         modifier = Modifier.weight(1f),
                         title = "가족위치",
@@ -99,12 +111,12 @@ fun HomeScreen(navController: NavController) {
                             id = R.drawable.ic_map
                         )
                     ) {
-
+                        // todo: 가족위치 클릭
                     }
 
                     Spacer(modifier = Modifier.width(16.dp))
 
-                    // todo: 초대하기
+                    /** 초대하기 카드 */
                     HomeCard(
                         modifier = Modifier.weight(1f),
                         title = "초대하기",
@@ -113,12 +125,31 @@ fun HomeScreen(navController: NavController) {
                             id = R.drawable.ic_invite
                         )
                     ) {
-
+                        // todo: 초대하기 클릭
                     }
                 }
                 Spacer(modifier = Modifier.height(16.dp))
-                // todo: 달력
-                CalendarCard(onAddScheduleClick = {})
+
+                /** 달력 카드 */
+                CalendarCard(
+                    visibleBottomSheetState = visibleBottomSheetState,
+                    selection = selection,
+                    map = map
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                /** 바텀 시트 */
+                if (visibleBottomSheetState.value) {
+                    BottomSheet(
+                        map.getOrDefault(
+                            "${selection.value!!.date.year}-${selection.value!!.date.monthValue}-${selection.value!!.date.dayOfMonth}",
+                            emptyList()
+                        )
+                    ) {
+                        visibleBottomSheetState.value = false
+                    }
+                }
             }
         }
     }
@@ -136,8 +167,11 @@ private fun HomeToolBar(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
+
         /** 로고 */
         Row(verticalAlignment = Alignment.CenterVertically) {
+
+            /** 로고 아이콘 */
             Icon(
                 modifier = Modifier.size(32.dp),
                 imageVector = Icons.Default.Home,
@@ -145,16 +179,20 @@ private fun HomeToolBar(
                 contentDescription = "icon home"
             )
             Spacer(modifier = Modifier.width(8.dp))
+
+            /** 앱 이름 */
             Text(
                 modifier = Modifier.offset(y = (-2).dp),
                 text = "우리집",
-                style = MaterialTheme.typography.h5.copy(color = Color.White)
+                style = MaterialTheme.typography.subtitle1.copy(color = Color.White)
             )
         }
 
         /** 채팅 아이콘 */
         Icon(
-            modifier = Modifier.size(32.dp).clickable { onChatClick() },
+            modifier = Modifier
+                .size(32.dp)
+                .clickable { onChatClick() },
             painter = painterResource(id = R.drawable.ic_chat_white),
             contentDescription = "icon chat",
             tint = Color.White
@@ -186,6 +224,8 @@ private fun PersonList(personList: ArrayList<Person>) {
 @Composable
 private fun PersonListItem(item: Person) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
+
+        /** 프사 */
         Image(
             modifier = Modifier
                 .size(64.dp)
@@ -195,6 +235,8 @@ private fun PersonListItem(item: Person) {
             contentDescription = "Profile Image"
         )
         Spacer(modifier = Modifier.height(12.dp))
+
+        /** 이름 */
         Text(
             text = item.name,
             style = MaterialTheme.typography.caption.copy(
@@ -224,22 +266,27 @@ fun HomeCard(
             modifier = Modifier
                 .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
         ) {
-            Text(text = title, style = MaterialTheme.typography.h6)
+            /** 헤더 */
+            Text(text = title, style = MaterialTheme.typography.subtitle2)
             Spacer(modifier = Modifier.height(12.dp))
+
+            /** 내용 */
             Text(
                 text = content,
                 style = MaterialTheme.typography.body2.copy(
-                    lineHeight = 24.sp,
+                    lineHeight = 20.sp,
                     color = Color.Gray
                 )
             )
             Spacer(modifier = Modifier.height(16.dp))
+
+            /** 아이콘 */
             Box(
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.BottomEnd
             ) {
                 Image(
-                    modifier = Modifier.size(48.dp),
+                    modifier = Modifier.size(40.dp),
                     painter = image,
                     contentDescription = "logo"
                 )
@@ -248,37 +295,117 @@ fun HomeCard(
     }
 }
 
+/** 바텀 시트 */
 @Composable
-fun CalendarCard(
-    modifier: Modifier = Modifier,
-    onAddScheduleClick: () -> Unit,
-) {
-    Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .shadow(elevation = 2.dp, shape = RoundedCornerShape(16.dp))
+fun BottomSheet(list: List<Schedule>, onDismissRequest: () -> Unit) {
+    BottomSheetDialog(
+        onDismissRequest = {
+            onDismissRequest()
+        },
+        properties = BottomSheetDialogProperties()
     ) {
-        Column(
-            modifier = Modifier
-                .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+        // content
+        Surface(
+            shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+            Column(
+                modifier = Modifier
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(text = "공유 일정", style = MaterialTheme.typography.h6)
-                Icon(
-                    modifier = Modifier.size(32.dp).clickable { onAddScheduleClick() },
-                    imageVector = Icons.Default.Add, contentDescription = "일정 추가"
-                )
-            }
+                /** 바텀 시트 스크롤 바 */
+                Box(
+                    modifier = Modifier
+                        .width(40.dp)
+                        .height(3.dp)
+                        .background(Color.LightGray),
+                ) {
 
-            Spacer(modifier = Modifier.height(12.dp))
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                /** 일정이 없을 경우 */
+                if (list.isEmpty()) {
+                    NoScheduleItem()
+                }
+                /** 있을 경우 */
+                else {
+                    ScheduleList(list)
+                }
+            }
         }
     }
 }
 
+/** 일정이 있을 경우 바텀시트 */
+@Composable
+private fun ScheduleList(list: List<Schedule>) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        /** 바텀 시트 헤더 */
+        Text(text = "오늘의 일정", style = MaterialTheme.typography.subtitle2)
+
+        /** 바텀 시트 일정 추가 */
+        Text(
+            modifier = Modifier.clickable {
+                // todo: 일정 추가 화면으로 이동
+            },
+            text = "일정 추가",
+            style = MaterialTheme.typography.body2.copy(
+                color = Color.Gray,
+                fontWeight = FontWeight.Bold
+            )
+        )
+    }
+
+    Spacer(modifier = Modifier.height(16.dp))
+
+    /** 바텀 시트 일정 리스트 */
+    TodayScheduleList(list = list)
+}
+
+/** 일정이 없을 경우 바텀시트 */
+@Composable
+private fun NoScheduleItem() {
+    /** 헤더 */
+    Text(
+        text = "등록된 일정이 없습니다",
+        style = MaterialTheme.typography.subtitle2
+    )
+
+    Spacer(modifier = Modifier.height(16.dp))
+
+    /** 달력 이미지 */
+    Image(
+        modifier = Modifier
+            .size(112.dp)
+            .clickable {
+                // todo: 일정 추가 화면으로 이동
+            },
+        painter = painterResource(id = R.drawable.ic_calendar_add),
+        contentDescription = "calendar add"
+    )
+
+    Spacer(modifier = Modifier.height(16.dp))
+
+    /** 내용 */
+    Text(
+        text = "가족과 함께하는 일정을 추가해보세요!",
+        textAlign = TextAlign.Center,
+        style = MaterialTheme.typography.body1.copy(fontWeight = FontWeight.Bold),
+    )
+    Spacer(modifier = Modifier.height(16.dp))
+}
+
+/**
+Preview
+ */
 @Preview(showBackground = true)
 @Composable
 fun PreviewHomeScreen() {

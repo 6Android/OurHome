@@ -45,7 +45,7 @@ fun TextInput(
     TextField(
         value = valueState.value,
         onValueChange = { valueState.value = it },
-        label = { Text(text = labelId) },
+        label = { Text(text = labelId, style = MaterialTheme.typography.body1) },
         singleLine = isSingleLine,
         textStyle = TextStyle(
             fontSize = 18.sp,
@@ -86,7 +86,7 @@ fun EmailInput(
     TextField(
         value = emailState.value,
         onValueChange = { emailState.value = it },
-        label = { Text(text = labelId) },
+        label = { Text(text = labelId, style = MaterialTheme.typography.body1) },
         singleLine = isSingleLine,
         textStyle = TextStyle(
             fontSize = 18.sp,
@@ -134,7 +134,7 @@ fun PasswordInput(
         onValueChange = {
             passwordState.value = it
         },
-        label = { Text(text = labelId) },
+        label = { Text(text = labelId, style = MaterialTheme.typography.body1) },
         singleLine = true,
         textStyle = TextStyle(fontSize = 18.sp, color = MaterialTheme.colors.onBackground),
         modifier = modifier

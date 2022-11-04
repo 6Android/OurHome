@@ -45,7 +45,7 @@ fun MainAppBar(
                     verticalAlignment = Alignment.CenterVertically,
 
                     ) {
-                    Text(text = title, style = MaterialTheme.typography.h6)
+                    Text(text = title, style = MaterialTheme.typography.subtitle2)
 
                     if (icon != null) {
                         Icon(

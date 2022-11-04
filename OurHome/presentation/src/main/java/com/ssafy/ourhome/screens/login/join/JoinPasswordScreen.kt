@@ -46,7 +46,7 @@ fun JoinPasswordScreen(navController: NavController = NavController(LocalContext
                 Text(
                     modifier = Modifier.padding(start = 10.dp),
                     text = "비밀번호를 입력해주세요!",
-                    style = MaterialTheme.typography.h5
+                    style = MaterialTheme.typography.subtitle1
                 )
 
                 Spacer(modifier = Modifier.height(48.dp))
