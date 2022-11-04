@@ -24,12 +24,15 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavController
+import coil.compose.AsyncImagePainter.State.Empty.painter
 import coil.compose.rememberAsyncImagePainter
 import com.ssafy.ourhome.R
 import com.ssafy.ourhome.components.MainAppBar
 import com.ssafy.ourhome.components.OurHomeSurface
 import com.ssafy.ourhome.ui.theme.Gray
+import com.ssafy.ourhome.ui.theme.MainColor
 import com.ssafy.ourhome.utils.addFocusCleaner
 
 @Composable
@@ -58,88 +61,123 @@ fun ChatScreen(navController: NavController){
     }
 }
 
+/** 채팅 메세지 목록 **/
 @Composable
 private fun ChattingMsgList() {
     LazyColumn(
-        modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight(0.9f)
+        modifier = Modifier.fillMaxWidth().fillMaxHeight(0.9f)
     ) {
-        items(100) { //TODO widthIn
+        items(20) {
+            //TODO 본인, 타인 분기 처리 후 표시
             FamilyChatItem()
             MyChatItem()
         }
     }
 }
 
+/** 내 채팅 메세지 **/
 @Composable
 fun MyChatItem() {
-    //
+    ConstraintLayout(
+        modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
+    ) {
+        val (msg, time) = createRefs()
+
+        /** 채팅 메세지 **/
+        Column(
+            modifier = Modifier.constrainAs(msg){
+                    top.linkTo(parent.top)
+                    end.linkTo(parent.end, margin = 8.dp)
+                }.clip(RoundedCornerShape(12.dp))
+                .background(MainColor)
+                .padding(8.dp)
+                .widthIn(16.dp, 180.dp)
+                .wrapContentHeight(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(
+                text = "안녕하세요",
+                style = MaterialTheme.typography.body1,
+                color = Color.White
+            )
+        }
+
+        /** 시간 **/
+        Text(
+            text = "오후 12:20 분",
+            style = MaterialTheme.typography.caption,
+            color = Gray,
+            modifier = Modifier.constrainAs(time){
+                end.linkTo(msg.start, margin = 8.dp)
+                bottom.linkTo(msg.bottom)
+            }
+        )
+    }
 }
 
+/** 타인 채팅 메세지 **/
 @Composable
 fun FamilyChatItem() {
     val painter =
         rememberAsyncImagePainter("https://i.pinimg.com/222x/36/30/f7/3630f7d930f91e495d93c02833b4abfc.jpg")
 
-    var msgHeight by remember {
-        mutableStateOf<Int>(0)
-    }
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 16.dp)
+    ConstraintLayout(
+        modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
     ) {
+        val (profile, msg, time) = createRefs()
+        /** 프로필 **/
         Column(
+            modifier = Modifier.constrainAs(profile){
+                top.linkTo(parent.top)
+                start.linkTo(parent.start)
+            },
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top
         ) {
             Image(
-                modifier = Modifier
-                    .size(64.dp)
-                    .clip(CircleShape),
+                modifier = Modifier.size(64.dp).clip(CircleShape),
                 contentScale = ContentScale.Crop,
                 painter = painter,
                 contentDescription = "Profile Image"
             )
-            Text(modifier = Modifier.padding(top = 8.dp),
+            Text(
+                modifier = Modifier.padding(top = 8.dp),
                 text = "아빠",
                 style = MaterialTheme.typography.body2
             )
         }
-
-        Spacer(modifier = Modifier.width(8.dp))
-
+        /** 채팅 메세지 **/
         Column(
-            modifier = Modifier
-                .clip(RoundedCornerShape(12.dp))
+            modifier = Modifier.constrainAs(msg){
+                    top.linkTo(profile.top)
+                    start.linkTo(profile.end, margin = 8.dp)
+                }.clip(RoundedCornerShape(12.dp))
                 .background(Color.White)
-                .padding(8.dp)
-                .widthIn(16.dp, 180.dp)
-                .heightIn(16.dp)
-                .onGloballyPositioned { coordinates ->
-                    msgHeight = coordinates.size.height
-                },
+                .widthIn(16.dp, 188.dp)
+                .wrapContentHeight()
+                .padding(8.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Text(text = "ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd")
+            Text(
+                text = "안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요",
+                style = MaterialTheme.typography.body1
+            )
         }
-
-        Spacer(modifier = Modifier.width(8.dp))
-
-        Box(
-            modifier = Modifier.height(msgHeight.dp).background(Color.Black),
-        ) {
-            Text(text = "오후 12:20 분",
-                style = MaterialTheme.typography.caption,
-                color = Gray,
-            modifier = Modifier.align(Alignment.BottomStart))
-        }
+        /** 시간 **/
+        Text(
+            text = "오후 12:20 분",
+            style = MaterialTheme.typography.caption,
+            color = Gray,
+            modifier = Modifier.constrainAs(time){
+                start.linkTo(msg.end, margin = 8.dp)
+                bottom.linkTo(msg.bottom)
+            }
+        )
     }
 }
 
+/** 채팅 입력 창 **/
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun ChattingTextInput(chatContent: MutableState<String>) {
@@ -151,9 +189,7 @@ private fun ChattingTextInput(chatContent: MutableState<String>) {
         verticalArrangement = Arrangement.Bottom
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 12.dp),
+            modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(
@@ -206,6 +242,7 @@ private fun ChattingTextInput(chatContent: MutableState<String>) {
     }
 }
 
+/** 메세지 전송 아이콘 **/
 @Composable
 private fun SendIcon() {
     Image(
