@@ -9,10 +9,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
@@ -52,17 +49,26 @@ import java.util.*
 
 /** 오늘 일정 리스트  **/
 @Composable
-fun TodayScheduleList(modifier: Modifier = Modifier, list: List<Schedule>) {
+fun TodayScheduleList(
+    modifier: Modifier = Modifier,
+    list: List<Schedule>,
+    onScheduleClick: (Schedule) -> Unit,
+) {
     LazyColumn(modifier = modifier) {
         items(list) { item ->
-            TodayScheduleListItem(schedule = item)
+            TodayScheduleListItem(schedule = item, onScheduleClick = onScheduleClick)
         }
     }
 }
 
 /** 오늘 일정 리스트 아이템 **/
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun TodayScheduleListItem(modifier: Modifier = Modifier.fillMaxWidth(), schedule: Schedule) {
+fun TodayScheduleListItem(
+    modifier: Modifier = Modifier.fillMaxWidth(),
+    schedule: Schedule,
+    onScheduleClick: (Schedule) -> Unit
+) {
     Card(
         modifier = modifier
             .padding(vertical = 8.dp)
@@ -71,6 +77,7 @@ fun TodayScheduleListItem(modifier: Modifier = Modifier.fillMaxWidth(), schedule
         Column(
             modifier = modifier.clickable {
                 // todo: 일정 상세로 이동
+                onScheduleClick(schedule)
             }
         ) {
             Row(

@@ -51,7 +51,7 @@ fun SelectDate(
 
 /** 제목 */
 @Composable
-fun WriteTitle(titleState: MutableState<String>) {
+fun WriteTitle(titleState: MutableState<String>, isEditable: Boolean = true) {
     Text(
         modifier = Modifier.offset(x = 8.dp),
         text = "제목",
@@ -60,13 +60,13 @@ fun WriteTitle(titleState: MutableState<String>) {
     TextInput(
         valueState = titleState,
         placeholder = "제목을 입력해주세요",
-        enabled = true
+        enabled = isEditable
     )
 }
 
 /** 내용 */
 @Composable
-fun WriteContent(contentState: MutableState<String>) {
+fun WriteContent(contentState: MutableState<String>, isEditable: Boolean = true) {
     Text(
         modifier = Modifier.offset(x = 8.dp),
         text = "내용",
@@ -75,13 +75,13 @@ fun WriteContent(contentState: MutableState<String>) {
     TextInput(
         valueState = contentState,
         labelId = "간단한 내용을 작성해주세요.",
-        enabled = true
+        enabled = isEditable
     )
 }
 
 /** 함께하는 가족들 리스트 */
 @Composable
-fun PersonList(personList: ArrayList<Person>, onAddClick: () -> Unit) {
+fun PersonList(personList: ArrayList<Person>, isEditable: Boolean = true, onAddClick: () -> Unit) {
     Row {
         LazyRow(
             horizontalArrangement = Arrangement.spacedBy(16.dp)
@@ -92,28 +92,29 @@ fun PersonList(personList: ArrayList<Person>, onAddClick: () -> Unit) {
             items(items = personList, itemContent = { item ->
 
                 /** 구성원 리스트 아이템 */
-                PersonListItem(item)
+                PersonListItem(item, isEditable)
             })
+            if(isEditable) {
+                item {
 
-            item {
+                    /** 가족 추가 버튼 */
+                    Icon(
+                        modifier = Modifier
+                            .size(64.dp)
+                            .border(width = 1.dp, color = Color.Gray, shape = CircleShape)
+                            .clip(CircleShape)
+                            .clickable {
+                                // todo: 가족 구성원 추가 화면으로 이동
+                                onAddClick()
+                            }
+                            .padding(12.dp),
+                        painter = rememberVectorPainter(Icons.Default.Add),
+                        tint = Color.Gray,
+                        contentDescription = "Profile Image"
+                    )
 
-                /** 가족 추가 버튼 */
-                Icon(
-                    modifier = Modifier
-                        .size(64.dp)
-                        .border(width = 1.dp, color = Color.Gray, shape = CircleShape)
-                        .clip(CircleShape)
-                        .clickable {
-                            // todo: 가족 구성원 추가 화면으로 이동
-                            onAddClick()
-                        }
-                        .padding(12.dp),
-                    painter = rememberVectorPainter(Icons.Default.Add),
-                    tint = Color.Gray,
-                    contentDescription = "Profile Image"
-                )
-
-                Spacer(modifier = Modifier.width(16.dp))
+                    Spacer(modifier = Modifier.width(16.dp))
+                }
             }
         }
     }
@@ -121,7 +122,7 @@ fun PersonList(personList: ArrayList<Person>, onAddClick: () -> Unit) {
 
 /** 함께하는 가족들 리스트 아이템 */
 @Composable
-fun PersonListItem(item: Person) {
+fun PersonListItem(item: Person, isEditable: Boolean = true) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
         Box() {
@@ -137,23 +138,24 @@ fun PersonListItem(item: Person) {
             )
 
             /** 가족 구성원 삭제 버튼 */
-            Image(
-                modifier = Modifier
-                    .size(20.dp)
-                    .clip(CircleShape)
-                    .border(width = 1.dp, color = Color.Black, shape = CircleShape)
-                    .clickable {
-                        // todo: 가족 구성원 추가 화면으로 이동
-                    }
-                    .background(Color.White)
-                    .padding(2.dp)
-                    .align(Alignment.TopEnd),
-                contentScale = ContentScale.Crop,
-                painter = rememberVectorPainter(Icons.Default.Close),
-                contentDescription = "Profile Image"
-            )
+            if(isEditable) {
+                Image(
+                    modifier = Modifier
+                        .size(20.dp)
+                        .clip(CircleShape)
+                        .border(width = 1.dp, color = Color.Black, shape = CircleShape)
+                        .clickable {
+                            // todo: 가족 구성원 추가 화면으로 이동
+                        }
+                        .background(Color.White)
+                        .padding(2.dp)
+                        .align(Alignment.TopEnd),
+                    contentScale = ContentScale.Crop,
+                    painter = rememberVectorPainter(Icons.Default.Close),
+                    contentDescription = "Profile Image"
+                )
+            }
         }
-
 
         Spacer(modifier = Modifier.height(12.dp))
 

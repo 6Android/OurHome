@@ -1,5 +1,6 @@
 package com.ssafy.ourhome.screens.home
 
+import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
@@ -38,6 +39,7 @@ import com.ssafy.ourhome.ui.theme.OurHomeTheme
 import com.ssafy.ourhome.utils.Person
 import com.ssafy.ourhome.utils.Schedule
 import com.ssafy.ourhome.utils.personList
+import kotlin.math.log
 
 
 @Composable
@@ -46,6 +48,9 @@ fun HomeScreen(navController: NavController) {
     val scrollState = rememberScrollState()
     val visibleBottomSheetState = remember {
         mutableStateOf(false)
+    }
+    val onScheduleClick: (Schedule) -> Unit = { schedule ->
+        navController.navigate(OurHomeScreens.ScheduleDetailScreen.name)
     }
 
     /** 달력에 필요한 데이터 */
@@ -138,7 +143,8 @@ fun HomeScreen(navController: NavController) {
                             "${selection.value!!.date.year}-${selection.value!!.date.monthValue}-${selection.value!!.date.dayOfMonth}",
                             emptyList()
                         ),
-                        onAddScheduleClick = { moveToAddScheduleScreen(navController) }
+                        onAddScheduleClick = { moveToAddScheduleScreen(navController) },
+                        onScheduleClick = onScheduleClick
                     ) {
                         visibleBottomSheetState.value = false
                     }
@@ -293,6 +299,7 @@ fun HomeCard(
 fun BottomSheet(
     list: List<Schedule>,
     onAddScheduleClick: () -> Unit,
+    onScheduleClick: (Schedule) -> Unit,
     onDismissRequest: () -> Unit
 ) {
     BottomSheetDialog(
@@ -330,7 +337,11 @@ fun BottomSheet(
                 }
                 /** 있을 경우 */
                 else {
-                    ScheduleList(list = list, onAddScheduleClick = onAddScheduleClick)
+                    ScheduleList(
+                        list = list,
+                        onAddScheduleClick = onAddScheduleClick,
+                        onScheduleClick = onScheduleClick
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(32.dp))
@@ -341,7 +352,11 @@ fun BottomSheet(
 
 /** 일정이 있을 경우 바텀시트 */
 @Composable
-private fun ScheduleList(list: List<Schedule>, onAddScheduleClick: () -> Unit) {
+private fun ScheduleList(
+    list: List<Schedule>,
+    onAddScheduleClick: () -> Unit,
+    onScheduleClick: (Schedule) -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -369,7 +384,7 @@ private fun ScheduleList(list: List<Schedule>, onAddScheduleClick: () -> Unit) {
     Spacer(modifier = Modifier.height(16.dp))
 
     /** 바텀 시트 일정 리스트 */
-    TodayScheduleList(list = list)
+    TodayScheduleList(list = list, onScheduleClick = onScheduleClick)
 }
 
 /** 일정이 없을 경우 바텀시트 */

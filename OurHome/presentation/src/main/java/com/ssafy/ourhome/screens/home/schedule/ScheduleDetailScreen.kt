@@ -75,12 +75,12 @@ fun ScheduleDetailScreen(navController: NavHostController) {
                             Spacer(modifier = Modifier.height(16.dp))
 
                             /** 제목 */
-                            WriteTitle(titleState)
+                            WriteTitle(titleState, false)
 
                             Spacer(modifier = Modifier.height(16.dp))
 
                             /** 내용 */
-                            WriteContent(contentState)
+                            WriteContent(contentState, false)
 
                             Spacer(modifier = Modifier.height(16.dp))
 
@@ -95,7 +95,7 @@ fun ScheduleDetailScreen(navController: NavHostController) {
                         Spacer(modifier = Modifier.height(8.dp))
 
                         /** 함께하는 가족들 리스트 */
-                        PersonList(personList = personList) {
+                        PersonList(personList = personList, isEditable = false) {
                             navController.navigate(OurHomeScreens.AddMemberScreen.name)
                         }
                     }
