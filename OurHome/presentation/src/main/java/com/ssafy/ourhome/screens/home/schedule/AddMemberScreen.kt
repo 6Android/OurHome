@@ -1,6 +1,7 @@
 package com.ssafy.ourhome.screens.home.schedule
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -19,6 +20,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
+import com.ssafy.ourhome.R
 import com.ssafy.ourhome.components.MainAppBar
 import com.ssafy.ourhome.components.OurHomeSurface
 import com.ssafy.ourhome.components.RoundedButton
@@ -40,9 +42,11 @@ fun AddMemberScreen(navController: NavController) {
             )
         }
     ) {
-        OurHomeSurface() {
+        OurHomeSurface {
             /** 가족 리스트  */
-            FamilyList(familyState.value)
+            FamilyList(familyState.value) {
+
+            }
 
             /** 확인 버튼 */
             ConfirmButton {
@@ -52,46 +56,61 @@ fun AddMemberScreen(navController: NavController) {
     }
 }
 
+/** 가족 리스트  */
 @Composable
-fun FamilyList(list: List<Person>) {
-    LazyColumn() {
+fun FamilyList(list: List<Person>, onItemClick: () -> Unit) {
+    LazyColumn(
+        modifier = Modifier.fillMaxHeight(0.9f),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        item { }
         items(list) { person ->
-            FamilyListItem(person = person)
+            FamilyListItem(person = person, onItemClick = onItemClick)
         }
+        item { }
     }
 }
 
+/** 가족 리스트 아이템 */
 @Composable
-fun FamilyListItem(person: Person) {
+fun FamilyListItem(person: Person, onItemClick: () -> Unit) {
     Row(
-        modifier = Modifier.padding(16.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onItemClick() }
+            .padding(horizontal = 24.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Image(
-            modifier = Modifier
-                .size(64.dp)
-                .clip(CircleShape),
-            contentScale = ContentScale.Crop,
-            painter = rememberAsyncImagePainter(person.imgUrl),
-            contentDescription = "Profile Image"
-        )
-        Text(text = person.name, style = MaterialTheme.typography.body2)
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Image(
+                modifier = Modifier
+                    .size(64.dp)
+                    .clip(CircleShape),
+                contentScale = ContentScale.Crop,
+                painter = rememberAsyncImagePainter(person.imgUrl),
+                contentDescription = "Profile Image"
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            Text(text = person.name, style = MaterialTheme.typography.body2)
+        }
         if (person.checked) {
-//            Image(
-//                painter = painterResource(id = R.drawable.ic_checked),
-//                contentDescription = "checked"
-//            )
+            Image(
+                modifier = Modifier.size(24.dp),
+                painter = painterResource(id = R.drawable.ic_checked),
+                contentDescription = "checked"
+            )
         } else {
-//            Image(
-//                painter = painterResource(id = R.drawable.ic_unchecked),
-//                contentDescription = "checked"
-//            )
+            Image(
+                modifier = Modifier.size(24.dp),
+                painter = painterResource(id = R.drawable.ic_unchecked),
+                contentDescription = "checked"
+            )
         }
     }
 }
 
-
+/** 확인 버튼 */
 @Composable
 fun ConfirmButton(onClick: () -> Unit) {
     Box(
