@@ -9,7 +9,6 @@ import androidx.navigation.compose.navArgument
 import com.ssafy.ourhome.screens.NextScreen
 import com.ssafy.ourhome.screens.album.AlbumDetailScreen
 import com.ssafy.ourhome.screens.album.AlbumScreen
-import com.ssafy.ourhome.screens.album.Photo
 import com.ssafy.ourhome.screens.chat.ChatScreen
 import com.ssafy.ourhome.screens.home.HomeScreen
 import com.ssafy.ourhome.screens.userpage.MyPageScreen
