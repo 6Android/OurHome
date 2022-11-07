@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
@@ -31,6 +32,7 @@ import com.ssafy.ourhome.navigation.OurHomeScreens
 import com.ssafy.ourhome.ui.theme.Gray
 import com.ssafy.ourhome.ui.theme.MainColor
 import com.ssafy.ourhome.ui.theme.nanum
+import com.ssafy.ourhome.utils.CHATTING_ICON_BLACK
 import com.ssafy.ourhome.utils.SETTING_ICON
 
 @Composable
@@ -40,7 +42,7 @@ fun QuestionScreen(navController: NavController) {
     val scrollState = rememberScrollState()
 
     Scaffold(topBar = { // TODO 세팅 아이콘 -> 채팅 아이콘
-        MainAppBar(title = "질문", backIconEnable = false, icon = painterResource(id = SETTING_ICON), onIconClick = {
+        MainAppBar(title = "질문", backIconEnable = false, icon = painterResource(id = CHATTING_ICON_BLACK), onIconClick = {
             navigateChatScreen(navController)
         })
     }) {

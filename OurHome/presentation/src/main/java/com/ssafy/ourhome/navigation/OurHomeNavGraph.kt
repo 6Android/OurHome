@@ -7,6 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navArgument
 import com.ssafy.ourhome.screens.NextScreen
+import com.ssafy.ourhome.screens.album.AlbumDetailScreen
 import com.ssafy.ourhome.screens.album.AlbumScreen
 import com.ssafy.ourhome.screens.chat.ChatScreen
 import com.ssafy.ourhome.screens.home.HomeScreen
@@ -76,6 +77,21 @@ fun OurHomeNavGraph(navController: NavHostController) {
 
         composable(OurHomeScreens.ChatScreen.name){
             ChatScreen(navController = navController)
+        }
+
+        composable(OurHomeScreens.AlbumScreen.name){
+            AlbumScreen(navController = navController)
+        }
+
+        composable("${OurHomeScreens.AlbumDetailScreen.name}/{photoUrl}/{photoDate}",
+            arguments = listOf(navArgument(name = "photoUrl"){
+                type = NavType.StringType
+            }, navArgument(name = "photoDate"){
+                type = NavType.StringType
+            })
+        ){ backStackEntry ->
+            AlbumDetailScreen(navController = navController, photoUrl = backStackEntry!!.arguments!!.getString("photoUrl")!!,
+            photoDate = backStackEntry!!.arguments!!.getString("photoDate")!!)
         }
 
         composable(
