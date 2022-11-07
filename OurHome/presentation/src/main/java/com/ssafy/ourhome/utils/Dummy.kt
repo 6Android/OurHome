@@ -75,32 +75,38 @@ fun getSchedules(yearMonth: YearMonth): List<Schedule> {
 
 /** 일정 추가에서 사용하는 프로필 */
 data class Person(
-    val imgUrl: String, val name: String, var checked: Boolean = false
+    val id: Int, val imgUrl: String, val name: String, var checked: Boolean = false
 )
 
 val personList = arrayListOf(
     Person(
+        1,
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRxZScLkNntCccfde87I4ZcUM45MzxUb9FcmA&usqp=CAU",
         "유지니"
     ),
     Person(
+        2,
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQvGknHPBUegusBb26NtSy4y47-yxr2Q_-Hwg&usqp=CAU",
         "아이유"
     ),
     Person(
+        3,
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRxZScLkNntCccfde87I4ZcUM45MzxUb9FcmA&usqp=CAU",
         "유지니"
     ),
     Person(
+        4,
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQvGknHPBUegusBb26NtSy4y47-yxr2Q_-Hwg&usqp=CAU",
         "아이유"
     ),
     Person(
+        5,
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRxZScLkNntCccfde87I4ZcUM45MzxUb9FcmA&usqp=CAU",
         "유지니"
     ),
     Person(
+        6,
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQvGknHPBUegusBb26NtSy4y47-yxr2Q_-Hwg&usqp=CAU",
         "아이유"
-    ),
+    )
 )
