@@ -24,10 +24,7 @@ fun JoinEmailScreen(navController: NavController = NavController(LocalContext.cu
         mutableStateOf("")
     }
 
-    OurHomeSurface(
-//        contentAlignment = Alignment.BottomCenter
-    ) {
-        //Surface(modifier = Modifier.fillMaxSize().background(Color.Transparent)) {
+    OurHomeSurface {
         Column(modifier = Modifier.fillMaxHeight()) {
 
             /** 툴바 */

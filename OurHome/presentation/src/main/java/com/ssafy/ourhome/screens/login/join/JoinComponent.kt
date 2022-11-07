@@ -16,9 +16,8 @@ import com.ssafy.ourhome.ui.theme.MainColor
 fun NextButton(title: String, onClick: () -> Unit) {
     /** 다음 버튼 */
     Box(
-        modifier = Modifier
-            .padding(24.dp)
-//        , contentAlignment = Alignment.BottomCenter
+        modifier = Modifier.fillMaxSize()
+            .padding(24.dp), contentAlignment = Alignment.BottomCenter
     ) {
         RoundedButton(
             modifier = Modifier

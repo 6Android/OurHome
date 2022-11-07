@@ -98,6 +98,9 @@ dependencies {
     implementation 'com.google.maps.android:maps-compose:2.5.3'
     implementation 'com.google.android.gms:play-services-maps:18.0.2'
 
+    // ComposeCalendar
+    implementation 'com.squaredem:composecalendar:1.0.4'
+
     // status bar customization
     implementation "com.google.accompanist:accompanist-systemuicontroller:0.23.1"
 

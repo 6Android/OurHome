@@ -1,5 +1,6 @@
 package com.ssafy.ourhome.screens.home
 
+import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
@@ -33,13 +34,13 @@ import com.holix.android.bottomsheetdialog.compose.BottomSheetDialogProperties
 import com.kizitonwose.calendar.core.CalendarDay
 import com.ssafy.ourhome.R
 import com.ssafy.ourhome.components.OurHomeSurface
+import com.ssafy.ourhome.navigation.OurHomeScreens
 import com.ssafy.ourhome.ui.theme.OurHomeTheme
+import com.ssafy.ourhome.utils.Person
 import com.ssafy.ourhome.utils.Schedule
+import com.ssafy.ourhome.utils.personList
+import kotlin.math.log
 
-
-data class Person(
-    val imgUrl: String, val name: String
-)
 
 @Composable
 fun HomeScreen(navController: NavController) {
@@ -48,17 +49,13 @@ fun HomeScreen(navController: NavController) {
     val visibleBottomSheetState = remember {
         mutableStateOf(false)
     }
+    val onScheduleClick: (Schedule) -> Unit = { schedule ->
+        navController.navigate(OurHomeScreens.ScheduleDetailScreen.name)
+    }
 
     /** 달력에 필요한 데이터 */
     var selection = remember { mutableStateOf<CalendarDay?>(null) }
     val map = mutableMapOf<String, List<Schedule>>()
-
-    /** 더미 데이터 */
-    val url =
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQvGknHPBUegusBb26NtSy4y47-yxr2Q_-Hwg&usqp=CAU"
-    val person = Person(url, "아이유")
-    val personList = arrayListOf(person, person, person, person)
-    /** 더미 데이터 */
 
     Scaffold(topBar = {
 
@@ -142,10 +139,12 @@ fun HomeScreen(navController: NavController) {
                 /** 바텀 시트 */
                 if (visibleBottomSheetState.value) {
                     BottomSheet(
-                        map.getOrDefault(
+                        list = map.getOrDefault(
                             "${selection.value!!.date.year}-${selection.value!!.date.monthValue}-${selection.value!!.date.dayOfMonth}",
                             emptyList()
-                        )
+                        ),
+                        onAddScheduleClick = { moveToAddScheduleScreen(navController) },
+                        onScheduleClick = onScheduleClick
                     ) {
                         visibleBottomSheetState.value = false
                     }
@@ -297,12 +296,19 @@ fun HomeCard(
 
 /** 바텀 시트 */
 @Composable
-fun BottomSheet(list: List<Schedule>, onDismissRequest: () -> Unit) {
+fun BottomSheet(
+    list: List<Schedule>,
+    onAddScheduleClick: () -> Unit,
+    onScheduleClick: (Schedule) -> Unit,
+    onDismissRequest: () -> Unit
+) {
     BottomSheetDialog(
         onDismissRequest = {
             onDismissRequest()
         },
-        properties = BottomSheetDialogProperties()
+        properties = BottomSheetDialogProperties(
+
+        )
     ) {
         // content
         Surface(
@@ -327,12 +333,18 @@ fun BottomSheet(list: List<Schedule>, onDismissRequest: () -> Unit) {
 
                 /** 일정이 없을 경우 */
                 if (list.isEmpty()) {
-                    NoScheduleItem()
+                    NoScheduleItem(onAddScheduleClick = onAddScheduleClick)
                 }
                 /** 있을 경우 */
                 else {
-                    ScheduleList(list)
+                    ScheduleList(
+                        list = list,
+                        onAddScheduleClick = onAddScheduleClick,
+                        onScheduleClick = onScheduleClick
+                    )
                 }
+
+                Spacer(modifier = Modifier.height(32.dp))
             }
         }
     }
@@ -340,7 +352,11 @@ fun BottomSheet(list: List<Schedule>, onDismissRequest: () -> Unit) {
 
 /** 일정이 있을 경우 바텀시트 */
 @Composable
-private fun ScheduleList(list: List<Schedule>) {
+private fun ScheduleList(
+    list: List<Schedule>,
+    onAddScheduleClick: () -> Unit,
+    onScheduleClick: (Schedule) -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -354,7 +370,8 @@ private fun ScheduleList(list: List<Schedule>) {
         /** 바텀 시트 일정 추가 */
         Text(
             modifier = Modifier.clickable {
-                // todo: 일정 추가 화면으로 이동
+                // 일정 추가 화면으로 이동
+                onAddScheduleClick()
             },
             text = "일정 추가",
             style = MaterialTheme.typography.body2.copy(
@@ -367,12 +384,12 @@ private fun ScheduleList(list: List<Schedule>) {
     Spacer(modifier = Modifier.height(16.dp))
 
     /** 바텀 시트 일정 리스트 */
-    TodayScheduleList(list = list)
+    TodayScheduleList(list = list, onScheduleClick = onScheduleClick)
 }
 
 /** 일정이 없을 경우 바텀시트 */
 @Composable
-private fun NoScheduleItem() {
+private fun NoScheduleItem(onAddScheduleClick: () -> Unit) {
     /** 헤더 */
     Text(
         text = "등록된 일정이 없습니다",
@@ -386,7 +403,8 @@ private fun NoScheduleItem() {
         modifier = Modifier
             .size(112.dp)
             .clickable {
-                // todo: 일정 추가 화면으로 이동
+                // 일정 추가 화면으로 이동
+                onAddScheduleClick()
             },
         painter = painterResource(id = R.drawable.ic_calendar_add),
         contentDescription = "calendar add"
@@ -400,7 +418,11 @@ private fun NoScheduleItem() {
         textAlign = TextAlign.Center,
         style = MaterialTheme.typography.body1.copy(fontWeight = FontWeight.Bold),
     )
-    Spacer(modifier = Modifier.height(16.dp))
+}
+
+/** 일정 추가 화면으로 가는 함수 */
+fun moveToAddScheduleScreen(navController: NavController) {
+    navController.navigate(OurHomeScreens.AddScheduleScreen.name)
 }
 
 /**
