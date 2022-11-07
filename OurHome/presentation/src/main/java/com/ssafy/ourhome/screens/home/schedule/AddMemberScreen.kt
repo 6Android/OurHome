@@ -1,5 +1,6 @@
 package com.ssafy.ourhome.screens.home.schedule
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -9,9 +10,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,12 +26,23 @@ import com.ssafy.ourhome.components.RoundedButton
 import com.ssafy.ourhome.utils.Person
 import com.ssafy.ourhome.utils.personList
 
-
+@SuppressLint("UnrememberedMutableState")
 @Composable
 fun AddMemberScreen(navController: NavController) {
-    val familyState = remember {
-        mutableStateOf(personList)
+    var familyState = mutableStateListOf<Person>()
+    familyState.addAll(personList)
+
+    val onPersonClick: (Person) -> Unit = { person ->
+        var idx = 0
+        familyState.forEachIndexed { index, it ->
+            if (it.id == person.id) {
+                idx = index
+                return@forEachIndexed
+            }
+        }
+        familyState[idx] = familyState[idx].copy(checked = !person.checked)
     }
+
     Scaffold(
         topBar = {
             MainAppBar(
@@ -44,9 +54,7 @@ fun AddMemberScreen(navController: NavController) {
     ) {
         OurHomeSurface {
             /** 가족 리스트  */
-            FamilyList(familyState.value) {
-
-            }
+            FamilyList(familyState, onPersonClick)
 
             /** 확인 버튼 */
             ConfirmButton {
@@ -58,7 +66,7 @@ fun AddMemberScreen(navController: NavController) {
 
 /** 가족 리스트  */
 @Composable
-fun FamilyList(list: List<Person>, onItemClick: () -> Unit) {
+fun FamilyList(list: List<Person>, onItemClick: (Person) -> Unit) {
     LazyColumn(
         modifier = Modifier.fillMaxHeight(0.9f),
         verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -73,11 +81,11 @@ fun FamilyList(list: List<Person>, onItemClick: () -> Unit) {
 
 /** 가족 리스트 아이템 */
 @Composable
-fun FamilyListItem(person: Person, onItemClick: () -> Unit) {
+fun FamilyListItem(person: Person, onItemClick: (Person) -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onItemClick() }
+            .clickable { onItemClick(person) }
             .padding(horizontal = 24.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
