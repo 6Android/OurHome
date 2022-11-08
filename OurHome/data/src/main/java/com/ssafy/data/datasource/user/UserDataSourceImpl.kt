@@ -12,6 +12,6 @@ class UserDataSourceImpl @Inject constructor(
     override fun getFamilyUsers(familyCode: String)
         = fireStore.collection(FAMILY).document(familyCode).collection(USER)
 
-    override fun getMyProfile(familyCode: String, email: String)
+    override fun getProfile(familyCode: String, email: String)
         = fireStore.collection(FAMILY).document(familyCode).collection(USER).document(email)
 }

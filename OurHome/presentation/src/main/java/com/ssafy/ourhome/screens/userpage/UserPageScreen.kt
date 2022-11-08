@@ -8,33 +8,53 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.ssafy.domain.model.user.DomainUserDTO
+import com.ssafy.domain.utils.ResultType
 import com.ssafy.ourhome.components.MainAppBar
 import com.ssafy.ourhome.components.OurHomeSurface
-import com.ssafy.ourhome.ui.theme.OurHomeTheme
 import com.ssafy.ourhome.utils.SETTING_ICON
 
 @Composable
-fun UserPageScreen(navController: NavController = NavController(LocalContext.current)){
+fun UserPageScreen(
+    navController: NavController,
+    email: String
+) {
     val scrollState = rememberScrollState()
+
+    val vm: UserPageViewModel = hiltViewModel()
+
+    // TODO : 패밀리코드, 유저 이메일
+    vm.getProfile("EX7342", email = email)
+
+    val user = remember {
+        mutableStateOf(DomainUserDTO())
+    }
+
+    when (val userResponse = vm.userResponse) {
+        is ResultType.Uninitialized -> {}
+        is ResultType.Success -> {
+            user.value = userResponse.data
+        }
+        is ResultType.Error -> print(userResponse.exception)
+    }
 
     Scaffold(topBar = {
         MainAppBar(
-            title = "상대방 페이지",
+            title = "유저 정보",
             backIconEnable = true,
-            icon = painterResource(id = SETTING_ICON),
             onBackClick = {
                 navController.popBackStack()
             }
         )
     }) {
 
-        // TODO : 데이터 통신
         OurHomeSurface {
             Column(
                 modifier = Modifier
@@ -42,28 +62,23 @@ fun UserPageScreen(navController: NavController = NavController(LocalContext.cur
                     .verticalScroll(scrollState)
             ) {
                 Spacer(modifier = Modifier.padding(top = 16.dp))
-                UserInfoCard(
-                    userName = "한상엽",
-                    userEmail = "super7615@naver.com",
-                    userPhone = "010-1234-5678",
-                    isMyPage = false,
-                    isManager = true
-                )
+
+                UserInfoCard(userDTO = user.value)
 
                 Spacer(modifier = Modifier.height(16.dp))
-                UserColorCardList()
+                UserColorCardList(userDTO = user.value)
 
                 Spacer(modifier = Modifier.height(16.dp))
-                UserCommonCardList("안드로이드 개발자", "운동", "달리기")
+                UserCommonCardList(userDTO = user.value)
             }
         }
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-private fun UserPagePreview(){
-    OurHomeTheme {
-        UserPageScreen()
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//private fun UserPagePreview() {
+//    OurHomeTheme {
+//        UserPageScreen()
+//    }
+//}

@@ -30,8 +30,8 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getMyProfile(familyCode: String, email: String): Flow<UserResponse> = callbackFlow {
-        val snapshotListener = userDataSource.getMyProfile(familyCode, email).addSnapshotListener { snapshot, e ->
+    override fun getProfile(familyCode: String, email: String): Flow<UserResponse> = callbackFlow {
+        val snapshotListener = userDataSource.getProfile(familyCode, email).addSnapshotListener { snapshot, e ->
             val response = if (snapshot != null){
                 val user = snapshot.toObject(DomainUserDTO::class.java)!!
                 ResultType.Success(user)

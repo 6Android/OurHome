@@ -11,5 +11,5 @@ typealias UserResponse = ResultType<DomainUserDTO>
 
 interface UserRepository {
     fun getFamilyUsers(familyCode: String): Flow<UsersResponse>
-    fun getMyProfile(familyCode: String, email: String): Flow<UserResponse>
+    fun getProfile(familyCode: String, email: String): Flow<UserResponse>
 }

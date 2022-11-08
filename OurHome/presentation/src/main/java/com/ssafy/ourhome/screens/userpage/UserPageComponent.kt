@@ -1,5 +1,6 @@
 package com.ssafy.ourhome.screens.userpage
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -24,6 +25,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
+import com.ssafy.domain.model.user.DomainUserDTO
 import com.ssafy.ourhome.R
 import com.ssafy.ourhome.ui.theme.BirthDayColor
 import com.ssafy.ourhome.ui.theme.BloodTypeColor
@@ -31,16 +33,16 @@ import com.ssafy.ourhome.ui.theme.MBTIColor
 import com.ssafy.ourhome.ui.theme.hannar
 
 @Composable
-fun UserColorCardList() {
+fun UserColorCardList(userDTO: DomainUserDTO) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        BirthDayCard(cardModifier = Modifier.weight(1f), content = "1997.12.14")
+        BirthDayCard(cardModifier = Modifier.weight(1f), content = userDTO.birthday)
         Spacer(modifier = Modifier.width(12.dp))
-        BloodTypeCard(cardModifier = Modifier.weight(1f), content = "Rh+ O")
+        BloodTypeCard(cardModifier = Modifier.weight(1f), content = userDTO.blood_type)
         Spacer(modifier = Modifier.width(12.dp))
-        MBTICard(cardModifier = Modifier.weight(1f), content = "ENFP")
+        MBTICard(cardModifier = Modifier.weight(1f), content = userDTO.mbti)
     }
 }
 
@@ -74,17 +76,15 @@ fun UserCommonCard(
 
 @Composable
 fun UserCommonCardList(
-    jobContent: String,
-    likeContent: String,
-    hobbyContent: String
+    userDTO: DomainUserDTO
 ) {
     Column(
     ) {
-        UserCommonCard(title = "직업", content = jobContent)
+        UserCommonCard(title = "직업", content = userDTO.job)
         Spacer(modifier = Modifier.height(16.dp))
-        UserCommonCard(title = "관심사", content = likeContent)
+        UserCommonCard(title = "관심사", content = userDTO.interest)
         Spacer(modifier = Modifier.height(16.dp))
-        UserCommonCard(title = "취미", content = hobbyContent)
+        UserCommonCard(title = "취미", content = userDTO.hobby)
         Spacer(modifier = Modifier.height(16.dp))
     }
 }
@@ -94,9 +94,11 @@ fun BirthDayCard(
     cardModifier: Modifier = Modifier,
     content: String,
 ) {
-    val year = content.split(".")[0]
-    val month = content.split(".")[1]
-    val day = content.split(".")[2]
+    Log.d("test5", "BirthDayCard: $content")
+    val split = content.split(".")
+    val year = split[0]
+    val month = split[1]
+    val day = split[2]
 
     val numberSpanStyle = SpanStyle(
 
@@ -267,12 +269,7 @@ fun MBTICard(
 
 @Composable
 fun UserInfoCard(
-    imageUrl: String = "default",
-    userName: String,
-    userEmail: String,
-    userPhone: String,
-    isMyPage: Boolean,
-    isManager: Boolean = false,
+    userDTO: DomainUserDTO
 ) {
     Card(
         modifier = Modifier
@@ -292,12 +289,12 @@ fun UserInfoCard(
                         .size(100.dp)
                         .clip(CircleShape),
                     painter =
-                    if (imageUrl == "default") painterResource(R.drawable.img_default_user)
-                    else rememberAsyncImagePainter(imageUrl),
+                    if (userDTO.image == "default") painterResource(R.drawable.img_default_user)
+                    else rememberAsyncImagePainter(userDTO.image),
                     contentDescription = "Profile Image"
                 )
 
-                if (isManager) {
+                if (userDTO.manager) {
                     Image(
                         modifier = Modifier
                             .size(40.dp)
@@ -310,12 +307,12 @@ fun UserInfoCard(
             }
             Spacer(modifier = Modifier.height(20.dp))
             Text(
-                text = userName,
+                text = userDTO.name,
                 style = MaterialTheme.typography.body1
                     .copy(fontSize = 22.sp, fontWeight = FontWeight.Bold)
             )
             Spacer(modifier = Modifier.height(12.dp))
-            Text(text = userEmail, style = MaterialTheme.typography.body1)
+            Text(text = userDTO.email, style = MaterialTheme.typography.body1)
             Spacer(modifier = Modifier.height(6.dp))
 
             Row(
@@ -331,13 +328,14 @@ fun UserInfoCard(
                     painter = painterResource(R.drawable.img_phone),
                     contentDescription = "Phone Image"
                 )
-                Text(text = userPhone, style = MaterialTheme.typography.body1)
+                Text(text = userDTO.phone, style = MaterialTheme.typography.body1)
             }
 
             Spacer(modifier = Modifier.height(12.dp))
 
 
-            if (isMyPage) {
+            // TODO : 내 화면인지? 본인 이메일 추가
+            if (userDTO.email == "a@naver.com") {
                 OutlinedButton(
                     modifier = Modifier
                         .fillMaxWidth(),

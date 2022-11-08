@@ -5,5 +5,5 @@ import com.google.firebase.firestore.Query
 
 interface UserDataSource {
     fun getFamilyUsers(familyCode: String): Query
-    fun getMyProfile(familyCode: String, email: String): DocumentReference
+    fun getProfile(familyCode: String, email: String): DocumentReference
 }

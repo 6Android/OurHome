@@ -1,4 +1,4 @@
-package com.ssafy.ourhome.screens.userpage.mypage
+package com.ssafy.ourhome.screens.userpage
 
 import android.util.Log
 import androidx.compose.foundation.layout.Column
@@ -23,9 +23,6 @@ import com.ssafy.domain.utils.ResultType
 import com.ssafy.ourhome.components.MainAppBar
 import com.ssafy.ourhome.components.OurHomeSurface
 import com.ssafy.ourhome.navigation.OurHomeScreens
-import com.ssafy.ourhome.screens.userpage.UserColorCardList
-import com.ssafy.ourhome.screens.userpage.UserCommonCardList
-import com.ssafy.ourhome.screens.userpage.UserInfoCard
 import com.ssafy.ourhome.ui.theme.OurHomeTheme
 import com.ssafy.ourhome.utils.SETTING_ICON
 
@@ -34,17 +31,17 @@ import com.ssafy.ourhome.utils.SETTING_ICON
 fun MyPageScreen(navController: NavController = NavController(LocalContext.current)) {
     val scrollState = rememberScrollState()
 
-    val vm: MyPageViewModel = hiltViewModel()
+    val vm: UserPageViewModel = hiltViewModel()
 
     // TODO : 패밀리코드, 본인 이메일
-    vm.getMyProfile("EX7342","a@naver.com")
+    vm.getProfile("EX7342","a@naver.com")
 
     val user = remember {
         mutableStateOf(DomainUserDTO())
     }
 
     when(val userResponse = vm.userResponse) {
-        is ResultType.Loading -> {}
+        is ResultType.Uninitialized -> {}
         is ResultType.Success -> {
             user.value = userResponse.data
             Log.d("test5", "MyPageScreen: ${userResponse.data}")
@@ -58,7 +55,8 @@ fun MyPageScreen(navController: NavController = NavController(LocalContext.curre
             backIconEnable = false,
             icon = painterResource(id = SETTING_ICON),
             onIconClick = {
-                navController.navigate(OurHomeScreens.SettingScreen.name)
+                navController.navigate(OurHomeScreens.UserPageScreen.name + "/b@naver.com")
+//                navController.navigate(OurHomeScreens.SettingScreen.name)
             }
         )
     }) {

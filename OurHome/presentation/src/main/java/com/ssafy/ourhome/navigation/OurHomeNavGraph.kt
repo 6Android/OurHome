@@ -14,7 +14,7 @@ import com.ssafy.ourhome.screens.home.HomeScreen
 import com.ssafy.ourhome.screens.home.schedule.AddMemberScreen
 import com.ssafy.ourhome.screens.home.schedule.AddScheduleScreen
 import com.ssafy.ourhome.screens.home.schedule.ScheduleDetailScreen
-import com.ssafy.ourhome.screens.userpage.mypage.MyPageScreen
+import com.ssafy.ourhome.screens.userpage.MyPageScreen
 import com.ssafy.ourhome.screens.login.LoginScreen
 import com.ssafy.ourhome.screens.login.join.EnterHomeScreen
 import com.ssafy.ourhome.screens.login.join.JoinEmailScreen
@@ -24,6 +24,7 @@ import com.ssafy.ourhome.screens.question.QuestionDetailScreen
 import com.ssafy.ourhome.screens.question.QuestionListScreen
 import com.ssafy.ourhome.screens.question.QuestionScreen
 import com.ssafy.ourhome.screens.question.pet.PetDetailScreen
+import com.ssafy.ourhome.screens.userpage.UserPageScreen
 import com.ssafy.ourhome.screens.userpage.setting.ManageFamilyScreen
 import com.ssafy.ourhome.screens.userpage.setting.SettingScreen
 
@@ -63,35 +64,39 @@ fun OurHomeNavGraph(navController: NavHostController) {
             JoinPasswordScreen(navController = navController)
         }
 
-        composable(OurHomeScreens.QuestionListScreen.name){
+        composable(OurHomeScreens.QuestionListScreen.name) {
             QuestionListScreen(navController = navController)
         }
 
-        composable(OurHomeScreens.QuestionDetailScreen.name){
+        composable(OurHomeScreens.QuestionDetailScreen.name) {
             QuestionDetailScreen(navController = navController)
         }
 
-        composable(OurHomeScreens.PetDetailScreen.name){
+        composable(OurHomeScreens.PetDetailScreen.name) {
             PetDetailScreen(navController = navController)
         }
 
-        composable(OurHomeScreens.ChatScreen.name){
+        composable(OurHomeScreens.ChatScreen.name) {
             ChatScreen(navController = navController)
         }
 
-        composable(OurHomeScreens.AlbumScreen.name){
+        composable(OurHomeScreens.AlbumScreen.name) {
             AlbumScreen(navController = navController)
         }
 
-        composable("${OurHomeScreens.AlbumDetailScreen.name}/{photoUrl}/{photoDate}",
-            arguments = listOf(navArgument(name = "photoUrl"){
+        composable(
+            "${OurHomeScreens.AlbumDetailScreen.name}/{photoUrl}/{photoDate}",
+            arguments = listOf(navArgument(name = "photoUrl") {
                 type = NavType.StringType
-            }, navArgument(name = "photoDate"){
+            }, navArgument(name = "photoDate") {
                 type = NavType.StringType
             })
-        ){ backStackEntry ->
-            AlbumDetailScreen(navController = navController, photoUrl = backStackEntry!!.arguments!!.getString("photoUrl")!!,
-            photoDate = backStackEntry!!.arguments!!.getString("photoDate")!!)
+        ) { backStackEntry ->
+            AlbumDetailScreen(
+                navController = navController,
+                photoUrl = backStackEntry!!.arguments!!.getString("photoUrl")!!,
+                photoDate = backStackEntry!!.arguments!!.getString("photoDate")!!
+            )
         }
 
         composable(
@@ -106,11 +111,22 @@ fun OurHomeNavGraph(navController: NavHostController) {
             }
         }
 
-        composable(OurHomeScreens.SettingScreen.name){
+        composable(
+            "${OurHomeScreens.UserPageScreen.name}/{email}",
+            arguments = listOf(navArgument("email") {
+                type = NavType.StringType
+            })
+        ){ backStackEntry ->
+            backStackEntry.arguments?.getString("email").let {
+                UserPageScreen(navController = navController, email = it.toString())
+            }
+        }
+
+        composable(OurHomeScreens.SettingScreen.name) {
             SettingScreen(navController = navController)
         }
 
-        composable(OurHomeScreens.ManageFamilyScreen.name){
+        composable(OurHomeScreens.ManageFamilyScreen.name) {
             ManageFamilyScreen(navController = navController)
         }
 
