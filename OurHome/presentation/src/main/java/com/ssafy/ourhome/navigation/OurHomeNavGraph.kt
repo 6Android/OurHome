@@ -14,7 +14,7 @@ import com.ssafy.ourhome.screens.home.HomeScreen
 import com.ssafy.ourhome.screens.home.schedule.AddMemberScreen
 import com.ssafy.ourhome.screens.home.schedule.AddScheduleScreen
 import com.ssafy.ourhome.screens.home.schedule.ScheduleDetailScreen
-import com.ssafy.ourhome.screens.userpage.MyPageScreen
+import com.ssafy.ourhome.screens.userpage.mypage.MyPageScreen
 import com.ssafy.ourhome.screens.login.LoginScreen
 import com.ssafy.ourhome.screens.login.join.EnterHomeScreen
 import com.ssafy.ourhome.screens.login.join.JoinEmailScreen

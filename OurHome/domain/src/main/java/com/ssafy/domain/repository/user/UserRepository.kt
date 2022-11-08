@@ -7,6 +7,9 @@ import kotlinx.coroutines.flow.Flow
 typealias Users = List<DomainUserDTO>
 typealias UsersResponse = ResultType<Users>
 
+typealias UserResponse = ResultType<DomainUserDTO>
+
 interface UserRepository {
     fun getFamilyUsers(familyCode: String): Flow<UsersResponse>
+    fun getMyProfile(familyCode: String, email: String): Flow<UserResponse>
 }

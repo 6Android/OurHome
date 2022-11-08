@@ -1,8 +1,10 @@
 package com.ssafy.data.repository.user
 
+import android.util.Log
 import com.ssafy.data.datasource.user.UserDataSource
 import com.ssafy.domain.model.user.DomainUserDTO
 import com.ssafy.domain.repository.user.UserRepository
+import com.ssafy.domain.repository.user.UserResponse
 import com.ssafy.domain.repository.user.UsersResponse
 import com.ssafy.domain.utils.ResultType
 import kotlinx.coroutines.channels.awaitClose
@@ -18,6 +20,21 @@ class UserRepositoryImpl @Inject constructor(
             val response = if (snapshot != null){
                 val users = snapshot.toObjects(DomainUserDTO::class.java)
                 ResultType.Success(users)
+            }else{
+                ResultType.Error(e)
+            }
+            trySend(response)
+        }
+        awaitClose {
+            snapshotListener.remove()
+        }
+    }
+
+    override fun getMyProfile(familyCode: String, email: String): Flow<UserResponse> = callbackFlow {
+        val snapshotListener = userDataSource.getMyProfile(familyCode, email).addSnapshotListener { snapshot, e ->
+            val response = if (snapshot != null){
+                val user = snapshot.toObject(DomainUserDTO::class.java)!!
+                ResultType.Success(user)
             }else{
                 ResultType.Error(e)
             }

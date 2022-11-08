@@ -5,8 +5,8 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class DomainUserDTO(
-    val birthday: String = "",
-    val blood_type: String = "",
+    val birthday: String = "2000.01.01",
+    val blood_type: String = "RH+ A",
     val contribute_point: Long = 0L,
     val email: String = "",
     val family_code: String = "",
