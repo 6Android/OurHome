@@ -24,9 +24,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.ssafy.domain.model.user.DomainUserDTO
 import com.ssafy.ourhome.R
+import com.ssafy.ourhome.navigation.OurHomeScreens
 import com.ssafy.ourhome.ui.theme.BirthDayColor
 import com.ssafy.ourhome.ui.theme.BloodTypeColor
 import com.ssafy.ourhome.ui.theme.MBTIColor
@@ -244,7 +246,7 @@ fun MBTICard(
             .shadow(elevation = 2.dp, shape = RoundedCornerShape(8.dp)),
         backgroundColor = MBTIColor,
 
-    ) {
+        ) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -269,7 +271,8 @@ fun MBTICard(
 
 @Composable
 fun UserInfoCard(
-    userDTO: DomainUserDTO
+    userDTO: DomainUserDTO,
+    navController: NavController
 ) {
     Card(
         modifier = Modifier
@@ -339,8 +342,9 @@ fun UserInfoCard(
                 OutlinedButton(
                     modifier = Modifier
                         .fillMaxWidth(),
-                    // TODO : 프로필 편집 기능 추가
-                    onClick = { },
+                    onClick = {
+                        navController.currentBackStackEntry?.arguments?.putParcelable("userDTO", userDTO)
+                        navController.navigate(OurHomeScreens.EditProfileScreen.name) },
                     shape = RoundedCornerShape(8.dp),
                     border = BorderStroke(2.dp, Color.LightGray)
                 ) {

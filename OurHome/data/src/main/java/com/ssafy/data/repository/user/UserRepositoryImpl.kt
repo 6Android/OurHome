@@ -1,6 +1,5 @@
 package com.ssafy.data.repository.user
 
-import android.util.Log
 import com.ssafy.data.datasource.user.UserDataSource
 import com.ssafy.domain.model.user.DomainUserDTO
 import com.ssafy.domain.repository.user.UserRepository
@@ -16,32 +15,52 @@ class UserRepositoryImpl @Inject constructor(
     private val userDataSource: UserDataSource
 ) : UserRepository {
     override fun getFamilyUsers(familyCode: String): Flow<UsersResponse> = callbackFlow {
-        val snapshotListener = userDataSource.getFamilyUsers(familyCode).addSnapshotListener { snapshot, e ->
-            val response = if (snapshot != null){
-                val users = snapshot.toObjects(DomainUserDTO::class.java)
-                ResultType.Success(users)
-            }else{
-                ResultType.Error(e)
+        val snapshotListener =
+            userDataSource.getFamilyUsers(familyCode).addSnapshotListener { snapshot, e ->
+                val response = if (snapshot != null) {
+                    val users = snapshot.toObjects(DomainUserDTO::class.java)
+                    ResultType.Success(users)
+                } else {
+                    ResultType.Error(e)
+                }
+                trySend(response)
             }
-            trySend(response)
-        }
         awaitClose {
             snapshotListener.remove()
         }
     }
 
     override fun getProfile(familyCode: String, email: String): Flow<UserResponse> = callbackFlow {
-        val snapshotListener = userDataSource.getProfile(familyCode, email).addSnapshotListener { snapshot, e ->
-            val response = if (snapshot != null){
-                val user = snapshot.toObject(DomainUserDTO::class.java)!!
-                ResultType.Success(user)
-            }else{
-                ResultType.Error(e)
+        val snapshotListener =
+            userDataSource.getProfile(familyCode, email).addSnapshotListener { snapshot, e ->
+                val response = if (snapshot != null) {
+                    val user = snapshot.toObject(DomainUserDTO::class.java)!!
+                    ResultType.Success(user)
+                } else {
+                    ResultType.Error(e)
+                }
+                trySend(response)
             }
-            trySend(response)
-        }
         awaitClose {
             snapshotListener.remove()
         }
     }
+
+
+    override fun editProfile(familyCode: String, user: DomainUserDTO): Flow<ResultType<Unit>> =
+        callbackFlow {
+            val completeListener = userDataSource.editProfile(familyCode, user).addOnCompleteListener {
+                val response = if (it.isSuccessful) {
+                    ResultType.Success(Unit)
+                } else if (it.exception != null) {
+                    ResultType.Error(it.exception)
+                } else {
+                    ResultType.Loading
+                }
+                trySend(response)
+            }
+            awaitClose {
+
+            }
+        }
 }

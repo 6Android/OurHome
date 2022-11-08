@@ -6,6 +6,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navArgument
+import com.ssafy.domain.model.user.DomainUserDTO
 import com.ssafy.ourhome.screens.NextScreen
 import com.ssafy.ourhome.screens.album.AlbumDetailScreen
 import com.ssafy.ourhome.screens.album.AlbumScreen
@@ -24,6 +25,7 @@ import com.ssafy.ourhome.screens.question.QuestionDetailScreen
 import com.ssafy.ourhome.screens.question.QuestionListScreen
 import com.ssafy.ourhome.screens.question.QuestionScreen
 import com.ssafy.ourhome.screens.question.pet.PetDetailScreen
+import com.ssafy.ourhome.screens.userpage.EditProfileScreen
 import com.ssafy.ourhome.screens.userpage.UserPageScreen
 import com.ssafy.ourhome.screens.userpage.setting.ManageFamilyScreen
 import com.ssafy.ourhome.screens.userpage.setting.SettingScreen
@@ -116,10 +118,17 @@ fun OurHomeNavGraph(navController: NavHostController) {
             arguments = listOf(navArgument("email") {
                 type = NavType.StringType
             })
-        ){ backStackEntry ->
+        ) { backStackEntry ->
             backStackEntry.arguments?.getString("email").let {
                 UserPageScreen(navController = navController, email = it.toString())
             }
+        }
+
+        composable(OurHomeScreens.EditProfileScreen.name)
+        {
+            var userDTO =
+                navController.previousBackStackEntry?.arguments?.getParcelable<DomainUserDTO>("userDTO")
+            EditProfileScreen(navController = navController, userDTO = userDTO!!)
         }
 
         composable(OurHomeScreens.SettingScreen.name) {

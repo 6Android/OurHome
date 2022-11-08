@@ -63,7 +63,7 @@ fun UserPageScreen(
             ) {
                 Spacer(modifier = Modifier.padding(top = 16.dp))
 
-                UserInfoCard(userDTO = user.value)
+                UserInfoCard(userDTO = user.value, navController)
 
                 Spacer(modifier = Modifier.height(16.dp))
                 UserColorCardList(userDTO = user.value)

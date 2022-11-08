@@ -6,7 +6,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ssafy.domain.model.user.DomainUserDTO
 import com.ssafy.domain.repository.user.UserResponse
+import com.ssafy.domain.usecase.user.EditProfileUseCase
 import com.ssafy.domain.usecase.user.GetProfileUseCase
 import com.ssafy.domain.utils.ResultType
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,16 +18,27 @@ import javax.inject.Inject
 
 @HiltViewModel
 class UserPageViewModel @Inject constructor(
-    private val getProfileUseCase: GetProfileUseCase
+    private val getProfileUseCase: GetProfileUseCase,
+    private val editProfileUseCase: EditProfileUseCase
 ): ViewModel(){
 
     var userResponse by mutableStateOf<UserResponse>(ResultType.Uninitialized)
+        private set
+
+    var editResponse by mutableStateOf<ResultType<Unit>>(ResultType.Uninitialized)
         private set
 
     fun getProfile(familyCode: String, email: String) = viewModelScope.launch(Dispatchers.IO) {
         getProfileUseCase.execute(familyCode, email).collect{
             Log.d("test5", "getMyProfile: $it")
             userResponse = it
+        }
+    }
+
+    fun editProfile(familyCode: String, user: DomainUserDTO) = viewModelScope.launch(Dispatchers.IO) {
+        editProfileUseCase.execute(familyCode, user).collect{
+            Log.d("Edit", "editProfile: $it")
+            editResponse = it
         }
     }
 }
