@@ -9,5 +9,5 @@ class JoinEmailUseCase @Inject constructor(
     private val userRepository: UserRepository
 ) {
     // 이메일 회원 가입
-    fun execute(email: String, password: String) = userRepository.joinEmail(email, password)
+    fun execute(email: String, password: String, nickname: String) = userRepository.joinEmail(email, password, nickname)
 }

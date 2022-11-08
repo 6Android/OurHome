@@ -10,6 +10,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.ssafy.ourhome.components.RoundedButton
 import com.ssafy.ourhome.ui.theme.MainColor
+import org.checkerframework.checker.units.qual.m
 
 /** 다음 버튼 */
 @Composable
@@ -23,7 +24,8 @@ fun NextButton(title: String, onClick: () -> Unit) {
             modifier = Modifier
                 .fillMaxWidth()
                 .height(48.dp), label = title,
-            onClick = onClick
+            onClick = onClick,
+
         )
     }
 }
