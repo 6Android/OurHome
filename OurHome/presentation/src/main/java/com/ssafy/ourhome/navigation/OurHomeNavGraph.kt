@@ -36,7 +36,7 @@ import com.ssafy.ourhome.screens.userpage.setting.SettingScreen
 fun OurHomeNavGraph(navController: NavHostController) {
     NavHost(
         navController = navController,
-        startDestination = OurHomeScreens.MapScreen.name
+        startDestination = OurHomeScreens.LoginScreen.name
     ) {
         composable(BottomNavItem.Home.screenRoute) {
             HomeScreen(navController = navController)

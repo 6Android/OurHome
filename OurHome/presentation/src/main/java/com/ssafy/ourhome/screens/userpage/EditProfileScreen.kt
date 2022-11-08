@@ -1,6 +1,5 @@
 package com.ssafy.ourhome.screens.userpage
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -25,56 +24,25 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.ssafy.domain.model.user.DomainUserDTO
-import com.ssafy.domain.utils.ResultType
 import com.ssafy.ourhome.R
 import com.ssafy.ourhome.components.MainAppBar
 import com.ssafy.ourhome.components.OurHomeSurface
-import com.ssafy.ourhome.navigation.OurHomeScreens
-import com.ssafy.ourhome.ui.theme.OurHomeTheme
-
-//data class tmpUserDTO(
-//    val imageUrl: String = "default",
-//    val nickname: String,
-//    val email: String,
-//    val phone: String,
-//    val birth: String,
-//    val bloodType: String,
-//    val MBTI: String,
-//    val job: String,
-//    val interest: String,
-//    val hobby: String
-//)
 
 @Composable
 fun EditProfileScreen(
     navController: NavController = NavController(LocalContext.current),
-    userDTO: DomainUserDTO = DomainUserDTO(),
-    num: Int = 10
+    userDTO: DomainUserDTO = DomainUserDTO()
 ) {
     val scrollState = rememberScrollState()
 
     val vm: UserPageViewModel = hiltViewModel()
 
-    // 에디트 성공 여부
-    val editSuccess = remember {
-        mutableStateOf(false)
-    }
-
     var user = userDTO
-
-    when (val editResponse = vm.editResponse) {
-        is ResultType.Uninitialized -> {}
-        is ResultType.Success -> {
-            editSuccess.value = true
-        }
-        is ResultType.Error -> print(editResponse.exception)
-    }
 
     val nicknameState = remember {
         mutableStateOf(userDTO.name)
@@ -103,8 +71,7 @@ fun EditProfileScreen(
     }
 
     // 에디트 성공
-    if(editSuccess.value){
-        Log.d("Edit", "EditProfileScreen: ${editSuccess.value}")
+    if(vm.editSuccess){
         Toast.makeText(LocalContext.current, "정보 수정에 성공하였습니다.", Toast.LENGTH_SHORT).show()
         navController.popBackStack()
     }
