@@ -12,6 +12,7 @@ import com.ssafy.ourhome.screens.album.AlbumDetailScreen
 import com.ssafy.ourhome.screens.album.AlbumScreen
 import com.ssafy.ourhome.screens.chat.ChatScreen
 import com.ssafy.ourhome.screens.home.HomeScreen
+import com.ssafy.ourhome.screens.home.map.MapScreen
 import com.ssafy.ourhome.screens.home.schedule.AddMemberScreen
 import com.ssafy.ourhome.screens.home.schedule.AddScheduleScreen
 import com.ssafy.ourhome.screens.home.schedule.ScheduleDetailScreen
@@ -35,7 +36,7 @@ import com.ssafy.ourhome.screens.userpage.setting.SettingScreen
 fun OurHomeNavGraph(navController: NavHostController) {
     NavHost(
         navController = navController,
-        startDestination = OurHomeScreens.LoginScreen.name
+        startDestination = OurHomeScreens.MapScreen.name
     ) {
         composable(BottomNavItem.Home.screenRoute) {
             HomeScreen(navController = navController)
@@ -153,6 +154,10 @@ fun OurHomeNavGraph(navController: NavHostController) {
 
         composable(OurHomeScreens.ScheduleDetailScreen.name) {
             ScheduleDetailScreen(navController = navController)
+        }
+
+        composable(OurHomeScreens.MapScreen.name){
+            MapScreen(navController = navController)
         }
     }
 }

@@ -22,7 +22,8 @@ enum class OurHomeScreens {
     AlbumScreen,
     AlbumDetailScreen,
     UserPageScreen,
-    EditProfileScreen
+    EditProfileScreen,
+    MapScreen
     ;
 
     companion object {
@@ -46,6 +47,7 @@ enum class OurHomeScreens {
             AlbumDetailScreen.name -> AlbumDetailScreen
             UserPageScreen.name -> UserPageScreen
             EditProfileScreen.name -> EditProfileScreen
+            MapScreen.name -> MapScreen
 
             else -> throw IllegalStateException("Route $route is not recognized")
         }
