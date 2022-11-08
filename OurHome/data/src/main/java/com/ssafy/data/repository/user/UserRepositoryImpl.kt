@@ -29,14 +29,36 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
+    // 이메일 회원 가입
     override fun joinEmail(email: String, password: String): Flow<ResultType<Unit>> = callbackFlow {
-        val listener = userDataSource.joinEmail(email, password).addOnCompleteListener { task ->
+        userDataSource.joinEmail(email, password).addOnCompleteListener { task ->
             val response = if (task.isSuccessful) {
                 ResultType.Success(Unit)
             } else {
                 ResultType.Error(Exception())
             }
             trySend(response)
+        }
+        awaitClose {}
+    }
+
+    // 이메일 중복 검사
+    override fun checkEmail(email: String): Flow<ResultType<Unit>> = callbackFlow {
+        val snapshotListener =
+            userDataSource.checkEmail(email).addSnapshotListener { snapshot, e ->
+                val response =
+                    // 가입한 이력이 없는 유저
+                    if (snapshot?.data == null) {
+                        ResultType.Success(Unit)
+                    }
+                    // 가입한 이력이 있는 유저
+                    else {
+                        ResultType.Fail(Unit)
+                    }
+                trySend(response)
+            }
+        awaitClose {
+            snapshotListener.remove()
         }
     }
 }

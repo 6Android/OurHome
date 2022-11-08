@@ -8,5 +8,5 @@ import javax.inject.Singleton
 class GetFamilyUsersUseCase @Inject constructor(
     private val userRepository: UserRepository
 ) {
-    fun getFamilyUsers(familyCode: String) = userRepository.getFamilyUsers(familyCode)
+    fun execute(familyCode: String) = userRepository.getFamilyUsers(familyCode)
 }

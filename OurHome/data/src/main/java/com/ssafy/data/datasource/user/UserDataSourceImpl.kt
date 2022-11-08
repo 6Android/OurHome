@@ -1,6 +1,7 @@
 package com.ssafy.data.datasource.user
 
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.ssafy.data.utils.FAMILY
@@ -17,4 +18,8 @@ class UserDataSourceImpl @Inject constructor(
     // 이메일 회원 가입
     override fun joinEmail(email: String, password: String) =
         fireAuth.createUserWithEmailAndPassword(email, password)
+
+    // 이메일 중복 검사
+    override fun checkEmail(email: String): DocumentReference =
+        fireStore.collection(USER).document(email)
 }

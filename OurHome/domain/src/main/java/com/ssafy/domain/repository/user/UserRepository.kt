@@ -13,4 +13,7 @@ interface UserRepository {
 
     // 이메일 회원 가입
     fun joinEmail(email: String, password: String): Flow<ResultType<Unit>>
+
+    // 이메일 중복 검사
+    fun checkEmail(email: String): Flow<ResultType<Unit>>
 }

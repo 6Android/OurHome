@@ -27,6 +27,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.google.firebase.auth.FirebaseAuth
 import com.ssafy.domain.utils.ResultType
 import com.ssafy.ourhome.R
 import com.ssafy.ourhome.StatusBarColorUpdateEffect
@@ -44,6 +45,7 @@ fun LoginScreen(navController: NavController = NavController(LocalContext.curren
 
     val vm: LoginViewModel = hiltViewModel()
     vm.getFamilyUsers()
+    vm.checkEmail()
 
     when(val usersResponse = vm.usersResponse) {
         is ResultType.Loading -> {}
@@ -85,6 +87,28 @@ fun LoginScreen(navController: NavController = NavController(LocalContext.curren
             Join {
 //                navController.navigate(OurHomeScreens.JoinEmailScreen.name)
                 vm.joinEmail()
+
+                when(val result = vm.result) {
+                    is ResultType.Loading -> {}
+                    is ResultType.Success -> {
+                        val user = FirebaseAuth.getInstance().currentUser
+                        user?.let {
+                            Log.d("user", "user: ${it}")
+                            Log.d("user", "uid: ${it.uid}")
+                            Log.d("user", "email: ${it.email}")
+                            Log.d("user", "isAnonymous: ${it.isAnonymous}")
+                            Log.d("user", "metadata: ${it.metadata}")
+                            Log.d("user", "multiFactor: ${it.multiFactor}")
+                            Log.d("user", "tenantId: ${it.tenantId}")
+                            Log.d("user", "getIdToken: ${it.getIdToken(true)}")
+                            Log.d("user", "displayName: ${it.displayName}")
+                            Log.d("user", "isEmailVerified: ${it.isEmailVerified}")
+                            Log.d("user", "phoneNumber: ${it.phoneNumber}")
+                            Log.d("user", "photoUrl: ${it.photoUrl}")
+                            Log.d("user", "providerId: ${it.providerId}")
+                        }
+                    }
+                }
             }
 
             /** 소셜 로그인 버튼 */

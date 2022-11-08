@@ -7,6 +7,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ssafy.domain.repository.user.UsersResponse
+import com.ssafy.domain.usecase.user.CheckEmailUseCase
 import com.ssafy.domain.usecase.user.GetFamilyUsersUseCase
 import com.ssafy.domain.usecase.user.JoinEmailUseCase
 import com.ssafy.domain.utils.ResultType
@@ -18,7 +19,8 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val getFamilyUsersUseCase: GetFamilyUsersUseCase,
-    private val joinEmailUseCase: JoinEmailUseCase
+    private val joinEmailUseCase: JoinEmailUseCase,
+    private val checkEmailUseCase: CheckEmailUseCase
 ) : ViewModel() {
     var usersResponse by mutableStateOf<UsersResponse>(ResultType.Uninitialized)
         private set
@@ -26,14 +28,20 @@ class LoginViewModel @Inject constructor(
     var result by mutableStateOf<ResultType<Unit>>(ResultType.Uninitialized)
 
     fun getFamilyUsers() = viewModelScope.launch(Dispatchers.IO) {
-        getFamilyUsersUseCase.getFamilyUsers("EX7342").collect { response ->
+        getFamilyUsersUseCase.execute("EX7342").collect { response ->
             usersResponse = response
         }
     }
 
     fun joinEmail() = viewModelScope.launch(Dispatchers.IO) {
-        joinEmailUseCase.joinEmail("c@ssafy.com", "123456").collect { response ->
+        joinEmailUseCase.execute("c@ssafy.com", "123456").collect { response ->
+            Log.d("TAG", "joinEmail: $response")
             result = response
+        }
+    }
+
+    fun checkEmail()= viewModelScope.launch(Dispatchers.IO) {
+        checkEmailUseCase.execute("a@ssafy.com").collect { response ->
         }
     }
 }
