@@ -24,6 +24,8 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.ssafy.ourhome.navigation.BottomNavItem
 import com.ssafy.ourhome.navigation.BottomNavigation
 import com.ssafy.ourhome.navigation.OurHomeNavGraph
@@ -49,7 +51,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MyApp() {
     val bottomBarState = rememberSaveable { (mutableStateOf(true)) }
-
+val auth = Firebase.auth.currentUser
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colors.background

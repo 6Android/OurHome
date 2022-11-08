@@ -14,17 +14,29 @@ class UserRepositoryImpl @Inject constructor(
     private val userDataSource: UserDataSource
 ) : UserRepository {
     override fun getFamilyUsers(familyCode: String): Flow<UsersResponse> = callbackFlow {
-        val snapshotListener = userDataSource.getFamilyUsers(familyCode).addSnapshotListener { snapshot, e ->
-            val response = if (snapshot != null){
-                val users = snapshot.toObjects(DomainUserDTO::class.java)
-                ResultType.Success(users)
-            }else{
-                ResultType.Error(e)
+        val snapshotListener =
+            userDataSource.getFamilyUsers(familyCode).addSnapshotListener { snapshot, e ->
+                val response = if (snapshot != null) {
+                    val users = snapshot.toObjects(DomainUserDTO::class.java)
+                    ResultType.Success(users)
+                } else {
+                    ResultType.Error(e)
+                }
+                trySend(response)
             }
-            trySend(response)
-        }
         awaitClose {
             snapshotListener.remove()
+        }
+    }
+
+    override fun joinEmail(email: String, password: String): Flow<ResultType<Unit>> = callbackFlow {
+        val listener = userDataSource.joinEmail(email, password).addOnCompleteListener { task ->
+            val response = if (task.isSuccessful) {
+                ResultType.Success(Unit)
+            } else {
+                ResultType.Error(Exception())
+            }
+            trySend(response)
         }
     }
 }

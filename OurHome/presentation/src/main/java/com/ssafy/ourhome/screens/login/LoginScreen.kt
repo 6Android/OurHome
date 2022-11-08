@@ -53,7 +53,6 @@ fun LoginScreen(navController: NavController = NavController(LocalContext.curren
         is ResultType.Error -> print(usersResponse.exception)
     }
 
-    vm.usersResponse
 
     var idState = remember {
         mutableStateOf("")
@@ -84,7 +83,8 @@ fun LoginScreen(navController: NavController = NavController(LocalContext.curren
 
             /** 회원가입 */
             Join {
-                navController.navigate(OurHomeScreens.JoinEmailScreen.name)
+//                navController.navigate(OurHomeScreens.JoinEmailScreen.name)
+                vm.joinEmail()
             }
 
             /** 소셜 로그인 버튼 */

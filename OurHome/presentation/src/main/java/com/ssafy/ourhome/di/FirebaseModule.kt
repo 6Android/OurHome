@@ -1,5 +1,6 @@
 package com.ssafy.ourhome.di
 
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
 import dagger.Provides
@@ -14,7 +15,14 @@ object FirebaseModule {
     // Firestore DI
     @Provides
     @Singleton
-    fun provideFirebaseStore() : FirebaseFirestore {
+    fun provideFirebaseStore(): FirebaseFirestore {
         return FirebaseFirestore.getInstance()
+    }
+
+    // Firebase Auth
+    @Provides
+    @Singleton
+    fun provideFirebaseAuth(): FirebaseAuth {
+        return FirebaseAuth.getInstance()
     }
 }

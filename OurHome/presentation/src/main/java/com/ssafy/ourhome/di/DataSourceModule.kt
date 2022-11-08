@@ -1,5 +1,6 @@
 package com.ssafy.ourhome.di
 
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.ssafy.data.datasource.user.UserDataSource
 import com.ssafy.data.datasource.user.UserDataSourceImpl
@@ -17,8 +18,9 @@ object DataSourceModule {
     @Provides
     @Singleton
     fun provideUserDataSource(
-        fireStore: FirebaseFirestore
+        fireStore: FirebaseFirestore,
+        fireAuth: FirebaseAuth
     ): UserDataSource {
-        return UserDataSourceImpl(fireStore)
+        return UserDataSourceImpl(fireStore, fireAuth)
     }
 }
