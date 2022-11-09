@@ -1,13 +1,11 @@
 package com.ssafy.ourhome.screens.login.join
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -16,12 +14,19 @@ import com.ssafy.ourhome.components.EmailInput
 import com.ssafy.ourhome.components.MainAppBar
 import com.ssafy.ourhome.components.OurHomeSurface
 import com.ssafy.ourhome.navigation.OurHomeScreens
+import com.ssafy.ourhome.screens.login.LoginViewModel
 
 @Composable
-fun JoinEmailScreen(navController: NavController = NavController(LocalContext.current)) {
-
-    val idState = remember {
-        mutableStateOf("")
+fun JoinEmailScreen(
+    navController: NavController = NavController(LocalContext.current),
+    vm: LoginViewModel
+) {
+    val context = LocalContext.current
+    val onSuccessListener: () -> Unit = {
+        navigateToPasswordScreen(navController)
+    }
+    val onFailListener: () -> Unit = {
+        Toast.makeText(context, "이미 사용중인 아이디 입니다.", Toast.LENGTH_SHORT).show()
     }
 
     OurHomeSurface {
@@ -48,20 +53,24 @@ fun JoinEmailScreen(navController: NavController = NavController(LocalContext.cu
 
                 /** 아이디 입력창 */
                 EmailInput(
-                    emailState = idState,
+                    emailState = vm.joinIdState,
                     labelId = "이메일 아이디",
                     enabled = true,
                     onAction = KeyboardActions(onNext = {
-                        // todo: 다음 버튼
-                        navigateToPasswordScreen(navController)
+                        vm.checkEmail(
+                            onSuccess = onSuccessListener,
+                            onFail = onFailListener
+                        )
                     })
                 )
             }
         }
         /** 다음 버튼 */
         NextButton("다음") {
-            // todo: 다음 버튼
-            navigateToPasswordScreen(navController)
+            vm.checkEmail(
+                onSuccess = onSuccessListener,
+                onFail = onFailListener
+            )
         }
     }
 }

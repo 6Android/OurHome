@@ -1,6 +1,7 @@
 package com.ssafy.ourhome.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -16,8 +17,8 @@ import com.ssafy.ourhome.screens.home.map.MapScreen
 import com.ssafy.ourhome.screens.home.schedule.AddMemberScreen
 import com.ssafy.ourhome.screens.home.schedule.AddScheduleScreen
 import com.ssafy.ourhome.screens.home.schedule.ScheduleDetailScreen
-import com.ssafy.ourhome.screens.userpage.MyPageScreen
 import com.ssafy.ourhome.screens.login.LoginScreen
+import com.ssafy.ourhome.screens.login.LoginViewModel
 import com.ssafy.ourhome.screens.login.join.EnterHomeScreen
 import com.ssafy.ourhome.screens.login.join.JoinEmailScreen
 import com.ssafy.ourhome.screens.login.join.JoinNickNameScreen
@@ -26,6 +27,7 @@ import com.ssafy.ourhome.screens.question.QuestionDetailScreen
 import com.ssafy.ourhome.screens.question.QuestionListScreen
 import com.ssafy.ourhome.screens.question.QuestionScreen
 import com.ssafy.ourhome.screens.question.pet.PetDetailScreen
+import com.ssafy.ourhome.screens.userpage.MyPageScreen
 import com.ssafy.ourhome.screens.userpage.EditProfileScreen
 import com.ssafy.ourhome.screens.userpage.UserPageScreen
 import com.ssafy.ourhome.screens.userpage.setting.ManageFamilyScreen
@@ -34,6 +36,7 @@ import com.ssafy.ourhome.screens.userpage.setting.SettingScreen
 
 @Composable
 fun OurHomeNavGraph(navController: NavHostController) {
+    val loginViewModel: LoginViewModel = hiltViewModel()
     NavHost(
         navController = navController,
         startDestination = OurHomeScreens.LoginScreen.name
@@ -60,11 +63,11 @@ fun OurHomeNavGraph(navController: NavHostController) {
         }
 
         composable(OurHomeScreens.JoinEmailScreen.name) {
-            JoinEmailScreen(navController = navController)
+            JoinEmailScreen(navController = navController, loginViewModel)
         }
 
         composable(OurHomeScreens.JoinPasswordScreen.name) {
-            JoinPasswordScreen(navController = navController)
+            JoinPasswordScreen(navController = navController, loginViewModel)
         }
 
         composable(OurHomeScreens.QuestionListScreen.name) {
@@ -109,8 +112,11 @@ fun OurHomeNavGraph(navController: NavHostController) {
             })
         ) { backStackEntry ->
             backStackEntry.arguments?.getString("prev_type").let {
-
-                JoinNickNameScreen(navController = navController, prev_type = it.toString())
+                JoinNickNameScreen(
+                    navController = navController,
+                    prev_type = it.toString(),
+                    vm = loginViewModel
+                )
             }
         }
 

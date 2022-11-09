@@ -7,9 +7,9 @@ sealed class ResultType<out T> {
 
     object Empty : ResultType<Nothing>()
 
-    data class Success<T>(val data: T) : ResultType<T>()
+    object Fail : ResultType<Nothing>()
 
-    data class Fail<T>(val data: T) : ResultType<T>()
+    data class Success<T>(val data: T) : ResultType<T>()
 
     data class Error(val exception: Exception?) : ResultType<Nothing>()
 }

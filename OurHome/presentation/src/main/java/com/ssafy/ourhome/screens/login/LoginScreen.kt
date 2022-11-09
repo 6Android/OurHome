@@ -1,6 +1,5 @@
 package com.ssafy.ourhome.screens.login
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -9,7 +8,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -27,9 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.ssafy.domain.utils.ResultType
 import com.ssafy.ourhome.R
-import com.ssafy.ourhome.StatusBarColorUpdateEffect
 import com.ssafy.ourhome.components.EmailInput
 import com.ssafy.ourhome.components.OurHomeSurface
 import com.ssafy.ourhome.components.PasswordInput
@@ -40,21 +36,10 @@ import com.ssafy.ourhome.utils.LOGIN
 
 @Preview(showBackground = true)
 @Composable
-fun LoginScreen(navController: NavController = NavController(LocalContext.current)) {
-
-    val vm: LoginViewModel = hiltViewModel()
-    vm.getFamilyUsers()
-
-    when(val usersResponse = vm.usersResponse) {
-        is ResultType.Loading -> {}
-        is ResultType.Success -> {
-            Log.d("test5", "LoginScreen: ${usersResponse.data}")
-        }
-        is ResultType.Error -> print(usersResponse.exception)
-    }
-
-    vm.usersResponse
-
+fun LoginScreen(
+    navController: NavController = NavController(LocalContext.current),
+    vm: LoginViewModel = hiltViewModel()
+) {
     var idState = remember {
         mutableStateOf("")
     }

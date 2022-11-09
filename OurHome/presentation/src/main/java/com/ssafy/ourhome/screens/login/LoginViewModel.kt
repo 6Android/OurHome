@@ -1,28 +1,57 @@
 package com.ssafy.ourhome.screens.login
 
-import androidx.compose.runtime.getValue
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ssafy.domain.repository.user.UsersResponse
-import com.ssafy.domain.usecase.user.GetFamilyUsersUseCase
+import com.ssafy.domain.usecase.user.CheckEmailUseCase
+import com.ssafy.domain.usecase.user.JoinEmailUseCase
 import com.ssafy.domain.utils.ResultType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val getFamilyUsersUseCase: GetFamilyUsersUseCase
+    private val joinEmailUseCase: JoinEmailUseCase,
+    private val checkEmailUseCase: CheckEmailUseCase
 ) : ViewModel() {
-    var usersResponse by mutableStateOf<UsersResponse>(ResultType.Uninitialized)
-        private set
+    val joinIdState = mutableStateOf("")
+    val joinPasswordState = mutableStateOf("")
+    val joinPasswordConfirmState = mutableStateOf("")
+    val joinNickNameState = mutableStateOf("")
 
-    fun getFamilyUsers() = viewModelScope.launch(Dispatchers.IO) {
-        getFamilyUsersUseCase.getFamilyUsers("EX7342").collect { response ->
-            usersResponse = response
+
+    fun joinEmail(onSuccess: () -> Unit, onFail: () -> Unit) = viewModelScope.launch(Dispatchers.IO) {
+        joinEmailUseCase.execute(joinIdState.value, joinPasswordState.value, joinNickNameState.value).collect { response ->
+            withContext(Dispatchers.Main) {
+                when (response) {
+                    is ResultType.Success -> {
+                        onSuccess()
+                    }
+                    else -> {
+                        onFail()
+                    }
+                }
+            }
         }
     }
+
+    fun checkEmail(onSuccess: () -> Unit, onFail: () -> Unit) =
+        viewModelScope.launch(Dispatchers.IO) {
+            checkEmailUseCase.execute(joinIdState.value).collect { response ->
+                withContext(Dispatchers.Main) {
+                    when (response) {
+                        is ResultType.Success -> {
+                            onSuccess()
+                        }
+                        else -> {
+                            onFail()
+                        }
+                    }
+                }
+            }
+        }
 }

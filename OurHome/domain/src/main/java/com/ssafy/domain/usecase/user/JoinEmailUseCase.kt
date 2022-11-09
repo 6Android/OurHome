@@ -5,8 +5,9 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class GetFamilyUsersUseCase @Inject constructor(
+class JoinEmailUseCase @Inject constructor(
     private val userRepository: UserRepository
 ) {
-    fun execute(familyCode: String) = userRepository.getFamilyUsers(familyCode)
+    // 이메일 회원 가입
+    fun execute(email: String, password: String, nickname: String) = userRepository.joinEmail(email, password, nickname)
 }
