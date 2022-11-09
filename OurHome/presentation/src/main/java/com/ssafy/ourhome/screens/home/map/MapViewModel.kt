@@ -1,10 +1,13 @@
 package com.ssafy.ourhome.screens.home.map
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ssafy.domain.model.user.DomainUserDTO
 import com.ssafy.domain.repository.user.UsersResponse
 import com.ssafy.domain.usecase.user.GetFamilyUsersUseCase
 import com.ssafy.domain.utils.ResultType
@@ -16,14 +19,32 @@ import javax.inject.Inject
 @HiltViewModel
 class MapViewModel @Inject constructor(
     private val getFamilyUsersUseCase: GetFamilyUsersUseCase
-): ViewModel() {
+) : ViewModel() {
 
-    var usersResponse by mutableStateOf<UsersResponse>(ResultType.Uninitialized)
+    var users by mutableStateOf(listOf<DomainUserDTO>())
         private set
 
+    var errorState by mutableStateOf(false)
+
     fun getFamilyUsers(familyCode: String) = viewModelScope.launch(Dispatchers.IO) {
+        Log.d("MapScreen_", "getFamilyUsers: ")
         getFamilyUsersUseCase.execute(familyCode).collect { response ->
-            usersResponse = response
+            when (response) {
+                is ResultType.Loading -> {}
+                is ResultType.Success -> {
+                    Log.d("test5", "LoginScreen: ${response.data}")
+                    users = response.data
+                }
+                is ResultType.Error -> {
+                    errorState = true
+                }
+                else ->{
+
+                }
+            }
+
         }
     }
+
+
 }
