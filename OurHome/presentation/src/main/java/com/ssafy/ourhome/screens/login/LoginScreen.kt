@@ -1,5 +1,6 @@
 package com.ssafy.ourhome.screens.login
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -33,6 +34,7 @@ import com.ssafy.ourhome.components.RoundedButton
 import com.ssafy.ourhome.navigation.BottomNavItem
 import com.ssafy.ourhome.navigation.OurHomeScreens
 import com.ssafy.ourhome.utils.LOGIN
+import com.ssafy.ourhome.utils.State
 
 @Preview(showBackground = true)
 @Composable
@@ -40,16 +42,40 @@ fun LoginScreen(
     navController: NavController = NavController(LocalContext.current),
     vm: LoginViewModel = hiltViewModel()
 ) {
-    var idState = remember {
-        mutableStateOf("")
-    }
-    var passwordState = remember {
-        mutableStateOf("")
-    }
+    val context = LocalContext.current
+
     val passWordVisibility = remember {
         mutableStateOf(false)
     }
     val scrollState = rememberScrollState()
+
+    when (vm.loginState.value) {
+        State.SUCCESS -> {
+            when (vm.familyState.value) {
+                // 이미 가족방이 있을 때
+                true -> {
+                    navController.navigate(BottomNavItem.Home.screenRoute) {
+                        popUpTo(OurHomeScreens.LoginScreen.name) {
+                            inclusive = true
+                        }
+                    }
+                }
+                // 가족방이 없을 때
+                else -> {
+                    navController.navigate(OurHomeScreens.EnterHomeScreen.name) {
+                        popUpTo(OurHomeScreens.LoginScreen.name) {
+                            inclusive = true
+                        }
+                    }
+                }
+            }
+            vm.loginState.value = State.DEFAULT
+        }
+        State.FAIL -> {
+            Toast.makeText(context, "아이디와 비밀번호를 확인해주세요", Toast.LENGTH_SHORT).show()
+            vm.loginState.value = State.DEFAULT
+        }
+    }
 
     OurHomeSurface {
         Column(
@@ -63,8 +89,8 @@ fun LoginScreen(
             Logo()
 
             /** 로그인 */
-            Login(idState, passwordState, passWordVisibility) {
-                navController.navigate(BottomNavItem.Home.screenRoute)
+            Login(vm.loginIdState, vm.loginPasswordState, passWordVisibility) {
+                vm.signInEmail()
             }
 
             /** 회원가입 */
