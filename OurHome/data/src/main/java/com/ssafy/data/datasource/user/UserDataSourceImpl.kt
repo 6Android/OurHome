@@ -21,6 +21,10 @@ class UserDataSourceImpl @Inject constructor(
     override fun joinEmail(email: String, password: String) =
         fireAuth.createUserWithEmailAndPassword(email, password)
 
+    // 이메일 로그인
+    override fun signInEmail(email: String, password: String) =
+        fireAuth.signInWithEmailAndPassword(email, password)
+
     // 이메일 중복 검사
     override fun checkEmail(email: String): Task<DocumentSnapshot> =
         fireStore.collection(USER).document(email).get()
@@ -28,9 +32,14 @@ class UserDataSourceImpl @Inject constructor(
     override fun insertUser(user: DomainUserDTO) =
         fireStore.collection(USER).document(user.email).set(user)
 
-    override fun getProfile(familyCode: String, email: String)
-        = fireStore.collection(FAMILY).document(familyCode).collection(USER).document(email)
+    // 유저 Document 가져오기
+    override fun getUser(email: String) =
+        fireStore.collection(USER).document(email).get()
 
-    override fun editProfile(familyCode: String, user: DomainUserDTO): Task<Void>
-        = fireStore.collection(FAMILY).document(familyCode).collection(USER).document(user.email).set(user)
+    override fun getProfile(familyCode: String, email: String) =
+        fireStore.collection(FAMILY).document(familyCode).collection(USER).document(email)
+
+    override fun editProfile(familyCode: String, user: DomainUserDTO): Task<Void> =
+        fireStore.collection(FAMILY).document(familyCode).collection(USER).document(user.email)
+            .set(user)
 }
