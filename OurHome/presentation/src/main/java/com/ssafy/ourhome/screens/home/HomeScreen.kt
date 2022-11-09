@@ -1,6 +1,5 @@
 package com.ssafy.ourhome.screens.home
 
-import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
@@ -39,12 +38,10 @@ import com.ssafy.ourhome.ui.theme.OurHomeTheme
 import com.ssafy.ourhome.utils.Person
 import com.ssafy.ourhome.utils.Schedule
 import com.ssafy.ourhome.utils.personList
-import kotlin.math.log
 
 
 @Composable
 fun HomeScreen(navController: NavController) {
-
     val scrollState = rememberScrollState()
     val visibleBottomSheetState = remember {
         mutableStateOf(false)

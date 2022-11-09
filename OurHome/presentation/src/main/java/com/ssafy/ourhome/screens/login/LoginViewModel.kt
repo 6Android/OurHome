@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ssafy.domain.usecase.user.*
 import com.ssafy.domain.utils.ResultType
+import com.ssafy.ourhome.utils.Prefs
 import com.ssafy.ourhome.utils.SocialState
 import com.ssafy.ourhome.utils.State
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -47,6 +48,7 @@ class LoginViewModel @Inject constructor(
                 when (response) {
                     is ResultType.Success -> {
                         joinProcessState.value = State.SUCCESS
+                        Prefs.email = joinIdState.value
                     }
                     else -> {
                         joinProcessState.value = State.FAIL
@@ -61,6 +63,7 @@ class LoginViewModel @Inject constructor(
                 when (response) {
                     is ResultType.Success -> {
                         joinProcessState.value = State.SUCCESS
+                        Prefs.email = socialEmail
                     }
                     else -> {
                         joinProcessState.value = State.FAIL
@@ -84,10 +87,12 @@ class LoginViewModel @Inject constructor(
                             when (response2) {
                                 is ResultType.Success -> {
                                     // 유저 정보 가져올 때
+                                    Prefs.email = email
                                     if (response2.data.family_code.isBlank()) {
                                         socialProcessState.value = SocialState.MOVE_ENTER_HOME
                                     } else {
                                         socialProcessState.value = SocialState.MOVE_HOME
+                                        Prefs.familyCode = response2.data.family_code
                                     }
                                 }
                                 else -> {
@@ -132,8 +137,11 @@ class LoginViewModel @Inject constructor(
                     when (response) {
                         is ResultType.Success -> {
                             // 가족방이 없을 때
+                            Prefs.email = loginIdState.value
                             if (response.data.family_code.isBlank()) {
                                 hasFamilyState.value = false
+                            } else {
+                                Prefs.familyCode = response.data.family_code
                             }
 
                             loginProcessState.value = State.SUCCESS
