@@ -107,8 +107,30 @@ class UserRepositoryImpl @Inject constructor(
 
     override fun editProfile(familyCode: String, user: DomainUserDTO): Flow<ResultType<Unit>> =
         callbackFlow {
-            val completeListener =
-                userDataSource.editProfile(familyCode, user).addOnCompleteListener {
+            userDataSource.editProfile(familyCode, user).addOnCompleteListener {
+                val response = if (it.isSuccessful) {
+                    ResultType.Success(Unit)
+                } else if (it.exception != null) {
+                    ResultType.Error(it.exception)
+                } else {
+                    ResultType.Loading
+                }
+                trySend(response)
+            }
+            awaitClose {
+
+            }
+        }
+
+    override fun sendLatLng(
+        familyCode: String,
+        email: String,
+        latitude: Double,
+        longitude: Double
+    ): Flow<ResultType<Unit>> =
+        callbackFlow {
+            userDataSource.sendLatLng(familyCode, email, latitude, longitude)
+                .addOnCompleteListener {
                     val response = if (it.isSuccessful) {
                         ResultType.Success(Unit)
                     } else if (it.exception != null) {
@@ -122,4 +144,5 @@ class UserRepositoryImpl @Inject constructor(
 
             }
         }
+
 }

@@ -1,5 +1,6 @@
 package com.ssafy.ourhome.screens.userpage
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -36,12 +37,12 @@ import com.ssafy.ourhome.components.OurHomeSurface
 @Composable
 fun EditProfileScreen(
     navController: NavController = NavController(LocalContext.current),
-    userDTO: DomainUserDTO = DomainUserDTO()
+    userDTO: DomainUserDTO = DomainUserDTO(),
+    vm : UserPageViewModel
 ) {
     val scrollState = rememberScrollState()
 
-    val vm: UserPageViewModel = hiltViewModel()
-
+    Log.d("EditProfileScreen", "Recompose: ")
     var user = userDTO
 
     val nicknameState = remember {

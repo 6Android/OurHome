@@ -42,4 +42,13 @@ class UserDataSourceImpl @Inject constructor(
     override fun editProfile(familyCode: String, user: DomainUserDTO): Task<Void> =
         fireStore.collection(FAMILY).document(familyCode).collection(USER).document(user.email)
             .set(user)
+
+    override fun sendLatLng(
+        familyCode: String,
+        email: String,
+        latitude: Double,
+        longitude: Double
+    ): Task<Void> =
+        fireStore.collection(FAMILY).document(familyCode).collection(USER).document(email)
+            .update("latitude", latitude, "longitude", longitude)
 }

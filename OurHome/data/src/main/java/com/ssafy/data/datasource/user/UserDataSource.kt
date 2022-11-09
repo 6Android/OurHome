@@ -29,4 +29,6 @@ interface UserDataSource {
 
     fun editProfile(familyCode: String, user: DomainUserDTO): Task<Void>
 
+    fun sendLatLng(familyCode: String, email :String, latitude : Double, longitude : Double) : Task<Void>
+
 }

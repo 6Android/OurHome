@@ -24,6 +24,13 @@ interface UserRepository {
     fun checkEmail(email: String): Flow<ResultType<Unit>>
 
     fun getProfile(familyCode: String, email: String): Flow<UserResponse>
-    
+
     fun editProfile(familyCode: String, user: DomainUserDTO): Flow<ResultType<Unit>>
+
+    fun sendLatLng(
+        familyCode: String,
+        email: String,
+        latitude: Double,
+        longitude: Double
+    ): Flow<ResultType<Unit>>
 }
