@@ -3,6 +3,7 @@ package com.ssafy.data.repository.user
 import com.ssafy.data.datasource.user.UserDataSource
 import com.ssafy.domain.model.user.DomainUserDTO
 import com.ssafy.domain.repository.user.UserRepository
+import com.ssafy.domain.repository.user.UserResponse
 import com.ssafy.domain.repository.user.UsersResponse
 import com.ssafy.domain.utils.ResultType
 import kotlinx.coroutines.channels.awaitClose
@@ -19,6 +20,22 @@ class UserRepositoryImpl @Inject constructor(
                 val response = if (snapshot != null) {
                     val users = snapshot.toObjects(DomainUserDTO::class.java)
                     ResultType.Success(users)
+                } else {
+                    ResultType.Error(e)
+                }
+                trySend(response)
+            }
+        awaitClose {
+            snapshotListener.remove()
+        }
+    }
+
+    override fun getProfile(familyCode: String, email: String): Flow<UserResponse> = callbackFlow {
+        val snapshotListener =
+            userDataSource.getProfile(familyCode, email).addSnapshotListener { snapshot, e ->
+                val response = if (snapshot != null) {
+                    val user = snapshot.toObject(DomainUserDTO::class.java)!!
+                    ResultType.Success(user)
                 } else {
                     ResultType.Error(e)
                 }
@@ -67,4 +84,21 @@ class UserRepositoryImpl @Inject constructor(
             }
         awaitClose { }
     }
+
+    override fun editProfile(familyCode: String, user: DomainUserDTO): Flow<ResultType<Unit>> =
+        callbackFlow {
+            val completeListener = userDataSource.editProfile(familyCode, user).addOnCompleteListener {
+                val response = if (it.isSuccessful) {
+                    ResultType.Success(Unit)
+                } else if (it.exception != null) {
+                    ResultType.Error(it.exception)
+                } else {
+                    ResultType.Loading
+                }
+                trySend(response)
+            }
+            awaitClose {
+
+            }
+        }
 }

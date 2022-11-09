@@ -27,4 +27,10 @@ class UserDataSourceImpl @Inject constructor(
 
     override fun insertUser(user: DomainUserDTO) =
         fireStore.collection(USER).document(user.email).set(user)
+
+    override fun getProfile(familyCode: String, email: String)
+        = fireStore.collection(FAMILY).document(familyCode).collection(USER).document(email)
+
+    override fun editProfile(familyCode: String, user: DomainUserDTO): Task<Void>
+        = fireStore.collection(FAMILY).document(familyCode).collection(USER).document(user.email).set(user)
 }
