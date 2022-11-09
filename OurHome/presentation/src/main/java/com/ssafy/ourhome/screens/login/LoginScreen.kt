@@ -34,6 +34,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.AuthResult
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -55,6 +56,13 @@ fun LoginScreen(
     navController: NavController = NavController(LocalContext.current),
     vm: LoginViewModel = hiltViewModel()
 ) {
+    // 자동 로그인
+    LaunchedEffect("") {
+        FirebaseAuth.getInstance().currentUser?.let {
+            vm.checkSocialEmail(it.email!!)
+        }
+    }
+
     val context = LocalContext.current
     val token = stringResource(R.string.default_web_client_id)
     val launcher = rememberFirebaseAuthLauncher(
@@ -76,19 +84,11 @@ fun LoginScreen(
             when (vm.hasFamilyState.value) {
                 // 이미 가족방이 있을 때
                 true -> {
-                    navController.navigate(BottomNavItem.Home.screenRoute) {
-                        popUpTo(OurHomeScreens.LoginScreen.name) {
-                            inclusive = true
-                        }
-                    }
+                    navigateToHomeScreen(navController)
                 }
                 // 가족방이 없을 때
                 else -> {
-                    navController.navigate(OurHomeScreens.EnterHomeScreen.name) {
-                        popUpTo(OurHomeScreens.LoginScreen.name) {
-                            inclusive = true
-                        }
-                    }
+                    navigateToEnterHomeScreen(navController)
                 }
             }
             vm.loginProcessState.value = State.DEFAULT
@@ -101,23 +101,15 @@ fun LoginScreen(
 
     when (vm.socialProcessState.value) {
         SocialState.MOVE_ENTER_HOME -> {
-            navController.navigate(OurHomeScreens.EnterHomeScreen.name) {
-                popUpTo(OurHomeScreens.LoginScreen.name) {
-                    inclusive = true
-                }
-            }
+            navigateToEnterHomeScreen(navController)
             vm.socialProcessState.value = SocialState.DEFAULT
         }
         SocialState.MOVE_HOME -> {
-            navController.navigate(BottomNavItem.Home.screenRoute) {
-                popUpTo(OurHomeScreens.LoginScreen.name) {
-                    inclusive = true
-                }
-            }
+            navigateToHomeScreen(navController)
             vm.socialProcessState.value = SocialState.DEFAULT
         }
         SocialState.MOVE_JOIN_NICKNAME -> {
-            navController.navigate(OurHomeScreens.JoinNickNameScreen.name + "/${OurHomeScreens.LoginScreen.name}")
+            navigateToJoinNickNameScreen(navController)
             vm.socialProcessState.value = SocialState.DEFAULT
         }
         SocialState.ERROR -> {
@@ -179,6 +171,29 @@ fun LoginScreen(
                     // todo: 트위터 로그인
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun navigateToJoinNickNameScreen(navController: NavController) {
+    navController.navigate(OurHomeScreens.JoinNickNameScreen.name + "/${OurHomeScreens.LoginScreen.name}")
+}
+
+@Composable
+private fun navigateToEnterHomeScreen(navController: NavController) {
+    navController.navigate(OurHomeScreens.EnterHomeScreen.name) {
+        popUpTo(OurHomeScreens.LoginScreen.name) {
+            inclusive = true
+        }
+    }
+}
+
+@Composable
+private fun navigateToHomeScreen(navController: NavController) {
+    navController.navigate(BottomNavItem.Home.screenRoute) {
+        popUpTo(OurHomeScreens.LoginScreen.name) {
+            inclusive = true
         }
     }
 }

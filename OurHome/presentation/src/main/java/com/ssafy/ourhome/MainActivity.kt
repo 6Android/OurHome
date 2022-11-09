@@ -24,8 +24,6 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 import com.ssafy.ourhome.navigation.BottomNavItem
 import com.ssafy.ourhome.navigation.BottomNavigation
 import com.ssafy.ourhome.navigation.OurHomeNavGraph
@@ -42,7 +40,6 @@ class MainActivity : ComponentActivity() {
         setContent {
             OurHomeTheme {
                 MyApp()
-//                EditTextPreView()
             }
         }
     }
@@ -51,12 +48,10 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MyApp() {
     val bottomBarState = rememberSaveable { (mutableStateOf(true)) }
-val auth = Firebase.auth.currentUser
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colors.background
     ) {
-
         val navController = rememberNavController()
 
         // Subscribe to navBackStackEntry, required to get current route
@@ -64,27 +59,27 @@ val auth = Firebase.auth.currentUser
 
         // Control TopBar and BottomBar
         when (navBackStackEntry?.destination?.route) {
-            "${BottomNavItem.Home.screenRoute}" -> {
+            BottomNavItem.Home.screenRoute -> {
                 // Show BottomBar and TopBar
                 bottomBarState.value = true
                 StatusBarColorUpdateEffect(MainColor, false)
             }
-            "${BottomNavItem.Question.screenRoute}" -> {
+            BottomNavItem.Question.screenRoute -> {
                 // Show BottomBar and TopBar
                 bottomBarState.value = true
                 StatusBarColorUpdateEffect(Color.White, true)
             }
-            "${BottomNavItem.Album.screenRoute}" -> {
+            BottomNavItem.Album.screenRoute -> {
                 // Show BottomBar and TopBar
                 bottomBarState.value = true
                 StatusBarColorUpdateEffect(Color.White, true)
             }
-            "${BottomNavItem.MyPage.screenRoute}" -> {
+            BottomNavItem.MyPage.screenRoute -> {
                 // Hide BottomBar and TopBar
                 bottomBarState.value = true
                 StatusBarColorUpdateEffect(Color.White, true)
             }
-            "${OurHomeScreens.LoginScreen.name}" -> {
+            OurHomeScreens.LoginScreen.name -> {
                 bottomBarState.value = false
                 StatusBarColorUpdateEffect(Color(0xFFF8F8FB), true)
             }
@@ -106,12 +101,8 @@ val auth = Firebase.auth.currentUser
                     .padding(it)
             ) {
                 OurHomeNavGraph(navController)
-
             }
         }
-//        Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-//            RoundedButton(label = "우리집")
-//        }
     }
 }
 
