@@ -11,7 +11,7 @@ data class DomainUserDTO(
     var email: String = "",
     var family_code: String = "",
     var hobby: String = "",
-    var image: String = "",
+    var image: String = "default",
     var interest: String = "",
     var job: String = "",
     var latitude: Double = 0.0,
