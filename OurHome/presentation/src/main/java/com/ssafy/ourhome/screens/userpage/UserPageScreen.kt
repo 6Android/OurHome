@@ -24,11 +24,10 @@ import com.ssafy.ourhome.utils.SETTING_ICON
 @Composable
 fun UserPageScreen(
     navController: NavController,
-    email: String
+    email: String,
+    vm : UserPageViewModel
 ) {
     val scrollState = rememberScrollState()
-
-    val vm: UserPageViewModel = hiltViewModel()
 
     // TODO : 패밀리코드, 유저 이메일
     vm.getProfile("EX7342", email = email)

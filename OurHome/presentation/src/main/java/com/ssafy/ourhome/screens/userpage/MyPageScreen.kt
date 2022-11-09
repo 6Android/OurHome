@@ -28,10 +28,9 @@ import com.ssafy.ourhome.utils.SETTING_ICON
 
 
 @Composable
-fun MyPageScreen(navController: NavController = NavController(LocalContext.current)) {
+fun MyPageScreen(navController: NavController = NavController(LocalContext.current), vm : UserPageViewModel) {
     val scrollState = rememberScrollState()
 
-    val vm: UserPageViewModel = hiltViewModel()
 
     // TODO : 패밀리코드, 본인 이메일
     vm.getProfile("EX7342","a@naver.com")
@@ -81,13 +80,13 @@ fun MyPageScreen(navController: NavController = NavController(LocalContext.curre
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-private fun MyPagePreview() {
-    OurHomeTheme {
-        MyPageScreen()
-    }
-}
-
+//@Preview(showBackground = true)
+//@Composable
+//private fun MyPagePreview() {
+//    OurHomeTheme {
+//        MyPageScreen()
+//    }
+//}
+//
 
 
