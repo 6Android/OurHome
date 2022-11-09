@@ -1,5 +1,6 @@
 package com.ssafy.ourhome.screens.userpage
 
+import android.widget.Toast
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -23,65 +24,56 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.PopupProperties
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
+import com.ssafy.domain.model.user.DomainUserDTO
 import com.ssafy.ourhome.R
 import com.ssafy.ourhome.components.MainAppBar
 import com.ssafy.ourhome.components.OurHomeSurface
-import com.ssafy.ourhome.navigation.OurHomeScreens
-import com.ssafy.ourhome.ui.theme.MainColor
-import com.ssafy.ourhome.ui.theme.OurHomeTheme
-
-data class tmpUserDTO(
-    val imageUrl: String = "default",
-    val nickname: String,
-    val email: String,
-    val phone: String,
-    val birth: String,
-    val bloodType: String,
-    val MBTI: String,
-    val job: String,
-    val interest: String,
-    val hobby: String
-)
 
 @Composable
-fun EditProfileScreen(navController: NavController = NavController(LocalContext.current)) {
+fun EditProfileScreen(
+    navController: NavController = NavController(LocalContext.current),
+    userDTO: DomainUserDTO = DomainUserDTO()
+) {
     val scrollState = rememberScrollState()
 
-    // TODO : userDTO
-    val user = tmpUserDTO(
-        "default", "서경원", "skw@ssafy.com", "010-1234-5678",
-        "1997년 1월 1일", "Rh+ B", "ENFP", "개발자", "운동, 요리", "글쓰기"
-    )
+    val vm: UserPageViewModel = hiltViewModel()
+
+    var user = userDTO
 
     val nicknameState = remember {
-        mutableStateOf(user.nickname)
+        mutableStateOf(userDTO.name)
     }
     val phoneState = remember {
-        mutableStateOf(user.phone)
+        mutableStateOf(userDTO.phone)
     }
     val bloodTypeState = remember {
-        mutableStateOf(user.bloodType)
+        mutableStateOf(userDTO.blood_type)
     }
 
     val MBTIState = remember {
-        mutableStateOf(user.MBTI)
+        mutableStateOf(userDTO.mbti)
     }
 
     val jobState = remember {
-        mutableStateOf(user.job)
+        mutableStateOf(userDTO.job)
     }
 
     val interestState = remember {
-        mutableStateOf(user.interest)
+        mutableStateOf(userDTO.interest)
     }
 
     val hobbyState = remember {
-        mutableStateOf(user.hobby)
+        mutableStateOf(userDTO.hobby)
+    }
+
+    // 에디트 성공
+    if(vm.editSuccess){
+        Toast.makeText(LocalContext.current, "정보 수정에 성공하였습니다.", Toast.LENGTH_SHORT).show()
+        navController.popBackStack()
     }
 
     OurHomeSurface() {
@@ -92,7 +84,16 @@ fun EditProfileScreen(navController: NavController = NavController(LocalContext.
                 onBackClick = { navController.popBackStack() },
                 icon = painterResource(R.drawable.ic_check),
                 onIconClick = {
-                    navController.navigate(OurHomeScreens.SettingScreen.name)
+                    user.name = nicknameState.value
+                    user.phone = phoneState.value
+                    user.blood_type = bloodTypeState.value
+                    user.mbti = MBTIState.value
+                    user.job = jobState.value
+                    user.interest = interestState.value
+                    user.hobby = hobbyState.value
+
+                    // TODO : 패밀리코드
+                    vm.editProfile("EX7342",user)
                 }
             )
         }) {
@@ -111,13 +112,14 @@ fun EditProfileScreen(navController: NavController = NavController(LocalContext.
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    UserImage(user.imageUrl)
+                    UserImage(userDTO.image)
                     TextFieldWithClear(nicknameState)
                 }
 
                 Divider(
                     modifier = Modifier.padding(bottom = 24.dp),
-                    thickness = 4.dp, color = Color.LightGray.copy(alpha = 0.8f))
+                    thickness = 4.dp, color = Color.LightGray.copy(alpha = 0.8f)
+                )
 
                 Column(
                     modifier = Modifier
@@ -125,9 +127,9 @@ fun EditProfileScreen(navController: NavController = NavController(LocalContext.
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(24.dp)
                 ) {
-                    TextWithText("이메일", user.email)
+                    TextWithText("이메일", userDTO.email)
                     TextWithTextField("전화번호", phoneState)
-                    TextWithText(title = "생일", content = user.birth)
+                    TextWithText(title = "생일", content = userDTO.birthday)
                     TextWithDropDown(
                         title = "혈액형", textState = bloodTypeState, itemList =
                         listOf(
@@ -144,8 +146,8 @@ fun EditProfileScreen(navController: NavController = NavController(LocalContext.
                     TextWithDropDown(
                         title = "MBTI", textState = MBTIState, itemList =
                         listOf(
-                            "ENFP","ENFJ","ENTP","ENTJ","ESFP","ESFJ","ESTP","ESTJ",
-                            "INFP","INFJ","INTP","INTJ","ISFP","ISFJ","ISTP","ISTJ",
+                            "ENFP", "ENFJ", "ENTP", "ENTJ", "ESFP", "ESFJ", "ESTP", "ESTJ",
+                            "INFP", "INFJ", "INTP", "INTJ", "ISFP", "ISFJ", "ISTP", "ISTJ",
                         )
                     )
                     TextWithTextField("직업", jobState)
@@ -180,9 +182,11 @@ private fun TextWithDropDown(
             text = title, modifier = Modifier.weight(2f),
             style = MaterialTheme.typography.h6.copy(fontWeight = FontWeight.Bold)
         )
-        Box(modifier = Modifier
-            .fillMaxHeight()
-            .weight(4f)) {
+        Box(
+            modifier = Modifier
+                .fillMaxHeight()
+                .weight(4f)
+        ) {
 
 //            ExposedDropdownMenuBox(
 //                expanded = expanded,
@@ -223,7 +227,10 @@ private fun TextWithDropDown(
             Row(
                 Modifier
                     .fillMaxWidth()
-                    .height(30.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
+                    .height(30.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
                 Text(
                     text = itemList[selectedIndex], modifier = Modifier,
                     style = MaterialTheme.typography.h6.copy(fontWeight = FontWeight.Bold)
@@ -231,8 +238,11 @@ private fun TextWithDropDown(
 
                 IconButton(
                     onClick = { expanded = true }) {
-                    Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription = "Drop Down Button",
-                        modifier = Modifier.size(20.dp))
+                    Icon(
+                        imageVector = Icons.Default.ArrowDropDown,
+                        contentDescription = "Drop Down Button",
+                        modifier = Modifier.size(20.dp)
+                    )
                 }
             }
 
@@ -245,11 +255,11 @@ private fun TextWithDropDown(
 
             ) {
                 itemList.forEachIndexed { index, item ->
-                    DropdownMenuItem(modifier = Modifier.wrapContentHeight(),onClick = {
+                    DropdownMenuItem(modifier = Modifier.wrapContentHeight(), onClick = {
                         selectedIndex = index
                         expanded = false
                     }) {
-                        Text(text = item,style = MaterialTheme.typography.h6)
+                        Text(text = item, style = MaterialTheme.typography.h6)
                     }
                 }
             }
@@ -385,10 +395,10 @@ private fun NoLabelTextInput(
     )
 }
 
-@Preview(showBackground = true)
-@Composable
-private fun EditProfilePreview() {
-    OurHomeTheme {
-        EditProfileScreen()
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//private fun EditProfilePreview() {
+//    OurHomeTheme {
+//        EditProfileScreen()
+//    }
+//}

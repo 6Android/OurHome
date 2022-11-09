@@ -1,5 +1,6 @@
 package com.ssafy.ourhome.screens.home.map
 
+import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -23,6 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -32,6 +34,8 @@ import com.google.android.gms.maps.model.LatLngBounds
 import com.google.maps.android.compose.*
 import com.holix.android.bottomsheetdialog.compose.BottomSheetDialog
 import com.holix.android.bottomsheetdialog.compose.BottomSheetDialogProperties
+import com.ssafy.domain.model.user.DomainUserDTO
+import com.ssafy.domain.utils.ResultType
 import com.ssafy.ourhome.R
 import com.ssafy.ourhome.components.OurHomeSurface
 import com.ssafy.ourhome.ui.theme.OurHomeTheme
@@ -46,12 +50,22 @@ data class tmpUser(
 @Composable
 fun MapScreen(navController: NavController = NavController(LocalContext.current)) {
 
-    // TODO : 임의
-    val list = listOf(
-        LatLng(37.715133, 126.734086),
-        LatLng(36.715133, 128.734086),
-        LatLng(35.715133, 139.734086),
-    )
+    val vm : MapViewModel = hiltViewModel()
+    vm.getFamilyUsers("EX7342")
+
+    val users = remember {
+        mutableStateOf(listOf<DomainUserDTO>())
+    }
+
+    when(val usersResponse = vm.usersResponse) {
+        is ResultType.Loading -> {}
+        is ResultType.Success -> {
+            Log.d("test5", "LoginScreen: ${usersResponse.data}")
+            users.value = usersResponse.data
+        }
+        is ResultType.Error -> print(usersResponse.exception)
+    }
+
     val familyList = listOf(
         tmpUser("default", "아빠", System.currentTimeMillis() - 1000),
         tmpUser("default", "엄마", System.currentTimeMillis() - 100000),
@@ -97,30 +111,37 @@ fun MapScreen(navController: NavController = NavController(LocalContext.current)
             uiSettings = mapUiSettings,
             properties = mapProperties
         ) {
-            for (i in list) {
+
+            for (i in users.value) {
                 Marker(
-                    state = MarkerState(position = i),
-                    title = "유저 123",
-                    snippet = "Marker in Singapore"
+                    state = MarkerState(position = LatLng(i.latitude,i.longitude)),
+                    title = i.name,
+                    snippet = positionUpdateFormatter(i.location_updated)
                 )
             }
 
             val bounds = LatLngBounds.Builder()
+            val list = arrayListOf<LatLng>()
+            for(i in users.value){
+                list.add(LatLng(i.latitude,i.longitude))
+            }
             for (polyline in list) {
                 bounds.include(polyline)
             }
 
             // 맨 처음 초기화 때만 모든 가족이 보이도록 위치를 갱신한다.
-            if (!initState.value) {
-                cameraPositionState.move(
-                    CameraUpdateFactory.newLatLngBounds(
-                        bounds.build(),
-                        width,
-                        height,
-                        (height * 0.05f).toInt()
+            if(users.value.isNotEmpty()) {
+                if (!initState.value) {
+                    cameraPositionState.move(
+                        CameraUpdateFactory.newLatLngBounds(
+                            bounds.build(),
+                            width,
+                            height,
+                            (height * 0.05f).toInt()
+                        )
                     )
-                )
-                initState.value = true
+                    initState.value = true
+                }
             }
         }
 
