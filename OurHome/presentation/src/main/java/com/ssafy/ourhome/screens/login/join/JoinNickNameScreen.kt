@@ -1,5 +1,6 @@
 package com.ssafy.ourhome.screens.login.join
 
+import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
@@ -16,7 +17,7 @@ import com.ssafy.ourhome.components.OurHomeSurface
 import com.ssafy.ourhome.components.TextInput
 import com.ssafy.ourhome.navigation.OurHomeScreens
 import com.ssafy.ourhome.screens.login.LoginViewModel
-import com.ssafy.ourhome.utils.JOIN_PASSWORD
+import com.ssafy.ourhome.utils.State
 
 @Composable
 fun JoinNickNameScreen(
@@ -25,11 +26,16 @@ fun JoinNickNameScreen(
     prev_type: String
 ) {
     val context = LocalContext.current
-    val onSuccessListener: () -> Unit = {
-        navigateToEnterHomeScreen(navController)
-    }
-    val onFailListener: () -> Unit = {
-        Toast.makeText(context, "회원가입에 실패했습니다.", Toast.LENGTH_SHORT).show()
+
+    when (vm.joinProcessState.value) {
+        State.SUCCESS -> {
+            navigateToEnterHomeScreen(navController)
+            vm.joinProcessState.value = State.DEFAULT
+        }
+        State.FAIL -> {
+            Toast.makeText(context, "회원가입에 실패했습니다.", Toast.LENGTH_SHORT).show()
+            vm.joinProcessState.value = State.DEFAULT
+        }
     }
 
     OurHomeSurface {
@@ -43,7 +49,7 @@ fun JoinNickNameScreen(
             Column(modifier = Modifier.padding(horizontal = 24.dp)) {
 
                 /** 인디케이터 */
-                if (prev_type == JOIN_PASSWORD) JoinIndicator(step = 3)
+                if (prev_type == OurHomeScreens.JoinPasswordScreen.name) JoinIndicator(step = 3)
 
                 /** 헤더 */
                 Text(
@@ -61,7 +67,7 @@ fun JoinNickNameScreen(
                     enabled = true,
                     imeAction = ImeAction.Done,
                     onAction = KeyboardActions(onDone = {
-                        vm.joinEmail(onSuccess = onSuccessListener, onFail = onFailListener)
+                        joinUser(vm, context, prev_type)
                     })
                 )
             }
@@ -69,11 +75,22 @@ fun JoinNickNameScreen(
 
         /** 가입 버튼 */
         NextButton("가입") {
-            if(vm.joinNickNameState.value.isNullOrBlank()) {
-                Toast.makeText(context, "닉네임을 입력해주세요!", Toast.LENGTH_SHORT).show()
-                return@NextButton
-            }
-            vm.joinEmail(onSuccess = onSuccessListener, onFail = onFailListener)
+            joinUser(vm, context, prev_type)
+        }
+    }
+}
+
+fun joinUser(vm: LoginViewModel, context: Context, prev_type: String) {
+    if (vm.joinNickNameState.value.isBlank()) {
+        Toast.makeText(context, "닉네임을 입력해주세요!", Toast.LENGTH_SHORT).show()
+    }
+
+    when (prev_type) {
+        OurHomeScreens.JoinPasswordScreen.name -> {
+            vm.joinEmail()
+        }
+        OurHomeScreens.LoginScreen.name -> {
+            vm.joinSocial()
         }
     }
 }

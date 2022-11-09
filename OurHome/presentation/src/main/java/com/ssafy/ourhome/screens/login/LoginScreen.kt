@@ -1,6 +1,12 @@
 package com.ssafy.ourhome.screens.login
 
+import android.content.Intent
+import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -10,10 +16,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -21,11 +24,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
+import com.google.firebase.auth.AuthResult
+import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.ssafy.ourhome.R
 import com.ssafy.ourhome.components.EmailInput
 import com.ssafy.ourhome.components.OurHomeSurface
@@ -33,8 +44,10 @@ import com.ssafy.ourhome.components.PasswordInput
 import com.ssafy.ourhome.components.RoundedButton
 import com.ssafy.ourhome.navigation.BottomNavItem
 import com.ssafy.ourhome.navigation.OurHomeScreens
-import com.ssafy.ourhome.utils.LOGIN
+import com.ssafy.ourhome.utils.SocialState
 import com.ssafy.ourhome.utils.State
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 @Preview(showBackground = true)
 @Composable
@@ -43,15 +56,24 @@ fun LoginScreen(
     vm: LoginViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
+    val token = stringResource(R.string.default_web_client_id)
+    val launcher = rememberFirebaseAuthLauncher(
+        onAuthComplete = { result ->
+            vm.checkSocialEmail(result.user?.email!!)
+        },
+        onAuthError = {
+            Log.d("loginscreen_google", "$it")
+        }
+    )
 
     val passWordVisibility = remember {
         mutableStateOf(false)
     }
     val scrollState = rememberScrollState()
 
-    when (vm.loginState.value) {
+    when (vm.loginProcessState.value) {
         State.SUCCESS -> {
-            when (vm.familyState.value) {
+            when (vm.hasFamilyState.value) {
                 // 이미 가족방이 있을 때
                 true -> {
                     navController.navigate(BottomNavItem.Home.screenRoute) {
@@ -69,11 +91,38 @@ fun LoginScreen(
                     }
                 }
             }
-            vm.loginState.value = State.DEFAULT
+            vm.loginProcessState.value = State.DEFAULT
         }
         State.FAIL -> {
             Toast.makeText(context, "아이디와 비밀번호를 확인해주세요", Toast.LENGTH_SHORT).show()
-            vm.loginState.value = State.DEFAULT
+            vm.loginProcessState.value = State.DEFAULT
+        }
+    }
+
+    when (vm.socialProcessState.value) {
+        SocialState.MOVE_ENTER_HOME -> {
+            navController.navigate(OurHomeScreens.EnterHomeScreen.name) {
+                popUpTo(OurHomeScreens.LoginScreen.name) {
+                    inclusive = true
+                }
+            }
+            vm.socialProcessState.value = SocialState.DEFAULT
+        }
+        SocialState.MOVE_HOME -> {
+            navController.navigate(BottomNavItem.Home.screenRoute) {
+                popUpTo(OurHomeScreens.LoginScreen.name) {
+                    inclusive = true
+                }
+            }
+            vm.socialProcessState.value = SocialState.DEFAULT
+        }
+        SocialState.MOVE_JOIN_NICKNAME -> {
+            navController.navigate(OurHomeScreens.JoinNickNameScreen.name + "/${OurHomeScreens.LoginScreen.name}")
+            vm.socialProcessState.value = SocialState.DEFAULT
+        }
+        SocialState.ERROR -> {
+            Toast.makeText(context, "에러가 발생했습니다", Toast.LENGTH_SHORT).show()
+            vm.socialProcessState.value = SocialState.DEFAULT
         }
     }
 
@@ -99,43 +148,37 @@ fun LoginScreen(
             }
 
             /** 소셜 로그인 버튼 */
-            SocialLogin {
-                // todo: 닉네임 화면으로 이동
-                navController.navigate(OurHomeScreens.JoinNickNameScreen.name + "/$LOGIN")
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                SocialLoginButton(
+                    painterResource =
+                    painterResource(id = R.drawable.ic_google)
+                ) {
+                    // todo: 구글 로그인
+                    val gso =
+                        GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                            .requestIdToken(token)
+                            .requestEmail()
+                            .build()
+                    val googleSignInClient = GoogleSignIn.getClient(context, gso)
+                    launcher.launch(googleSignInClient.signInIntent)
+                }
+                SocialLoginButton(
+                    painterResource =
+                    painterResource(id = R.drawable.ic_facebook)
+                ) {
+                    // todo: 페이스북 로그인
+                }
+                SocialLoginButton(
+                    painterResource =
+                    painterResource(id = R.drawable.ic_twiter)
+                ) {
+                    // todo: 트위터 로그인
+                }
             }
-        }
-    }
-}
-
-/** 소셜 로그인 버튼 */
-// todo: 뷰모델 인자로 받기
-@Composable
-private fun SocialLogin(onDone: () -> Unit) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceEvenly
-    ) {
-        SocialLoginButton(
-            painterResource =
-            painterResource(id = R.drawable.ic_google)
-        ) {
-            // todo: 구글 로그인
-            onDone()
-        }
-        SocialLoginButton(
-            painterResource =
-            painterResource(id = R.drawable.ic_facebook)
-        ) {
-            // todo: 페이스북 로그인
-            onDone()
-        }
-        SocialLoginButton(
-            painterResource =
-            painterResource(id = R.drawable.ic_twiter)
-        ) {
-            // todo: 트위터 로그인
-            onDone()
         }
     }
 }
@@ -224,4 +267,26 @@ fun SocialLoginButton(
         painter = painterResource,
         contentDescription = "social login button",
     )
+}
+
+// 구글 로그인
+@Composable
+fun rememberFirebaseAuthLauncher(
+    onAuthComplete: (AuthResult) -> Unit,
+    onAuthError: (ApiException) -> Unit
+): ManagedActivityResultLauncher<Intent, ActivityResult> {
+    val scope = rememberCoroutineScope()
+    return rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+        try {
+            val account = task.getResult(ApiException::class.java)!!
+            val credential = GoogleAuthProvider.getCredential(account.idToken!!, null)
+            scope.launch {
+                val authResult = Firebase.auth.signInWithCredential(credential).await()
+                onAuthComplete(authResult)
+            }
+        } catch (e: ApiException) {
+            onAuthError(e)
+        }
+    }
 }
