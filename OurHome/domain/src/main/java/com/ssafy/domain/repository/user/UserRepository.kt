@@ -1,5 +1,7 @@
 package com.ssafy.domain.repository.user
 
+import com.google.android.gms.tasks.Task
+import com.google.firebase.firestore.DocumentReference
 import com.ssafy.domain.model.family.DomainFamilyDTO
 import com.ssafy.domain.model.user.DomainUserDTO
 import com.ssafy.domain.utils.ResultType
@@ -35,10 +37,13 @@ interface UserRepository {
     // 가족방 생성
     fun insetFamily(familyCode: String, familyDTO: DomainFamilyDTO): Flow<ResultType<Unit>>
 
+    // 유저 정보 가져오기
     fun getProfile(familyCode: String, email: String): Flow<UserResponse>
 
+    // 유저 정보 수정하기
     fun editProfile(familyCode: String, user: DomainUserDTO): Flow<ResultType<Unit>>
 
+    // 현재 위치 전송하기
     fun sendLatLng(
         familyCode: String,
         email: String,
@@ -46,4 +51,7 @@ interface UserRepository {
         longitude: Double,
         time: Long
     ): Flow<ResultType<Unit>>
+
+    // 위치 공유 동의 여부 수정하기
+    fun editLocationPermission(familyCode: String, email: String, permission: Boolean): Flow<ResultType<Unit>>
 }

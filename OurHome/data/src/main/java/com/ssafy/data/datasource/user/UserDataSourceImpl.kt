@@ -47,13 +47,16 @@ class UserDataSourceImpl @Inject constructor(
     override fun insetFamily(familyCode: String, familyDTO: DomainFamilyDTO) =
         fireStore.collection(FAMILY).document(familyCode).set(familyDTO)
 
+    // 유저 정보 가져오기
     override fun getProfile(familyCode: String, email: String) =
         fireStore.collection(FAMILY).document(familyCode).collection(USER).document(email)
 
+    // 유저 정보 수정하기
     override fun editProfile(familyCode: String, user: DomainUserDTO): Task<Void> =
         fireStore.collection(FAMILY).document(familyCode).collection(USER).document(user.email)
             .set(user)
 
+    // 현재 위치 전송하기
     override fun sendLatLng(
         familyCode: String,
         email: String,
@@ -63,4 +66,9 @@ class UserDataSourceImpl @Inject constructor(
     ): Task<Void> =
         fireStore.collection(FAMILY).document(familyCode).collection(USER).document(email)
             .update("latitude", latitude, "longitude", longitude, "location_updated", time)
+
+    // 위치 공유 동의 여부 수정하기
+    override fun editLocationPermission(familyCode: String, email: String, permission: Boolean): Task<Void> =
+        fireStore.collection(FAMILY).document(familyCode).collection(USER).document(email)
+            .update("location_permit", permission)
 }

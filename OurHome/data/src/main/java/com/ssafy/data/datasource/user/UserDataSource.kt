@@ -33,10 +33,15 @@ interface UserDataSource {
     // 가족방 생성
     fun insetFamily(familyCode: String, familyDTO: DomainFamilyDTO): Task<Void>
 
+    // 유저 정보 가져오기
     fun getProfile(familyCode: String, email: String): DocumentReference
 
+    // 유저 정보 수정하기
     fun editProfile(familyCode: String, user: DomainUserDTO): Task<Void>
 
+    // 현재 위치 전송하기
     fun sendLatLng(familyCode: String, email :String, latitude : Double, longitude : Double, time: Long) : Task<Void>
 
+    // 위치 공유 동의 여부 수정하기
+    fun editLocationPermission(familyCode: String, email: String, permission: Boolean): Task<Void>
 }
