@@ -2,6 +2,7 @@ package com.ssafy.ourhome
 
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -24,19 +25,63 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequest
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import com.ssafy.ourhome.navigation.BottomNavItem
 import com.ssafy.ourhome.navigation.BottomNavigation
 import com.ssafy.ourhome.navigation.OurHomeNavGraph
 import com.ssafy.ourhome.navigation.OurHomeScreens
 import com.ssafy.ourhome.ui.theme.MainColor
 import com.ssafy.ourhome.ui.theme.OurHomeTheme
+import com.ssafy.ourhome.utils.LOCATION
 import com.ssafy.ourhome.utils.findActivity
+import com.ssafy.ourhome.work.MapWorkManager
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.concurrent.TimeUnit
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    companion object {
+        private val locationWorkRequest: PeriodicWorkRequest =
+            PeriodicWorkRequestBuilder<MapWorkManager>(15, TimeUnit.MINUTES)
+                .build()
+        lateinit var workManager: WorkManager
+
+        // 위치 정보 갱신 워크매니저 시작
+        fun startWorkManager() {
+            workManager.enqueueUniquePeriodicWork(
+                LOCATION,
+                ExistingPeriodicWorkPolicy.KEEP,
+                locationWorkRequest
+            )
+
+            val workState = workManager.getWorkInfosForUniqueWork(LOCATION).get()
+            for (i in workState) {
+                Log.d("test5", "WorkState: $i")
+            }
+        }
+
+        // 위치 정보 갱신 워크매니저 종료
+        fun stopWorkManager() {
+            workManager.cancelUniqueWork(LOCATION)
+
+            val workState = workManager.getWorkInfosForUniqueWork(LOCATION).get()
+            for (i in workState) {
+                Log.d("test5", "WorkState: $i")
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        workManager = WorkManager.getInstance(applicationContext)
+
+//        stopWorkManager()
+//        startWorkManager()
+
         setContent {
             OurHomeTheme {
                 MyApp()
@@ -48,6 +93,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MyApp() {
     val bottomBarState = rememberSaveable { (mutableStateOf(true)) }
+
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colors.background

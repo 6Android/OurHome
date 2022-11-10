@@ -1,5 +1,6 @@
 package com.ssafy.ourhome.navigation
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -7,13 +8,16 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navArgument
+import com.google.android.gms.maps.MapView
 import com.ssafy.domain.model.user.DomainUserDTO
 import com.ssafy.ourhome.screens.NextScreen
 import com.ssafy.ourhome.screens.album.AlbumDetailScreen
 import com.ssafy.ourhome.screens.album.AlbumScreen
 import com.ssafy.ourhome.screens.chat.ChatScreen
 import com.ssafy.ourhome.screens.home.HomeScreen
+import com.ssafy.ourhome.screens.home.HomeViewModel
 import com.ssafy.ourhome.screens.home.map.MapScreen
+import com.ssafy.ourhome.screens.home.map.MapViewModel
 import com.ssafy.ourhome.screens.home.schedule.AddMemberScreen
 import com.ssafy.ourhome.screens.home.schedule.AddScheduleScreen
 import com.ssafy.ourhome.screens.home.schedule.ScheduleDetailScreen
@@ -30,6 +34,7 @@ import com.ssafy.ourhome.screens.question.pet.PetDetailScreen
 import com.ssafy.ourhome.screens.userpage.EditProfileScreen
 import com.ssafy.ourhome.screens.userpage.MyPageScreen
 import com.ssafy.ourhome.screens.userpage.UserPageScreen
+import com.ssafy.ourhome.screens.userpage.UserPageViewModel
 import com.ssafy.ourhome.screens.userpage.setting.ManageFamilyScreen
 import com.ssafy.ourhome.screens.userpage.setting.SettingScreen
 
@@ -37,12 +42,15 @@ import com.ssafy.ourhome.screens.userpage.setting.SettingScreen
 @Composable
 fun OurHomeNavGraph(navController: NavHostController) {
     val loginViewModel: LoginViewModel = hiltViewModel()
+    val mapViewModel : MapViewModel = hiltViewModel()
+    val userPageViewModel : UserPageViewModel = hiltViewModel()
+    val homeViewModel : HomeViewModel = hiltViewModel()
     NavHost(
         navController = navController,
         startDestination = OurHomeScreens.LoginScreen.name
     ) {
         composable(BottomNavItem.Home.screenRoute) {
-            HomeScreen(navController = navController)
+            HomeScreen(navController = navController, vm = homeViewModel)
         }
         composable(BottomNavItem.Question.screenRoute) {
             QuestionScreen(navController = navController)
@@ -51,7 +59,7 @@ fun OurHomeNavGraph(navController: NavHostController) {
             AlbumScreen(navController = navController)
         }
         composable(BottomNavItem.MyPage.screenRoute) {
-            MyPageScreen(navController = navController)
+            MyPageScreen(navController = navController,vm = userPageViewModel)
         }
 
         composable(OurHomeScreens.NextScreen.name) {
@@ -127,7 +135,7 @@ fun OurHomeNavGraph(navController: NavHostController) {
             })
         ) { backStackEntry ->
             backStackEntry.arguments?.getString("email").let {
-                UserPageScreen(navController = navController, email = it.toString())
+                UserPageScreen(navController = navController, email = it.toString(),vm = userPageViewModel)
             }
         }
 
@@ -135,7 +143,8 @@ fun OurHomeNavGraph(navController: NavHostController) {
         {
             var userDTO =
                 navController.previousBackStackEntry?.arguments?.getParcelable<DomainUserDTO>("userDTO")
-            EditProfileScreen(navController = navController, userDTO = userDTO!!)
+            Log.d("UserPageScreen_", "navigation: $userDTO ")
+            EditProfileScreen(navController = navController, userDTO = userDTO!!,vm = userPageViewModel)
         }
 
         composable(OurHomeScreens.SettingScreen.name) {
@@ -162,8 +171,8 @@ fun OurHomeNavGraph(navController: NavHostController) {
             ScheduleDetailScreen(navController = navController)
         }
 
-        composable(OurHomeScreens.MapScreen.name) {
-            MapScreen(navController = navController)
+        composable(OurHomeScreens.MapScreen.name){
+            MapScreen(navController = navController,vm = mapViewModel )
         }
     }
 }

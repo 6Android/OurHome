@@ -40,6 +40,7 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
+    // 유저 정보 가져오기
     override fun getProfile(familyCode: String, email: String): Flow<UserResponse> = callbackFlow {
         val snapshotListener =
             userDataSource.getProfile(familyCode, email).addSnapshotListener { snapshot, e ->
@@ -203,10 +204,60 @@ class UserRepositoryImpl @Inject constructor(
             awaitClose {}
         }
 
+    // 유저 정보 수정하기
     override fun editProfile(familyCode: String, user: DomainUserDTO): Flow<ResultType<Unit>> =
         callbackFlow {
-            val completeListener =
-                userDataSource.editProfile(familyCode, user).addOnCompleteListener {
+            userDataSource.editProfile(familyCode, user).addOnCompleteListener {
+                val response = if (it.isSuccessful) {
+                    ResultType.Success(Unit)
+                } else if (it.exception != null) {
+                    ResultType.Error(it.exception)
+                } else {
+                    ResultType.Loading
+                }
+                trySend(response)
+            }
+            awaitClose {
+
+            }
+        }
+
+    // 현재 위치 전송하기
+    override fun sendLatLng(
+        familyCode: String,
+        email: String,
+        latitude: Double,
+        longitude: Double,
+        time: Long
+    ): Flow<ResultType<Unit>> =
+        callbackFlow {
+            userDataSource.sendLatLng(familyCode, email, latitude, longitude, time)
+                .addOnCompleteListener {
+                    Log.d("test5", "sendLatLng: $it")
+                    val response = if (it.isSuccessful) {
+                        ResultType.Success(Unit)
+                    } else if (it.exception != null) {
+                        ResultType.Error(it.exception)
+                    } else {
+                        ResultType.Loading
+                    }
+                    trySend(response)
+                }
+            awaitClose {
+
+            }
+        }
+
+    // 위치 공유 동의 여부 수정하기
+    override fun editLocationPermission(
+        familyCode: String,
+        email: String,
+        permission: Boolean
+    ): Flow<ResultType<Unit>> =
+        callbackFlow {
+            userDataSource.editLocationPermission(familyCode, email, permission)
+                .addOnCompleteListener {
+                    Log.d("test5", "editLocationPermission: $it")
                     val response = if (it.isSuccessful) {
                         ResultType.Success(Unit)
                     } else if (it.exception != null) {
