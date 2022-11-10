@@ -37,6 +37,15 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/GOOGLE_MAP_API" />
+
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            tools:node="remove">
+        </provider>
+
     </application>
+
+
 
 </manifest>
