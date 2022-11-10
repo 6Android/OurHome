@@ -11,6 +11,7 @@ class SendLatLngUseCase @Inject constructor(private val userRepository: UserRepo
         familyCode: String,
         email: String,
         latitude: Double,
-        longitude: Double
-    ) = userRepository.sendLatLng(familyCode, email, latitude, longitude)
+        longitude: Double,
+        time: Long
+    ) = userRepository.sendLatLng(familyCode, email, latitude, longitude, time)
 }

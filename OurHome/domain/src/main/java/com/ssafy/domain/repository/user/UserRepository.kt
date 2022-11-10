@@ -1,7 +1,5 @@
 package com.ssafy.domain.repository.user
 
-import com.google.android.gms.tasks.Task
-import com.google.firebase.auth.AuthResult
 import com.ssafy.domain.model.user.DomainUserDTO
 import com.ssafy.domain.utils.ResultType
 import kotlinx.coroutines.flow.Flow
@@ -31,6 +29,7 @@ interface UserRepository {
         familyCode: String,
         email: String,
         latitude: Double,
-        longitude: Double
+        longitude: Double,
+        time: Long
     ): Flow<ResultType<Unit>>
 }

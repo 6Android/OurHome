@@ -47,8 +47,9 @@ class UserDataSourceImpl @Inject constructor(
         familyCode: String,
         email: String,
         latitude: Double,
-        longitude: Double
+        longitude: Double,
+        time: Long
     ): Task<Void> =
         fireStore.collection(FAMILY).document(familyCode).collection(USER).document(email)
-            .update("latitude", latitude, "longitude", longitude)
+            .update("latitude", latitude, "longitude", longitude, "location_updated", time)
 }

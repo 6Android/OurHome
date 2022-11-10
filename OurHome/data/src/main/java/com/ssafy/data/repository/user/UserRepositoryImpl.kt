@@ -1,5 +1,6 @@
 package com.ssafy.data.repository.user
 
+import android.util.Log
 import com.ssafy.data.datasource.user.UserDataSource
 import com.ssafy.domain.model.user.DomainUserDTO
 import com.ssafy.domain.repository.user.UserRepository
@@ -126,11 +127,13 @@ class UserRepositoryImpl @Inject constructor(
         familyCode: String,
         email: String,
         latitude: Double,
-        longitude: Double
+        longitude: Double,
+        time: Long
     ): Flow<ResultType<Unit>> =
         callbackFlow {
-            userDataSource.sendLatLng(familyCode, email, latitude, longitude)
+            userDataSource.sendLatLng(familyCode, email, latitude, longitude, time)
                 .addOnCompleteListener {
+                    Log.d("test5", "sendLatLng: $it")
                     val response = if (it.isSuccessful) {
                         ResultType.Success(Unit)
                     } else if (it.exception != null) {
