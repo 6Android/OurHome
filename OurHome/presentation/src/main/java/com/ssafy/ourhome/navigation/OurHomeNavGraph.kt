@@ -30,8 +30,8 @@ import com.ssafy.ourhome.screens.question.QuestionDetailScreen
 import com.ssafy.ourhome.screens.question.QuestionListScreen
 import com.ssafy.ourhome.screens.question.QuestionScreen
 import com.ssafy.ourhome.screens.question.pet.PetDetailScreen
-import com.ssafy.ourhome.screens.userpage.MyPageScreen
 import com.ssafy.ourhome.screens.userpage.EditProfileScreen
+import com.ssafy.ourhome.screens.userpage.MyPageScreen
 import com.ssafy.ourhome.screens.userpage.UserPageScreen
 import com.ssafy.ourhome.screens.userpage.UserPageViewModel
 import com.ssafy.ourhome.screens.userpage.setting.ManageFamilyScreen
@@ -65,7 +65,7 @@ fun OurHomeNavGraph(navController: NavHostController) {
         }
 
         composable(OurHomeScreens.LoginScreen.name) {
-            LoginScreen(navController = navController)
+            LoginScreen(navController = navController, loginViewModel)
         }
 
         composable(OurHomeScreens.JoinEmailScreen.name) {

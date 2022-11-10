@@ -15,11 +15,17 @@ interface UserRepository {
     // 이메일 회원 가입
     fun joinEmail(email: String, password: String, nickname: String): Flow<ResultType<Unit>>
 
+    // 소셜 회원 가입
+    fun joinSocial(email: String, nickname: String): Flow<ResultType<Unit>>
+
     // 이메일 로그인
     fun signInEmail(email: String, password: String): Flow<UserResponse>
 
     // 이메일 중복 검사
     fun checkEmail(email: String): Flow<ResultType<Unit>>
+
+    // 유저 정보 가져오기
+    fun getUser(email: String): Flow<UserResponse>
 
     fun getProfile(familyCode: String, email: String): Flow<UserResponse>
 

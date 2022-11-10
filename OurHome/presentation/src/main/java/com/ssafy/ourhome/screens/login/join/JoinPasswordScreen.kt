@@ -18,7 +18,6 @@ import com.ssafy.ourhome.components.OurHomeSurface
 import com.ssafy.ourhome.components.PasswordInput
 import com.ssafy.ourhome.navigation.OurHomeScreens
 import com.ssafy.ourhome.screens.login.LoginViewModel
-import com.ssafy.ourhome.utils.JOIN_PASSWORD
 
 
 @SuppressLint("UnrememberedMutableState")
@@ -96,5 +95,5 @@ fun JoinPasswordScreen(
 }
 
 fun navigateToNickNameScreen(navController: NavController) {
-    navController.navigate(OurHomeScreens.JoinNickNameScreen.name + "/$JOIN_PASSWORD")
+    navController.navigate(OurHomeScreens.JoinNickNameScreen.name + "/${OurHomeScreens.JoinPasswordScreen.name}")
 }

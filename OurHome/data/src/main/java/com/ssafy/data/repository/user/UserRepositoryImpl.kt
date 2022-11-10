@@ -54,7 +54,7 @@ class UserRepositoryImpl @Inject constructor(
                 if (task.isSuccessful) {
                     userDataSource.insertUser(DomainUserDTO(email = email, name = nickname))
                         .addOnCompleteListener {
-                            val response = if (task.isSuccessful) {
+                            val response = if (it.isSuccessful) {
                                 ResultType.Success(Unit)
                             } else {
                                 ResultType.Error(Exception())
@@ -67,6 +67,21 @@ class UserRepositoryImpl @Inject constructor(
             }
             awaitClose {}
         }
+
+    override fun joinSocial(email: String, nickname: String): Flow<ResultType<Unit>> =
+        callbackFlow {
+            userDataSource.insertUser(DomainUserDTO(email = email, name = nickname))
+                .addOnCompleteListener { task ->
+                    val response = if (task.isSuccessful) {
+                        ResultType.Success(Unit)
+                    } else {
+                        ResultType.Error(Exception())
+                    }
+                    trySend(response)
+                }
+            awaitClose {}
+        }
+
 
     // 이메일 로그인
     override fun signInEmail(email: String, password: String): Flow<UserResponse> =
@@ -88,21 +103,33 @@ class UserRepositoryImpl @Inject constructor(
             awaitClose {}
         }
 
+    // 유저 정보 가져오기
+    override fun getUser(email: String): Flow<UserResponse> = callbackFlow {
+        userDataSource.getUser(email)
+            .addOnSuccessListener {
+                val user = it.toObject(DomainUserDTO::class.java) ?: DomainUserDTO()
+                trySend(ResultType.Success(user))
+            }
+            .addOnFailureListener {
+                trySend(ResultType.Error(it))
+            }
+        awaitClose {}
+    }
+
     // 이메일 중복 검사
     override fun checkEmail(email: String): Flow<ResultType<Unit>> = callbackFlow {
-        val snapshotListener =
-            userDataSource.checkEmail(email).addOnSuccessListener { documentSnapshot ->
-                val response =
-                    // 가입한 이력이 없는 유저
-                    if (documentSnapshot?.data == null) {
-                        ResultType.Success(Unit)
-                    }
-                    // 가입한 이력이 있는 유저
-                    else {
-                        ResultType.Fail
-                    }
-                trySend(response)
-            }
+        userDataSource.checkEmail(email).addOnSuccessListener { documentSnapshot ->
+            val response =
+                // 가입한 이력이 없는 유저
+                if (documentSnapshot?.data == null) {
+                    ResultType.Success(Unit)
+                }
+                // 가입한 이력이 있는 유저
+                else {
+                    ResultType.Fail
+                }
+            trySend(response)
+        }
         awaitClose { }
     }
 
