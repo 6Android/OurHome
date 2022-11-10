@@ -13,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -26,19 +27,20 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
+import com.squaredem.composecalendar.ComposeCalendar
 import com.ssafy.domain.model.user.DomainUserDTO
 import com.ssafy.ourhome.R
 import com.ssafy.ourhome.components.MainAppBar
 import com.ssafy.ourhome.components.OurHomeSurface
+import java.time.LocalDate
 
 @Composable
 fun EditProfileScreen(
     navController: NavController = NavController(LocalContext.current),
     userDTO: DomainUserDTO = DomainUserDTO(),
-    vm : UserPageViewModel
+    vm: UserPageViewModel
 ) {
     val scrollState = rememberScrollState()
 
@@ -51,6 +53,11 @@ fun EditProfileScreen(
     val phoneState = remember {
         mutableStateOf(userDTO.phone)
     }
+
+    val birthDayState = remember {
+        mutableStateOf(LocalDate.parse(userDTO.birthday))
+    }
+
     val bloodTypeState = remember {
         mutableStateOf(userDTO.blood_type)
     }
@@ -71,10 +78,27 @@ fun EditProfileScreen(
         mutableStateOf(userDTO.hobby)
     }
 
+    val showDialog = rememberSaveable { mutableStateOf(false) }
+
     // 에디트 성공
-    if(vm.editSuccess){
+    if (vm.editSuccess) {
         Toast.makeText(LocalContext.current, "정보 수정에 성공하였습니다.", Toast.LENGTH_SHORT).show()
         navController.popBackStack()
+    }
+
+    if (showDialog.value) {
+        ComposeCalendar(
+            onDone = { it: LocalDate ->
+                // Hide dialog
+                birthDayState.value = it
+                showDialog.value = false
+                // Do something with the date
+            },
+            onDismiss = {
+                // Hide dialog
+                showDialog.value = false
+            }
+        )
     }
 
     OurHomeSurface() {
@@ -87,6 +111,7 @@ fun EditProfileScreen(
                 onIconClick = {
                     user.name = nicknameState.value
                     user.phone = phoneState.value
+                    user.birthday = birthDayState.value.toString()
                     user.blood_type = bloodTypeState.value
                     user.mbti = MBTIState.value
                     user.job = jobState.value
@@ -129,7 +154,7 @@ fun EditProfileScreen(
                 ) {
                     TextWithText("이메일", userDTO.email)
                     TextWithTextField("전화번호", phoneState)
-                    TextWithText(title = "생일", content = userDTO.birthday)
+                    BirthDaySelect(title = "생일", birthDayState, showDialog)
                     TextWithDropDown(
                         title = "혈액형", textState = bloodTypeState, itemList =
                         listOf(
@@ -147,7 +172,7 @@ fun EditProfileScreen(
                         title = "MBTI", textState = MBTIState, itemList =
                         listOf(
                             "ENFP", "ENFJ", "ENTP", "ENTJ", "ESFP", "ESFJ", "ESTP", "ESTJ",
-                            "INFP", "INFJ", "INTP", "INTJ", "ISFP", "ISFJ", "ISTP", "ISTJ",
+                            "INFP", "INFJ", "INTP", "INTJ", "ISFP", "ISFJ", "ISTP", "ISTJ", "MBTI",
                         )
                     )
                     TextWithTextField("직업", jobState)
@@ -157,6 +182,37 @@ fun EditProfileScreen(
                 Spacer(modifier = Modifier.height(16.dp))
             }
         }
+    }
+}
+
+@Composable
+private fun BirthDaySelect(
+    title: String,
+    birthDayState: MutableState<LocalDate>,
+    showDialog: MutableState<Boolean>
+
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = title, modifier = Modifier.weight(1f),
+            style = MaterialTheme.typography.h6.copy(fontWeight = FontWeight.Bold)
+        )
+        Button(
+            modifier = Modifier.weight(2f),
+            border = BorderStroke(width = 2.dp, color = Color.LightGray),
+            colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
+            elevation = ButtonDefaults.elevation(0.dp),
+            onClick = { showDialog.value = true }) {
+            Text(
+                text = "${birthDayState.value}",
+                style = MaterialTheme.typography.body2.copy(fontWeight = FontWeight.Bold)
+            )
+        }
+
+
     }
 }
 
@@ -178,13 +234,13 @@ private fun TextWithDropDown(
 
     Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         Text(
-            text = title, modifier = Modifier.weight(2f),
+            text = title, modifier = Modifier.weight(1f),
             style = MaterialTheme.typography.h6.copy(fontWeight = FontWeight.Bold)
         )
         Box(
             modifier = Modifier
                 .fillMaxHeight()
-                .weight(4f)
+                .weight(2f)
         ) {
 
 //            ExposedDropdownMenuBox(

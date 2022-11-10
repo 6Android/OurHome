@@ -98,7 +98,7 @@ fun BirthDayCard(
     content: String,
 ) {
     Log.d("test5", "BirthDayCard: $content")
-    val split = content.split(".")
+    val split = content.split("-")
     val year = split[0]
     val month = split[1]
     val day = split[2]
