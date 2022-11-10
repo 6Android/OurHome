@@ -1,6 +1,8 @@
 package com.ssafy.ourhome.utils
 
 import android.content.SharedPreferences
+import com.ssafy.data.utils.EMAIL
+import com.ssafy.data.utils.FAMILY_CODE
 
 object Prefs {
     var prefs: SharedPreferences? = null

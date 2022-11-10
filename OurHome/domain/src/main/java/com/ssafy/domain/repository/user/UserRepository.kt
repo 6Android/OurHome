@@ -1,5 +1,6 @@
 package com.ssafy.domain.repository.user
 
+import com.ssafy.domain.model.family.DomainFamilyDTO
 import com.ssafy.domain.model.user.DomainUserDTO
 import com.ssafy.domain.utils.ResultType
 import kotlinx.coroutines.flow.Flow
@@ -26,6 +27,13 @@ interface UserRepository {
 
     // 유저 정보 가져오기
     fun getUser(email: String): Flow<UserResponse>
+
+    // 가족방 생성시
+    // 유저 정보(familyCode, manager)업데이트
+    fun updateUserFamilyCode(map: Map<String, Any>): Flow<ResultType<Unit>>
+
+    // 가족방 생성
+    fun insetFamily(familyCode: String, familyDTO: DomainFamilyDTO): Flow<ResultType<Unit>>
 
     fun getProfile(familyCode: String, email: String): Flow<UserResponse>
 
