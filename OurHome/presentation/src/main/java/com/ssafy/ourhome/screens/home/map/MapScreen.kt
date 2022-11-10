@@ -41,7 +41,7 @@ fun MapScreen(
     vm: MapViewModel
 ) {
 
-    vm.getFamilyUsers("EX7342")
+    vm.getFamilyUsers()
 
     val width = remember {
         mutableStateOf(0)

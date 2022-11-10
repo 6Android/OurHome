@@ -1,6 +1,5 @@
 package com.ssafy.ourhome.screens.home.map
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -9,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.ssafy.domain.model.user.DomainUserDTO
 import com.ssafy.domain.usecase.user.GetFamilyUsersUseCase
 import com.ssafy.domain.utils.ResultType
+import com.ssafy.ourhome.utils.Prefs
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -24,8 +24,8 @@ class MapViewModel @Inject constructor(
 
     var errorState by mutableStateOf(false)
 
-    fun getFamilyUsers(familyCode: String) = viewModelScope.launch(Dispatchers.IO) {
-        getFamilyUsersUseCase.execute(familyCode).collect { response ->
+    fun getFamilyUsers() = viewModelScope.launch(Dispatchers.IO) {
+        getFamilyUsersUseCase.execute(Prefs.familyCode).collect { response ->
             when (response) {
                 is ResultType.Loading -> {}
                 is ResultType.Success -> {
@@ -38,7 +38,6 @@ class MapViewModel @Inject constructor(
 
                 }
             }
-
         }
     }
 }
