@@ -8,41 +8,21 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.ssafy.domain.model.user.DomainUserDTO
-import com.ssafy.domain.utils.ResultType
 import com.ssafy.ourhome.components.MainAppBar
 import com.ssafy.ourhome.components.OurHomeSurface
-import com.ssafy.ourhome.utils.SETTING_ICON
 
 @Composable
 fun UserPageScreen(
     navController: NavController,
     email: String,
-    vm : UserPageViewModel
+    vm: UserPageViewModel
 ) {
     val scrollState = rememberScrollState()
 
-    // TODO : 패밀리코드, 유저 이메일
-    vm.getProfile("EX7342", email = email)
-
-    val user = remember {
-        mutableStateOf(DomainUserDTO())
-    }
-
-    when (val userResponse = vm.userResponse) {
-        is ResultType.Uninitialized -> {}
-        is ResultType.Success -> {
-            user.value = userResponse.data
-        }
-        is ResultType.Error -> print(userResponse.exception)
-    }
+    vm.getProfile(email)
 
     Scaffold(topBar = {
         MainAppBar(
@@ -62,13 +42,13 @@ fun UserPageScreen(
             ) {
                 Spacer(modifier = Modifier.padding(top = 16.dp))
 
-                UserInfoCard(userDTO = user.value, navController)
+                UserInfoCard(userDTO = vm.user, navController)
 
                 Spacer(modifier = Modifier.height(16.dp))
-                UserColorCardList(userDTO = user.value)
+                UserColorCardList(userDTO = vm.user)
 
                 Spacer(modifier = Modifier.height(16.dp))
-                UserCommonCardList(userDTO = user.value)
+                UserCommonCardList(userDTO = vm.user)
             }
         }
     }

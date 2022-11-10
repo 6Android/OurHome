@@ -93,8 +93,7 @@ fun EditProfileScreen(
                     user.interest = interestState.value
                     user.hobby = hobbyState.value
 
-                    // TODO : 패밀리코드
-                    vm.editProfile("EX7342",user)
+                    vm.editProfile(user)
                 }
             )
         }) {
@@ -161,7 +160,6 @@ fun EditProfileScreen(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun TextWithDropDown(
     title: String,
