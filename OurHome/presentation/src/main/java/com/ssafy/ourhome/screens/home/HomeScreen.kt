@@ -1,5 +1,12 @@
 package com.ssafy.ourhome.screens.home
 
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
+import android.widget.Toast
+import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
@@ -23,31 +30,89 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.holix.android.bottomsheetdialog.compose.BottomSheetDialog
 import com.holix.android.bottomsheetdialog.compose.BottomSheetDialogProperties
 import com.kizitonwose.calendar.core.CalendarDay
+import com.ssafy.ourhome.MainActivity.Companion.startWorkManager
 import com.ssafy.ourhome.R
 import com.ssafy.ourhome.components.OurHomeSurface
 import com.ssafy.ourhome.navigation.OurHomeScreens
-import com.ssafy.ourhome.ui.theme.OurHomeTheme
 import com.ssafy.ourhome.utils.Person
 import com.ssafy.ourhome.utils.Schedule
 import com.ssafy.ourhome.utils.personList
 
 
+/** 맵 화면 이동 **/
+fun moveMap(navController: NavController, vm : HomeViewModel){
+    // 맵 화면이동
+    navController.navigate(OurHomeScreens.MapScreen.name)
+
+    // 스위치 on
+    vm.editLocationPermission(true)
+
+    // 워크매니저 시작
+    startWorkManager()
+}
+
+/** 권한 체크, 요청 코드 **/
+fun checkAndRequestLocationPermissions(
+    context: Context,
+    permissions: Array<String>,
+    launcher: ManagedActivityResultLauncher<Array<String>, Map<String, Boolean>>,
+    navController: NavController,
+    vm : HomeViewModel
+) {
+    /** 권한이 이미 있는 경우 **/
+    if (
+        permissions.all {
+            ContextCompat.checkSelfPermission(
+                context,
+                it
+            ) == PackageManager.PERMISSION_GRANTED
+        }
+    ) {
+        moveMap(navController, vm)
+    }
+    /** 권한이 없는 경우 **/
+    else {
+        launcher.launch(permissions)
+    }
+}
+
 @Composable
-fun HomeScreen(navController: NavController) {
+fun HomeScreen(navController: NavController, vm: HomeViewModel) {
     val scrollState = rememberScrollState()
+    val context = LocalContext.current
     val visibleBottomSheetState = remember {
         mutableStateOf(false)
     }
     val onScheduleClick: (Schedule) -> Unit = { schedule ->
         navController.navigate(OurHomeScreens.ScheduleDetailScreen.name)
+    }
+
+    /** 위치 권한 요청 코드 **/
+    val permissions = arrayOf(
+        Manifest.permission.ACCESS_COARSE_LOCATION,
+        Manifest.permission.ACCESS_FINE_LOCATION
+    )
+
+    val launcherMultiplePermissions = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissionsMap ->
+        val areGranted = permissionsMap.values.reduce { acc, next -> acc && next }
+        /** 권한 요청시 동의 했을 경우 **/
+        if (areGranted) {
+            moveMap(navController, vm)
+        }
+        /** 권한 요청시 거부 했을 경우 **/
+        else {
+            Toast.makeText(context, "가족의 위치를 확인하기 위해 위치 권한을 반드시 동의해주세요.", Toast.LENGTH_SHORT).show()
+        }
     }
 
     /** 달력에 필요한 데이터 */
@@ -105,7 +170,13 @@ fun HomeScreen(navController: NavController) {
                             id = R.drawable.ic_map
                         )
                     ) {
-                        // todo: 가족위치 클릭
+                        checkAndRequestLocationPermissions(
+                            context,
+                            permissions,
+                            launcherMultiplePermissions,
+                            navController,
+                            vm
+                        )
                     }
 
                     Spacer(modifier = Modifier.width(16.dp))
@@ -425,10 +496,10 @@ fun moveToAddScheduleScreen(navController: NavController) {
 /**
 Preview
  */
-@Preview(showBackground = true)
-@Composable
-fun PreviewHomeScreen() {
-    OurHomeTheme {
-        HomeScreen(navController = NavController(LocalContext.current))
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun PreviewHomeScreen() {
+//    OurHomeTheme {
+//        HomeScreen(navController = NavController(LocalContext.current))
+//    }
+//}
