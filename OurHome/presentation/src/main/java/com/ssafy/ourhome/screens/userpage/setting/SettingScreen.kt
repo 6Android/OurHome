@@ -23,6 +23,7 @@ import com.ssafy.ourhome.components.OurHomeSurface
 import com.ssafy.ourhome.navigation.OurHomeScreens
 import com.ssafy.ourhome.ui.theme.MainColor
 import com.ssafy.ourhome.ui.theme.OurHomeTheme
+import com.ssafy.ourhome.utils.Prefs
 
 @Composable
 fun SettingScreen(navController: NavController = NavController(LocalContext.current)) {
@@ -48,7 +49,7 @@ fun SettingScreen(navController: NavController = NavController(LocalContext.curr
                 TextWithSwitch(title = "위치 공유 허용", isChecked = switchChecked)
 
                 Spacer(modifier = Modifier.height(42.dp))
-                OurHomeSetting(code = "4FJK2L",navController)
+                OurHomeSetting(code = Prefs.familyCode,navController)
 
                 Spacer(modifier = Modifier.height(42.dp))
                 Support()
