@@ -154,7 +154,7 @@ fun OurHomeNavGraph(navController: NavHostController) {
         }
 
         composable(OurHomeScreens.EnterHomeScreen.name) {
-            EnterHomeScreen(navController = navController)
+            EnterHomeScreen(navController = navController, vm = loginViewModel)
         }
 
         composable(OurHomeScreens.AddScheduleScreen.name) {

@@ -14,5 +14,3 @@ const val LOGIN = "LOGIN"
 const val JOIN_PASSWORD = "JOIN_PASSWORD"
 
 const val OUR_HOME = "our_home"
-const val EMAIL = "email"
-const val FAMILY_CODE = "family_code"

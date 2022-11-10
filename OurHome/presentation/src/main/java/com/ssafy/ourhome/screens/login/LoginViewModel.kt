@@ -3,13 +3,19 @@ package com.ssafy.ourhome.screens.login
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ssafy.data.utils.EMAIL
+import com.ssafy.data.utils.FAMILY_CODE
+import com.ssafy.data.utils.MANAGER
+import com.ssafy.domain.model.family.DomainFamilyDTO
 import com.ssafy.domain.usecase.user.*
 import com.ssafy.domain.utils.ResultType
 import com.ssafy.ourhome.utils.Prefs
 import com.ssafy.ourhome.utils.SocialState
 import com.ssafy.ourhome.utils.State
+import com.ssafy.ourhome.utils.getRandomString
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.zip
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -20,7 +26,9 @@ class LoginViewModel @Inject constructor(
     private val checkEmailUseCase: CheckEmailUseCase,
     private val signInEmailUseCase: SignInEmailUseCase,
     private val getUserUseCase: GetUserUseCase,
-    private val joinSocialUseCase: JoinSocialUseCase
+    private val joinSocialUseCase: JoinSocialUseCase,
+    private val insertFamilyUseCase: InsertFamilyUseCase,
+    private val updateUserFamilyCodeUseCase: UpdateUserFamilyCodeUseCase
 ) : ViewModel() {
 
     val loginIdState = mutableStateOf("")
@@ -37,6 +45,7 @@ class LoginViewModel @Inject constructor(
     var socialEmail = ""
     val joinProcessState = mutableStateOf(State.DEFAULT)
 
+    val insertFamilyProcessState = mutableStateOf(State.DEFAULT)
 
     fun joinEmail() =
         viewModelScope.launch(Dispatchers.IO) {
@@ -153,4 +162,36 @@ class LoginViewModel @Inject constructor(
                 }
             }
     }
+
+    // 가족방 생성
+    fun insertFamily() =
+        viewModelScope.launch(Dispatchers.IO) {
+
+            // Family Doc
+            val randomCode = getRandomString(8)
+            val family = DomainFamilyDTO(randomCode)
+
+            // User Doc
+            val map =
+                mapOf<String, Any>(EMAIL to Prefs.email, FAMILY_CODE to randomCode, MANAGER to true)
+
+            // Family Doc만들고, User에 familyCode 정보 추가 & manager 상태 변경
+            insertFamilyUseCase.execute(randomCode, family)
+                .zip(updateUserFamilyCodeUseCase.execute(map)) { response1, response2 ->
+                    if (response1 is ResultType.Success && response2 is ResultType.Success) ResultType.Success(
+                        Unit
+                    )
+                    else ResultType.Fail
+                }.collect { result ->
+                    when (result) {
+                        is ResultType.Success -> {
+                            insertFamilyProcessState.value = State.SUCCESS
+                            Prefs.familyCode = randomCode
+                        }
+                        else -> {
+                            insertFamilyProcessState.value = State.FAIL
+                        }
+                    }
+                }
+        }
 }
