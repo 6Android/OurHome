@@ -21,17 +21,28 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.ssafy.ourhome.R
 import com.ssafy.ourhome.components.OurHomeSurface
 import com.ssafy.ourhome.components.RoundedButton
 import com.ssafy.ourhome.components.TextInput
 import com.ssafy.ourhome.navigation.BottomNavItem
+import com.ssafy.ourhome.screens.login.LoginViewModel
 import com.ssafy.ourhome.ui.theme.MainColor
 import com.ssafy.ourhome.ui.theme.OurHomeTheme
+import com.ssafy.ourhome.utils.State
 
 @Composable
-fun EnterHomeScreen(navController: NavController) {
+fun EnterHomeScreen(navController: NavController, vm: LoginViewModel = hiltViewModel()) {
+
+    // 가족방 생성 되었는지 관찰 state
+    when (vm.insertFamilyProcessState.value) {
+        State.SUCCESS -> {
+            navController.navigate(BottomNavItem.Home.screenRoute)
+        }
+        State.FAIL -> {}
+    }
 
     val visibleState = remember {
         mutableStateOf(false)
@@ -54,7 +65,7 @@ fun EnterHomeScreen(navController: NavController) {
                 backgroundColor = Color.White
             ) {
                 // todo: 우리 집 생성
-                navController.navigate(BottomNavItem.Home.screenRoute)
+                vm.insertFamily()
             }
 
             /** 입주 생성 카드 */

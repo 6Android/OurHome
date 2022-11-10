@@ -7,6 +7,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.ssafy.data.utils.FAMILY
 import com.ssafy.data.utils.USER
+import com.ssafy.domain.model.family.DomainFamilyDTO
 import com.ssafy.domain.model.user.DomainUserDTO
 import javax.inject.Inject
 
@@ -35,6 +36,10 @@ class UserDataSourceImpl @Inject constructor(
     // 유저 Document 가져오기
     override fun getUser(email: String) =
         fireStore.collection(USER).document(email).get()
+
+    // 가족방 생성
+    override fun insetFamily(familyCode: String, familyDTO: DomainFamilyDTO) =
+        fireStore.collection(FAMILY).document(familyCode).set(familyDTO)
 
     override fun getProfile(familyCode: String, email: String) =
         fireStore.collection(FAMILY).document(familyCode).collection(USER).document(email)

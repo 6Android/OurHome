@@ -3,11 +3,13 @@ package com.ssafy.ourhome.screens.login
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ssafy.domain.model.family.DomainFamilyDTO
 import com.ssafy.domain.usecase.user.*
 import com.ssafy.domain.utils.ResultType
 import com.ssafy.ourhome.utils.Prefs
 import com.ssafy.ourhome.utils.SocialState
 import com.ssafy.ourhome.utils.State
+import com.ssafy.ourhome.utils.getRandomString
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -20,7 +22,8 @@ class LoginViewModel @Inject constructor(
     private val checkEmailUseCase: CheckEmailUseCase,
     private val signInEmailUseCase: SignInEmailUseCase,
     private val getUserUseCase: GetUserUseCase,
-    private val joinSocialUseCase: JoinSocialUseCase
+    private val joinSocialUseCase: JoinSocialUseCase,
+    private val insertFamilyUseCase: InsertFamilyUseCase
 ) : ViewModel() {
 
     val loginIdState = mutableStateOf("")
@@ -37,6 +40,7 @@ class LoginViewModel @Inject constructor(
     var socialEmail = ""
     val joinProcessState = mutableStateOf(State.DEFAULT)
 
+    val insertFamilyProcessState = mutableStateOf(State.DEFAULT)
 
     fun joinEmail() =
         viewModelScope.launch(Dispatchers.IO) {
@@ -153,4 +157,25 @@ class LoginViewModel @Inject constructor(
                 }
             }
     }
+
+    // 가족방 생성
+    fun insertFamily() =
+        viewModelScope.launch(Dispatchers.IO) {
+            val randomCode = getRandomString(8)
+            val family = DomainFamilyDTO(randomCode)
+            // 랜덤코드로 가족방 만들고
+            // 유저 정보에도 추가해주고
+            // 쉐어드에도 저장해주고
+            insertFamilyUseCase.execute(randomCode, family).collect { response ->
+                when (response) {
+                    is ResultType.Success -> {
+                        insertFamilyProcessState.value = State.SUCCESS
+                        Prefs.familyCode = randomCode
+                    }
+                    else -> {
+                        insertFamilyProcessState.value = State.FAIL
+                    }
+                }
+            }
+        }
 }

@@ -1,6 +1,7 @@
 package com.ssafy.data.repository.user
 
 import com.ssafy.data.datasource.user.UserDataSource
+import com.ssafy.domain.model.family.DomainFamilyDTO
 import com.ssafy.domain.model.user.DomainUserDTO
 import com.ssafy.domain.repository.user.UserRepository
 import com.ssafy.domain.repository.user.UserResponse
@@ -131,6 +132,24 @@ class UserRepositoryImpl @Inject constructor(
         }
         awaitClose { }
     }
+
+    // 가족방 생성
+    override fun insetFamily(
+        familyCode: String,
+        familyDTO: DomainFamilyDTO
+    ): Flow<ResultType<Unit>> =
+        callbackFlow {
+            userDataSource.insetFamily(familyCode, familyDTO)
+                .addOnCompleteListener { task ->
+                    val response = if (task.isSuccessful) {
+                        ResultType.Success(Unit)
+                    } else {
+                        ResultType.Error(Exception())
+                    }
+                    trySend(response)
+                }
+            awaitClose {}
+        }
 
     override fun editProfile(familyCode: String, user: DomainUserDTO): Flow<ResultType<Unit>> =
         callbackFlow {
