@@ -17,6 +17,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
@@ -38,6 +39,7 @@ class LoginViewModel @Inject constructor(
     val joinPasswordState = mutableStateOf("")
     val joinPasswordConfirmState = mutableStateOf("")
     val joinNickNameState = mutableStateOf("")
+    val joinDateState = mutableStateOf(LocalDate.now())
 
     val socialProcessState = mutableStateOf(SocialState.DEFAULT)
     var socialEmail = ""
@@ -50,7 +52,8 @@ class LoginViewModel @Inject constructor(
             joinEmailUseCase.execute(
                 joinIdState.value,
                 joinPasswordState.value,
-                joinNickNameState.value
+                joinNickNameState.value,
+                "${joinDateState.value}"
             ).collect { response ->
                 when (response) {
                     is ResultType.Success -> {
@@ -66,7 +69,7 @@ class LoginViewModel @Inject constructor(
 
     fun joinSocial() =
         viewModelScope.launch(Dispatchers.IO) {
-            joinSocialUseCase.execute(socialEmail, joinNickNameState.value).collect { response ->
+            joinSocialUseCase.execute(socialEmail, joinNickNameState.value, "${joinDateState.value}").collect { response ->
                 when (response) {
                     is ResultType.Success -> {
                         joinProcessState.value = State.SUCCESS

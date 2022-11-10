@@ -9,5 +9,5 @@ class JoinSocialUseCase @Inject constructor(
     private val userRepository: UserRepository
 ) {
     // 이메일 회원 가입
-    fun execute(email: String, nickname: String) = userRepository.joinSocial(email, nickname)
+    fun execute(email: String, nickname: String, birthday: String) = userRepository.joinSocial(email, nickname, birthday)
 }

@@ -28,6 +28,7 @@ import com.ssafy.ourhome.components.OurHomeSurface
 import com.ssafy.ourhome.components.RoundedButton
 import com.ssafy.ourhome.components.TextInput
 import com.ssafy.ourhome.navigation.BottomNavItem
+import com.ssafy.ourhome.navigation.OurHomeScreens
 import com.ssafy.ourhome.screens.login.LoginViewModel
 import com.ssafy.ourhome.ui.theme.MainColor
 import com.ssafy.ourhome.ui.theme.OurHomeTheme
@@ -39,7 +40,11 @@ fun EnterHomeScreen(navController: NavController, vm: LoginViewModel = hiltViewM
     // 가족방 생성 되었는지 관찰 state
     when (vm.insertFamilyProcessState.value) {
         State.SUCCESS -> {
-            navController.navigate(BottomNavItem.Home.screenRoute)
+            navController.navigate(BottomNavItem.Home.screenRoute){
+                popUpTo(OurHomeScreens.EnterHomeScreen.name) {
+                    inclusive = true
+                }
+            }
         }
         State.FAIL -> {}
     }

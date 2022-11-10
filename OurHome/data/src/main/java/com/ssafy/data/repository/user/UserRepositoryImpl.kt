@@ -57,11 +57,11 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     // 이메일 회원 가입
-    override fun joinEmail(email: String, password: String, nickname: String) =
+    override fun joinEmail(email: String, password: String, nickname: String, birthday: String) =
         callbackFlow {
             userDataSource.joinEmail(email, password).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    userDataSource.insertUser(DomainUserDTO(email = email, name = nickname))
+                    userDataSource.insertUser(DomainUserDTO(email = email, name = nickname, birthday = birthday))
                         .addOnCompleteListener {
                             val response = if (it.isSuccessful) {
                                 ResultType.Success(Unit)
@@ -77,9 +77,9 @@ class UserRepositoryImpl @Inject constructor(
             awaitClose {}
         }
 
-    override fun joinSocial(email: String, nickname: String): Flow<ResultType<Unit>> =
+    override fun joinSocial(email: String, nickname: String, birthday: String): Flow<ResultType<Unit>> =
         callbackFlow {
-            userDataSource.insertUser(DomainUserDTO(email = email, name = nickname))
+            userDataSource.insertUser(DomainUserDTO(email = email, name = nickname, birthday = birthday))
                 .addOnCompleteListener { task ->
                     val response = if (task.isSuccessful) {
                         ResultType.Success(Unit)
@@ -187,10 +187,7 @@ class UserRepositoryImpl @Inject constructor(
                 // family/question 안에 doc 새로 추가
                 val questionMap = mapOf<String, Any>(
                     "question_seq" to 1,
-                    "email_map" to mapOf<String, DomainQuestionDTO>(
-                        "a@naver.com" to DomainQuestionDTO(),
-                        "b@naver.com" to DomainQuestionDTO(),
-                    )
+                    "email_map" to mapOf<String, DomainQuestionDTO>()
                 )
                 transaction.set(familyQuestionDocRef, questionMap)
 

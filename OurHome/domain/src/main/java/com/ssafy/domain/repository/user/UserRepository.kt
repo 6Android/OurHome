@@ -14,10 +14,10 @@ interface UserRepository {
     fun getFamilyUsers(familyCode: String): Flow<UsersResponse>
 
     // 이메일 회원 가입
-    fun joinEmail(email: String, password: String, nickname: String): Flow<ResultType<Unit>>
+    fun joinEmail(email: String, password: String, nickname: String, birthday: String): Flow<ResultType<Unit>>
 
     // 소셜 회원 가입
-    fun joinSocial(email: String, nickname: String): Flow<ResultType<Unit>>
+    fun joinSocial(email: String, nickname: String, birthday: String): Flow<ResultType<Unit>>
 
     // 이메일 로그인
     fun signInEmail(email: String, password: String): Flow<UserResponse>

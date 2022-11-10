@@ -7,17 +7,21 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.squaredem.composecalendar.ComposeCalendar
 import com.ssafy.ourhome.components.MainAppBar
 import com.ssafy.ourhome.components.OurHomeSurface
 import com.ssafy.ourhome.components.TextInput
 import com.ssafy.ourhome.navigation.OurHomeScreens
 import com.ssafy.ourhome.screens.login.LoginViewModel
 import com.ssafy.ourhome.utils.State
+import java.time.LocalDate
 
 @Composable
 fun JoinNickNameScreen(
@@ -26,6 +30,7 @@ fun JoinNickNameScreen(
     prev_type: String
 ) {
     val context = LocalContext.current
+    val showDialog = rememberSaveable { mutableStateOf(false) }
 
     when (vm.joinProcessState.value) {
         State.SUCCESS -> {
@@ -54,7 +59,7 @@ fun JoinNickNameScreen(
                 /** 헤더 */
                 Text(
                     modifier = Modifier.padding(start = 10.dp),
-                    text = "닉네임을 입력해주세요!",
+                    text = "닉네임과 생일을\n입력해주세요!",
                     style = MaterialTheme.typography.subtitle1
                 )
 
@@ -70,12 +75,35 @@ fun JoinNickNameScreen(
                         joinUser(vm, context, prev_type)
                     })
                 )
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                /**  생일 */
+                SelectBirth(vm.joinDateState) {
+                    showDialog.value = true
+                }
             }
         }
 
         /** 가입 버튼 */
         NextButton("가입") {
             joinUser(vm, context, prev_type)
+        }
+
+        /** 날짜 선택 다이얼로그 */
+        if (showDialog.value) {
+            ComposeCalendar(
+                onDone = { it: LocalDate ->
+                    // Hide dialog
+                    vm.joinDateState.value = it
+                    showDialog.value = false
+                    // Do something with the date
+                },
+                onDismiss = {
+                    // Hide dialog
+                    showDialog.value = false
+                }
+            )
         }
     }
 }
