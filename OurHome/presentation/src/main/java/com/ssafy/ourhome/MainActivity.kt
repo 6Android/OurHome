@@ -2,6 +2,7 @@ package com.ssafy.ourhome
 
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -24,6 +25,10 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequest
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.ssafy.ourhome.navigation.BottomNavItem
@@ -33,16 +38,44 @@ import com.ssafy.ourhome.navigation.OurHomeScreens
 import com.ssafy.ourhome.ui.theme.MainColor
 import com.ssafy.ourhome.ui.theme.OurHomeTheme
 import com.ssafy.ourhome.utils.findActivity
+import com.ssafy.ourhome.work.MapWorkManager
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.concurrent.TimeUnit
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val locationWorkRequest: PeriodicWorkRequest =
+            PeriodicWorkRequestBuilder<MapWorkManager>(15, TimeUnit.MINUTES)
+                .build()
+
+        val workManager = WorkManager.getInstance(applicationContext)
+
+//        workManager.cancelUniqueWork("location")
+
+        var a = workManager.getWorkInfosForUniqueWork("location").get()
+        for(i in a){
+            Log.d("test5", "onCreate: $i")
+        }
+
+        workManager.enqueueUniquePeriodicWork(
+            "location",
+            ExistingPeriodicWorkPolicy.KEEP,
+            locationWorkRequest
+        )
+
+        a = workManager.getWorkInfosForUniqueWork("location").get()
+        for(i in a){
+            Log.d("test5", "onCreate: $i")
+        }
+
+
         setContent {
             OurHomeTheme {
                 MyApp()
-//                EditTextPreView()
             }
         }
     }
@@ -51,7 +84,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MyApp() {
     val bottomBarState = rememberSaveable { (mutableStateOf(true)) }
-val auth = Firebase.auth.currentUser
+    val auth = Firebase.auth.currentUser
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colors.background

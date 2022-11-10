@@ -1,6 +1,5 @@
 package com.ssafy.ourhome.screens.home.map
 
-import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -21,10 +20,8 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -37,15 +34,6 @@ import com.holix.android.bottomsheetdialog.compose.BottomSheetDialogProperties
 import com.ssafy.domain.model.user.DomainUserDTO
 import com.ssafy.ourhome.R
 import com.ssafy.ourhome.components.OurHomeSurface
-import com.ssafy.ourhome.ui.theme.OurHomeTheme
-
-// TODO : 임시 유저 파일
-data class tmpUser(
-    val imageUrl: String,
-    val nickname: String,
-    val lastUpdated: Long
-)
-
 
 @Composable
 fun MapScreen(
@@ -322,6 +310,7 @@ private fun MapBackButton(navController: NavController) {
         )
     }
 }
+
 
 //@Preview(showBackground = true)
 //@Composable
