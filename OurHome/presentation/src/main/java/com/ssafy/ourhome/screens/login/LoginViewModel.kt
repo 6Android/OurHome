@@ -3,10 +3,16 @@ package com.ssafy.ourhome.screens.login
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ssafy.data.utils.EMAIL
+import com.ssafy.data.utils.FAMILY_CODE
+import com.ssafy.data.utils.MANAGER
 import com.ssafy.domain.model.family.DomainFamilyDTO
 import com.ssafy.domain.usecase.user.*
 import com.ssafy.domain.utils.ResultType
-import com.ssafy.ourhome.utils.*
+import com.ssafy.ourhome.utils.Prefs
+import com.ssafy.ourhome.utils.SocialState
+import com.ssafy.ourhome.utils.State
+import com.ssafy.ourhome.utils.getRandomString
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.zip
