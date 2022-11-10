@@ -10,6 +10,6 @@ class InsertFamilyUseCase @Inject constructor(
     private val userRepository: UserRepository
 ) {
     // 이메일 회원 가입
-    fun execute(familyCode: String, familyDTO: DomainFamilyDTO) =
-        userRepository.insetFamily(familyCode, familyDTO)
+    fun execute(familyCode: String, familyDTO: DomainFamilyDTO, map: Map<String, Any>) =
+        userRepository.insetFamily(familyCode, familyDTO, map)
 }

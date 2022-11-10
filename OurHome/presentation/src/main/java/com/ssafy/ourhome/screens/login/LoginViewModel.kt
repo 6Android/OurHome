@@ -15,9 +15,9 @@ import com.ssafy.ourhome.utils.State
 import com.ssafy.ourhome.utils.getRandomString
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.zip
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
@@ -27,8 +27,7 @@ class LoginViewModel @Inject constructor(
     private val signInEmailUseCase: SignInEmailUseCase,
     private val getUserUseCase: GetUserUseCase,
     private val joinSocialUseCase: JoinSocialUseCase,
-    private val insertFamilyUseCase: InsertFamilyUseCase,
-    private val updateUserFamilyCodeUseCase: UpdateUserFamilyCodeUseCase
+    private val insertFamilyUseCase: InsertFamilyUseCase
 ) : ViewModel() {
 
     val loginIdState = mutableStateOf("")
@@ -40,6 +39,7 @@ class LoginViewModel @Inject constructor(
     val joinPasswordState = mutableStateOf("")
     val joinPasswordConfirmState = mutableStateOf("")
     val joinNickNameState = mutableStateOf("")
+    val joinDateState = mutableStateOf(LocalDate.now())
 
     val socialProcessState = mutableStateOf(SocialState.DEFAULT)
     var socialEmail = ""
@@ -52,7 +52,8 @@ class LoginViewModel @Inject constructor(
             joinEmailUseCase.execute(
                 joinIdState.value,
                 joinPasswordState.value,
-                joinNickNameState.value
+                joinNickNameState.value,
+                "${joinDateState.value}"
             ).collect { response ->
                 when (response) {
                     is ResultType.Success -> {
@@ -68,7 +69,7 @@ class LoginViewModel @Inject constructor(
 
     fun joinSocial() =
         viewModelScope.launch(Dispatchers.IO) {
-            joinSocialUseCase.execute(socialEmail, joinNickNameState.value).collect { response ->
+            joinSocialUseCase.execute(socialEmail, joinNickNameState.value, "${joinDateState.value}").collect { response ->
                 when (response) {
                     is ResultType.Success -> {
                         joinProcessState.value = State.SUCCESS
@@ -167,23 +168,19 @@ class LoginViewModel @Inject constructor(
     fun insertFamily() =
         viewModelScope.launch(Dispatchers.IO) {
 
+            val user_email = Prefs.email
+
             // Family Doc
             val randomCode = getRandomString(8)
-            val family = DomainFamilyDTO(randomCode)
+            val family = DomainFamilyDTO(family_code = randomCode, manager = user_email)
 
             // User Doc
             val map =
-                mapOf<String, Any>(EMAIL to Prefs.email, FAMILY_CODE to randomCode, MANAGER to true)
+                mapOf<String, Any>(EMAIL to user_email, FAMILY_CODE to randomCode, MANAGER to true)
 
-            // Family Doc만들고, User에 familyCode 정보 추가 & manager 상태 변경
-            insertFamilyUseCase.execute(randomCode, family)
-                .zip(updateUserFamilyCodeUseCase.execute(map)) { response1, response2 ->
-                    if (response1 is ResultType.Success && response2 is ResultType.Success) ResultType.Success(
-                        Unit
-                    )
-                    else ResultType.Fail
-                }.collect { result ->
-                    when (result) {
+            insertFamilyUseCase.execute(randomCode, family, map).collect { response ->
+                withContext(Dispatchers.Main) {
+                    when (response) {
                         is ResultType.Success -> {
                             insertFamilyProcessState.value = State.SUCCESS
                             Prefs.familyCode = randomCode
@@ -193,5 +190,7 @@ class LoginViewModel @Inject constructor(
                         }
                     }
                 }
+
+            }
         }
 }

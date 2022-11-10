@@ -2,6 +2,8 @@ package com.ssafy.ourhome.di
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.ssafy.data.datasource.family.FamilyDataSource
+import com.ssafy.data.datasource.family.FamilyDataSourceImpl
 import com.ssafy.data.datasource.user.UserDataSource
 import com.ssafy.data.datasource.user.UserDataSourceImpl
 import dagger.Module
@@ -22,5 +24,15 @@ object DataSourceModule {
         fireAuth: FirebaseAuth
     ): UserDataSource {
         return UserDataSourceImpl(fireStore, fireAuth)
+    }
+
+    // FamilyDataSource DI
+    @Provides
+    @Singleton
+    fun provideFamilyDataSource(
+        fireStore: FirebaseFirestore,
+        fireAuth: FirebaseAuth
+    ): FamilyDataSource {
+        return FamilyDataSourceImpl(fireStore, fireAuth)
     }
 }

@@ -5,7 +5,6 @@ import com.google.firebase.auth.AuthResult
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.Query
-import com.ssafy.domain.model.family.DomainFamilyDTO
 import com.ssafy.domain.model.user.DomainUserDTO
 
 interface UserDataSource {
@@ -26,12 +25,8 @@ interface UserDataSource {
     // 유저 Document 가져오기
     fun getUser(email: String): Task<DocumentSnapshot>
 
-    // 가족방 생성시
-    // 유저 정보(familyCode, manager)업데이트
-    fun updateUserFamilyCode(map: Map<String, Any>): Task<Void>
-
-    // 가족방 생성
-    fun insetFamily(familyCode: String, familyDTO: DomainFamilyDTO): Task<Void>
+    // user Doc (user Collection -> email Doc)
+    fun getUserDoc(email: String): DocumentReference
 
     // 유저 정보 가져오기
     fun getProfile(familyCode: String, email: String): DocumentReference
