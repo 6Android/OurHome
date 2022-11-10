@@ -33,6 +33,7 @@ import com.ssafy.ourhome.ui.theme.BirthDayColor
 import com.ssafy.ourhome.ui.theme.BloodTypeColor
 import com.ssafy.ourhome.ui.theme.MBTIColor
 import com.ssafy.ourhome.ui.theme.hannar
+import com.ssafy.ourhome.utils.Prefs
 
 @Composable
 fun UserColorCardList(userDTO: DomainUserDTO) {
@@ -337,8 +338,7 @@ fun UserInfoCard(
             Spacer(modifier = Modifier.height(12.dp))
 
 
-            // TODO : 내 화면인지? 본인 이메일 추가
-            if (userDTO.email == "a@naver.com") {
+            if (userDTO.email == Prefs.email) {
                 OutlinedButton(
                     modifier = Modifier
                         .fillMaxWidth(),
