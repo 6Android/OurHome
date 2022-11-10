@@ -28,12 +28,12 @@ interface UserRepository {
     // 유저 정보 가져오기
     fun getUser(email: String): Flow<UserResponse>
 
-    // 가족방 생성시
-    // 유저 정보(familyCode, manager)업데이트
-    fun updateUserFamilyCode(map: Map<String, Any>): Flow<ResultType<Unit>>
-
     // 가족방 생성
-    fun insetFamily(familyCode: String, familyDTO: DomainFamilyDTO): Flow<ResultType<Unit>>
+    fun insetFamily(
+        familyCode: String,
+        familyDTO: DomainFamilyDTO,
+        map: Map<String, Any>
+    ): Flow<ResultType<Unit>>
 
     fun getProfile(familyCode: String, email: String): Flow<UserResponse>
 

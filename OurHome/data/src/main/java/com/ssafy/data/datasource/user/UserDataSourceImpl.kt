@@ -5,10 +5,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
-import com.ssafy.data.utils.EMAIL
 import com.ssafy.data.utils.FAMILY
 import com.ssafy.data.utils.USER
-import com.ssafy.domain.model.family.DomainFamilyDTO
 import com.ssafy.domain.model.user.DomainUserDTO
 import javax.inject.Inject
 
@@ -38,14 +36,9 @@ class UserDataSourceImpl @Inject constructor(
     override fun getUser(email: String) =
         fireStore.collection(USER).document(email).get()
 
-    // 가족방 생성시
-    // 유저 정보(familyCode, manager)업데이트
-    override fun updateUserFamilyCode(map: Map<String, Any>) =
-        fireStore.collection(USER).document(map[EMAIL].toString()).update(map)
-
-    // 가족방 생성
-    override fun insetFamily(familyCode: String, familyDTO: DomainFamilyDTO) =
-        fireStore.collection(FAMILY).document(familyCode).set(familyDTO)
+    // user Doc (user Collection -> email Doc)
+    override fun getUserDoc(email: String) =
+        fireStore.collection(USER).document(email)
 
     override fun getProfile(familyCode: String, email: String) =
         fireStore.collection(FAMILY).document(familyCode).collection(USER).document(email)

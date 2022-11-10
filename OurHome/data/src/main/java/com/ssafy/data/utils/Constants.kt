@@ -7,6 +7,7 @@ const val USER = "user"
 const val EMAIL = "email"
 const val MANAGER = "manager"
 
+const val QUESTION = "question"
 const val QUESTION_INFO = "question_info"
 const val COMPLETED = "completed"
 

@@ -6,4 +6,5 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class DomainFamilyDTO(
     var family_code: String = "",
+    var manager: String = ""
 ) : Parcelable
