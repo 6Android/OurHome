@@ -26,6 +26,10 @@ interface UserDataSource {
     // 유저 Document 가져오기
     fun getUser(email: String): Task<DocumentSnapshot>
 
+    // 가족방 생성시
+    // 유저 정보(familyCode, manager)업데이트
+    fun updateUserFamilyCode(map: Map<String, Any>): Task<Void>
+
     // 가족방 생성
     fun insetFamily(familyCode: String, familyDTO: DomainFamilyDTO): Task<Void>
 

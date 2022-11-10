@@ -151,6 +151,20 @@ class UserRepositoryImpl @Inject constructor(
             awaitClose {}
         }
 
+    // 가족방 생성시
+    // 유저 정보(familyCode, manager)업데이트
+    override fun updateUserFamilyCode(map: Map<String, Any>): Flow<ResultType<Unit>> = callbackFlow {
+        userDataSource.updateUserFamilyCode(map).addOnCompleteListener { task ->
+            val response = if (task.isSuccessful) {
+                ResultType.Success(Unit)
+            } else {
+                ResultType.Error(Exception())
+            }
+            trySend(response)
+        }
+        awaitClose {}
+    }
+
     override fun editProfile(familyCode: String, user: DomainUserDTO): Flow<ResultType<Unit>> =
         callbackFlow {
             val completeListener =

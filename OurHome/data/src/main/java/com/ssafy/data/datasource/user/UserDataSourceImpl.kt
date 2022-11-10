@@ -37,6 +37,11 @@ class UserDataSourceImpl @Inject constructor(
     override fun getUser(email: String) =
         fireStore.collection(USER).document(email).get()
 
+    // 가족방 생성시
+    // 유저 정보(familyCode, manager)업데이트
+    override fun updateUserFamilyCode(map: Map<String, Any>) =
+        fireStore.collection(USER).document(map["email"].toString()).update(map)
+
     // 가족방 생성
     override fun insetFamily(familyCode: String, familyDTO: DomainFamilyDTO) =
         fireStore.collection(FAMILY).document(familyCode).set(familyDTO)
