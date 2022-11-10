@@ -29,14 +29,13 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequest
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 import com.ssafy.ourhome.navigation.BottomNavItem
 import com.ssafy.ourhome.navigation.BottomNavigation
 import com.ssafy.ourhome.navigation.OurHomeNavGraph
 import com.ssafy.ourhome.navigation.OurHomeScreens
 import com.ssafy.ourhome.ui.theme.MainColor
 import com.ssafy.ourhome.ui.theme.OurHomeTheme
+import com.ssafy.ourhome.utils.LOCATION
 import com.ssafy.ourhome.utils.findActivity
 import com.ssafy.ourhome.work.MapWorkManager
 import dagger.hilt.android.AndroidEntryPoint
@@ -45,33 +44,43 @@ import java.util.concurrent.TimeUnit
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        val locationWorkRequest: PeriodicWorkRequest =
+    companion object {
+        private val locationWorkRequest: PeriodicWorkRequest =
             PeriodicWorkRequestBuilder<MapWorkManager>(15, TimeUnit.MINUTES)
                 .build()
+        lateinit var workManager: WorkManager
 
-        val workManager = WorkManager.getInstance(applicationContext)
+        // 위치 정보 갱신 워크매니저 시작
+        fun startWorkManager() {
+            workManager.enqueueUniquePeriodicWork(
+                LOCATION,
+                ExistingPeriodicWorkPolicy.KEEP,
+                locationWorkRequest
+            )
 
-//        workManager.cancelUniqueWork("location")
-
-        var a = workManager.getWorkInfosForUniqueWork("location").get()
-        for(i in a){
-            Log.d("test5", "onCreate: $i")
+            val workState = workManager.getWorkInfosForUniqueWork(LOCATION).get()
+            for (i in workState) {
+                Log.d("test5", "WorkState: $i")
+            }
         }
 
-        workManager.enqueueUniquePeriodicWork(
-            "location",
-            ExistingPeriodicWorkPolicy.KEEP,
-            locationWorkRequest
-        )
+        // 위치 정보 갱신 워크매니저 종료
+        fun stopWorkManager() {
+            workManager.cancelUniqueWork(LOCATION)
 
-        a = workManager.getWorkInfosForUniqueWork("location").get()
-        for(i in a){
-            Log.d("test5", "onCreate: $i")
+            val workState = workManager.getWorkInfosForUniqueWork(LOCATION).get()
+            for (i in workState) {
+                Log.d("test5", "WorkState: $i")
+            }
         }
+    }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        workManager = WorkManager.getInstance(applicationContext)
+
+//        stopWorkManager()
+//        startWorkManager()
 
         setContent {
             OurHomeTheme {

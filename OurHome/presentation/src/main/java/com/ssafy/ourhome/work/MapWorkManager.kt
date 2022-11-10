@@ -14,6 +14,7 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.ssafy.domain.usecase.user.SendLatLngUseCase
+import com.ssafy.ourhome.utils.Prefs
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.coroutineScope
@@ -45,8 +46,8 @@ class MapWorkManager @AssistedInject constructor(
 //        }
 
         sendLatLngUseCase.execute(
-            "EX7342",
-            "a@naver.com",
+            Prefs.familyCode,
+            Prefs.email,
             Random.nextDouble(100.0),
             Random.nextDouble(100.0),
             System.currentTimeMillis()
