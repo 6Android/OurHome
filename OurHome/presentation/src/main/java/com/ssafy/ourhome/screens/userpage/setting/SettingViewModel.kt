@@ -31,7 +31,5 @@ class SettingViewModel @Inject constructor(
 
             }
         }
-
     }
-
 }
