@@ -19,6 +19,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -28,6 +29,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coil.compose.AsyncImagePainter.State.Empty.painter
 import coil.compose.rememberAsyncImagePainter
 import com.squaredem.composecalendar.ComposeCalendar
 import com.ssafy.domain.model.user.DomainUserDTO
@@ -83,6 +85,7 @@ fun EditProfileScreen(
     // 에디트 성공
     if (vm.editSuccess) {
         Toast.makeText(LocalContext.current, "정보 수정에 성공하였습니다.", Toast.LENGTH_SHORT).show()
+        vm.setEditSuccess()
         navController.popBackStack()
     }
 
@@ -119,6 +122,7 @@ fun EditProfileScreen(
                     user.hobby = hobbyState.value
 
                     vm.editProfile(user)
+                    Log.d("test5", "EditProfileScreen: $user")
                 }
             )
         }) {
@@ -153,7 +157,7 @@ fun EditProfileScreen(
                     verticalArrangement = Arrangement.spacedBy(24.dp)
                 ) {
                     TextWithText("이메일", userDTO.email)
-                    TextWithTextField("전화번호", phoneState)
+                    TextWithTextField("전화번호", phoneState, KeyboardType.Number)
                     BirthDaySelect(title = "생일", birthDayState, showDialog)
                     TextWithDropDown(
                         title = "혈액형", textState = bloodTypeState, itemList =
@@ -228,7 +232,6 @@ private fun TextWithDropDown(
     }
 
     var selectedIndex by remember {
-
         mutableStateOf(itemList.indexOf(textState.value))
     }
 
@@ -242,43 +245,6 @@ private fun TextWithDropDown(
                 .fillMaxHeight()
                 .weight(2f)
         ) {
-
-//            ExposedDropdownMenuBox(
-//                expanded = expanded,
-//                onExpandedChange = {
-//                    expanded = !expanded
-//                },
-//                modifier = Modifier.wrapContentHeight()
-//            ) {
-//                TextField(
-//                    readOnly = true,
-//                    value = itemList[selectedIndex],
-//                    onValueChange = { },
-//                    trailingIcon = {
-//                        ExposedDropdownMenuDefaults.TrailingIcon(
-//                            expanded = expanded
-//                        )
-//                    },
-//                    colors = ExposedDropdownMenuDefaults.textFieldColors()
-//                )
-//                ExposedDropdownMenu(
-//                    expanded = expanded,
-//                    onDismissRequest = {
-//                        expanded = false
-//                    }
-//                ) {
-//                    itemList.forEachIndexed { idx, selectionOption ->
-//                        DropdownMenuItem(
-//                            onClick = {
-//                               selectedIndex = idx
-//                                expanded = false
-//                            }
-//                        ) {
-//                            Text(text = selectionOption, style = MaterialTheme.typography.h6)
-//                        }
-//                    }
-//                }
-//            }
             Row(
                 Modifier
                     .fillMaxWidth()
@@ -312,6 +278,7 @@ private fun TextWithDropDown(
                 itemList.forEachIndexed { index, item ->
                     DropdownMenuItem(modifier = Modifier.wrapContentHeight(), onClick = {
                         selectedIndex = index
+                        textState.value = item
                         expanded = false
                     }) {
                         Text(text = item, style = MaterialTheme.typography.h6)
@@ -369,7 +336,8 @@ private fun TextWithText(
 @Composable
 private fun TextWithTextField(
     title: String,
-    textState: MutableState<String>
+    textState: MutableState<String>,
+    keyboardType: KeyboardType = KeyboardType.Text
 ) {
     Row(modifier = Modifier.fillMaxWidth()) {
         Text(
@@ -380,8 +348,9 @@ private fun TextWithTextField(
             modifier = Modifier.weight(4f),
             valueState = textState,
             isAlignCenter = false,
+            keyboardType = keyboardType,
             enabled = true,
-            maxLength = 10
+            maxLength = 20
         )
     }
 }
@@ -394,6 +363,7 @@ private fun UserImage(
         modifier = Modifier
             .size(100.dp)
             .clip(CircleShape),
+        contentScale = ContentScale.Crop,
         painter =
         if (imageUrl == "default") painterResource(R.drawable.img_default_user)
         else rememberAsyncImagePainter(imageUrl),

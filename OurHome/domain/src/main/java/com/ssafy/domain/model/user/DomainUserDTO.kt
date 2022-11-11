@@ -21,6 +21,6 @@ data class DomainUserDTO(
     var manager: Boolean = false,
     var mbti: String = "MBTI",
     var name: String = "",
-    var phone: String = "010-1234-5678",
+    var phone: String = "01012345678",
     var role: String = ""
 ): Parcelable
