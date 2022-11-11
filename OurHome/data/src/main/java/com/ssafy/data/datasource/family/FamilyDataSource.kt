@@ -1,6 +1,8 @@
 package com.ssafy.data.datasource.family
 
+import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.DocumentSnapshot
 
 interface FamilyDataSource {
 
@@ -12,4 +14,7 @@ interface FamilyDataSource {
 
     // family/question Doc (family Collection -> family_code Doc ->  question Collection -> seq Doc)
     fun getFamilyQuestionDoc(familyCode: String, seq: String): DocumentReference
+
+    // family 이미 있는지 검사
+    fun checkFamily(email: String): Task<DocumentSnapshot>
 }

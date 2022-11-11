@@ -27,7 +27,8 @@ class LoginViewModel @Inject constructor(
     private val signInEmailUseCase: SignInEmailUseCase,
     private val getUserUseCase: GetUserUseCase,
     private val joinSocialUseCase: JoinSocialUseCase,
-    private val insertFamilyUseCase: InsertFamilyUseCase
+    private val insertFamilyUseCase: InsertFamilyUseCase,
+    private val enterFamilyUseCase: EnterFamilyUseCase
 ) : ViewModel() {
 
     val loginIdState = mutableStateOf("")
@@ -46,6 +47,8 @@ class LoginViewModel @Inject constructor(
     val joinProcessState = mutableStateOf(State.DEFAULT)
 
     val insertFamilyProcessState = mutableStateOf(State.DEFAULT)
+
+    val enterFamilyCodeState = mutableStateOf("")
 
     fun joinEmail() =
         viewModelScope.launch(Dispatchers.IO) {
@@ -69,7 +72,11 @@ class LoginViewModel @Inject constructor(
 
     fun joinSocial() =
         viewModelScope.launch(Dispatchers.IO) {
-            joinSocialUseCase.execute(socialEmail, joinNickNameState.value, "${joinDateState.value}").collect { response ->
+            joinSocialUseCase.execute(
+                socialEmail,
+                joinNickNameState.value,
+                "${joinDateState.value}"
+            ).collect { response ->
                 when (response) {
                     is ResultType.Success -> {
                         joinProcessState.value = State.SUCCESS
@@ -184,6 +191,29 @@ class LoginViewModel @Inject constructor(
                         is ResultType.Success -> {
                             insertFamilyProcessState.value = State.SUCCESS
                             Prefs.familyCode = randomCode
+                        }
+                        else -> {
+                            insertFamilyProcessState.value = State.FAIL
+                        }
+                    }
+                }
+
+            }
+        }
+
+    // 가족방 참여
+    fun enterFamily() =
+        viewModelScope.launch(Dispatchers.IO) {
+
+            val user_email = Prefs.email
+            val family_code = enterFamilyCodeState.value
+
+            enterFamilyUseCase.execute(family_code, user_email).collect { response ->
+                withContext(Dispatchers.Main) {
+                    when (response) {
+                        is ResultType.Success -> {
+                            insertFamilyProcessState.value = State.SUCCESS
+                            Prefs.familyCode = family_code
                         }
                         else -> {
                             insertFamilyProcessState.value = State.FAIL
