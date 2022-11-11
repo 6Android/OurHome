@@ -24,7 +24,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImagePainter
+import coil.compose.AsyncImagePainter.State.Empty.painter
 import coil.compose.rememberAsyncImagePainter
+import com.ssafy.domain.model.pet.DomainFamilyPetDTO
 import com.ssafy.ourhome.components.MainAppBar
 import com.ssafy.ourhome.components.OurHomeSurface
 import com.ssafy.ourhome.components.pie.PieChart
@@ -34,18 +36,16 @@ import com.ssafy.ourhome.components.pie.animation.simpleChartAnimation
 import com.ssafy.ourhome.components.pie.renderer.SimpleSliceDrawer
 import com.ssafy.ourhome.navigation.OurHomeScreens
 import com.ssafy.ourhome.screens.question.CenterHorizontalColumn
+import com.ssafy.ourhome.screens.question.QuestionViewModel
 import com.ssafy.ourhome.ui.theme.Gray
 import com.ssafy.ourhome.ui.theme.MainColor
 import com.ssafy.ourhome.ui.theme.nanum
 
 
 @Composable
-fun PetDetailScreen(navController: NavController) {
-    val painter =
-        rememberAsyncImagePainter("https://i.pinimg.com/222x/36/30/f7/3630f7d930f91e495d93c02833b4abfc.jpg")
+fun PetDetailScreen(navController: NavController, vm: QuestionViewModel) {
     val scrollState = rememberScrollState()
     val familyContributeList = PieChartData(listOf(Slice(0.5F, Color.Red, "아빠"), Slice(0.3F, Color.Blue, "엄마"), Slice(0.2F, Color.Green, "아들")))
-
 
     Scaffold(topBar = {
         MainAppBar(title = "캐릭터 상세", onBackClick = {
@@ -63,14 +63,13 @@ fun PetDetailScreen(navController: NavController) {
 
                 CenterHorizontalColumn{
 
-                    PetDetail(petName = "고라파덕", painter = painter, petLevel = "Lv. 2",
-                        petDescription = "고라파덕은 물 속성 포켓몬이다.\n골덕으로 진화한다.", petQuest = "성장요인 : 가족 답변쓰기, 가족 앨범 등록")
+                    PetDetail(vm.pet)
 
                 }
 
                 Spacer(modifier = Modifier.height(32.dp))
 
-                PetExp()
+                PetExp(vm.pet)
 
                 Spacer(modifier = Modifier.height(24.dp))
 
@@ -139,7 +138,7 @@ fun FamilyExpPieChart(familyContributeList: PieChartData){
 
 /** 펫 경험치 text and progressbar **/
 @Composable
-fun PetExp() {
+fun PetExp(pet: DomainFamilyPetDTO) {
     Row(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = "경험치",
@@ -148,7 +147,7 @@ fun PetExp() {
 
         Spacer(modifier = Modifier.width(12.dp))
 
-        customProgressBar(progress = 75)
+        customProgressBar(progress = (pet.pet_level * 100 / pet.next_level_exp))
     }
 }
 
@@ -250,9 +249,9 @@ fun customProgressBar(progress: Int) {
 
 /** 펫 정보 (이름, 이미지, 레벨, 설명, 퀘스트) **/
 @Composable
-fun PetDetail(petName: String, painter: AsyncImagePainter, petLevel: String, petDescription: String, petQuest: String) {
+fun PetDetail(pet: DomainFamilyPetDTO) {
     Text(
-        text = petName,
+        text = pet.name,
         style = MaterialTheme.typography.h5.copy(fontWeight = FontWeight.Bold)
     )
 
@@ -260,14 +259,14 @@ fun PetDetail(petName: String, painter: AsyncImagePainter, petLevel: String, pet
 
     Image(
         modifier = Modifier.size(250.dp),
-        painter = painter,
+        painter = rememberAsyncImagePainter(pet.image),
         contentDescription = "펫 이미지"
     )
 
     Spacer(modifier = Modifier.height(4.dp))
 
     Text(
-        text = petLevel,
+        text = "Lv. " + pet.pet_level.toString(),
         style = MaterialTheme.typography.body1.copy(fontWeight = FontWeight.Bold)
 
     )
@@ -275,7 +274,7 @@ fun PetDetail(petName: String, painter: AsyncImagePainter, petLevel: String, pet
     Spacer(modifier = Modifier.height(16.dp))
 
     Text(
-        text = petDescription,
+        text = pet.description.replace("\\n", "\n"),
         style = MaterialTheme.typography.body2,
         textAlign = TextAlign.Center
     )
@@ -283,7 +282,8 @@ fun PetDetail(petName: String, painter: AsyncImagePainter, petLevel: String, pet
     Spacer(modifier = Modifier.height(8.dp))
 
     Text(
-        text = petQuest,
-        style = MaterialTheme.typography.body2
+        text = "질문에 대한 답변을 많이 하고 \n 답변을 길게 작성하면 빠른 성장을 할 수 있어요.",
+        style = MaterialTheme.typography.body2,
+        textAlign = TextAlign.Center
     )
 }
