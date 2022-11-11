@@ -1,5 +1,6 @@
 package com.ssafy.domain.repository.user
 
+import com.google.android.gms.tasks.Task
 import com.ssafy.domain.model.family.DomainFamilyDTO
 import com.ssafy.domain.model.user.DomainUserDTO
 import com.ssafy.domain.utils.ResultType
@@ -67,4 +68,9 @@ interface UserRepository {
         email: String,
         permission: Boolean
     ): Flow<ResultType<Unit>>
+
+    // 가족장 변경하기
+    fun editManager(familyCode: String,
+                    myEmail: String,
+                    otherEmail: String): Flow<ResultType<Unit>>
 }

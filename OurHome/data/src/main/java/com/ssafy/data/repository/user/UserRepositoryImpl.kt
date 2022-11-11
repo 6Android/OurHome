@@ -341,4 +341,32 @@ class UserRepositoryImpl @Inject constructor(
 
             }
         }
+
+    // 가족장 변경하기
+    override fun editManager(
+        familyCode: String,
+        myEmail: String,
+        otherEmail: String
+    ): Flow<ResultType<Unit>> =
+        callbackFlow {
+
+            // 내 가족장 위임
+            userDataSource.editManager(familyCode, myEmail, false).addOnCompleteListener { my ->
+                if (my.isSuccessful) {
+                    // 가족장 전달받음
+                    userDataSource.editManager(familyCode, otherEmail, true).addOnSuccessListener {
+                        val response2 = ResultType.Success(Unit)
+                        trySend(response2)
+                    }.addOnFailureListener {
+                        trySend(ResultType.Error(it))
+                    }
+                } else {
+                    trySend(ResultType.Fail)
+                }
+            }
+            awaitClose {
+
+            }
+        }
+
 }

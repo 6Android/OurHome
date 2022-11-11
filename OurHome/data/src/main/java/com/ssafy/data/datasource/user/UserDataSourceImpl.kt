@@ -64,4 +64,9 @@ class UserDataSourceImpl @Inject constructor(
     override fun editLocationPermission(familyCode: String, email: String, permission: Boolean): Task<Void> =
         fireStore.collection(FAMILY).document(familyCode).collection(USER).document(email)
             .update("location_permit", permission)
+
+    // 가족장 변경하기
+    override fun editManager(familyCode: String, email: String, isManager: Boolean): Task<Void> =
+        fireStore.collection(FAMILY).document(familyCode).collection(USER).document(email)
+            .update("manager", isManager)
 }

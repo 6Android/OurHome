@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.ssafy.domain.model.user.DomainUserDTO
 import com.ssafy.domain.usecase.user.EditLocationPermissionUseCase
+import com.ssafy.domain.usecase.user.EditManagerUseCase
 import com.ssafy.domain.usecase.user.GetFamilyUsersUseCase
 import com.ssafy.domain.utils.ResultType
 import com.ssafy.ourhome.utils.Prefs
@@ -20,7 +21,8 @@ import javax.inject.Inject
 @HiltViewModel
 class SettingViewModel @Inject constructor(
     private val editLocationPermissionUseCase: EditLocationPermissionUseCase,
-    private val getFamilyUsersUseCase: GetFamilyUsersUseCase
+    private val getFamilyUsersUseCase: GetFamilyUsersUseCase,
+    private val editManagerUseCase: EditManagerUseCase
 ) : ViewModel() {
 
     @Inject
@@ -30,6 +32,9 @@ class SettingViewModel @Inject constructor(
         private set
 
     var errorState by mutableStateOf(false)
+
+    var editSuccess by mutableStateOf(false)
+        private set
 
     fun editLocationPermission(permit : Boolean){
         viewModelScope.launch(Dispatchers.IO) {
@@ -65,9 +70,30 @@ class SettingViewModel @Inject constructor(
         }
     }
 
+    fun editManager(otherEmail: String){
+        viewModelScope.launch(Dispatchers.IO) {
+            editManagerUseCase.execute(Prefs.familyCode,Prefs.email, otherEmail).collect{
+                when(it){
+                    is ResultType.Success -> {
+                        Log.d("SettingViewModel", "yes: ")
+                        editSuccess = true
+                    }
+                    else ->{
+                        Log.d("SettingViewModel", "no: ")
+                    }
+                }
+
+            }
+        }
+    }
+
     fun logout(){
         firebaseAuth.signOut()
         Prefs.email = ""
         Prefs.familyCode = ""
+    }
+
+    fun setEditSuccess(){
+        editSuccess = false
     }
 }

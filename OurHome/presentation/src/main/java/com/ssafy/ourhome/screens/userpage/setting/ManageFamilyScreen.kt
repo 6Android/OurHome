@@ -1,5 +1,6 @@
 package com.ssafy.ourhome.screens.userpage.setting
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -30,10 +31,21 @@ import com.ssafy.ourhome.ui.theme.MainColor
 
 
 @Composable
-fun ManageFamilyScreen(navController: NavController = NavController(LocalContext.current), vm: SettingViewModel) {
+fun ManageFamilyScreen(
+    navController: NavController = NavController(LocalContext.current),
+    vm: SettingViewModel
+) {
 
     // 가족원 전부 불러오기
     vm.getFamilyUsers()
+
+    // 가족장 위임
+    if(vm.editSuccess){
+        navController.popBackStack()
+        navController.popBackStack()
+        vm.setEditSuccess()
+        Toast.makeText(LocalContext.current, "가족장이 위임되었습니다.", Toast.LENGTH_SHORT).show()
+    }
 
     Scaffold(topBar = {
         MainAppBar(title = "가족 관리", backIconEnable = true, onBackClick = {
@@ -49,7 +61,9 @@ fun ManageFamilyScreen(navController: NavController = NavController(LocalContext
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 items(items = vm.users) { user ->
-                    FamilyManageItem(user)
+                    FamilyManageItem(user, editManager = {
+                        vm.editManager(it)
+                    })
                 }
             }
         }
@@ -60,7 +74,8 @@ fun ManageFamilyScreen(navController: NavController = NavController(LocalContext
 
 @Composable
 fun FamilyManageItem(
-    user: DomainUserDTO
+    user: DomainUserDTO,
+    editManager: (String) -> Unit
 ) {
     Card(
         modifier = Modifier
@@ -107,7 +122,7 @@ fun FamilyManageItem(
                             .weight(1f)
 
                     ) {
-                        //TODO : 가족장 위임 클릭이벤트
+                        editManager.invoke(user.email)
                     }
 
                     RoundedTextButton(

@@ -39,4 +39,7 @@ interface UserDataSource {
 
     // 위치 공유 동의 여부 수정하기
     fun editLocationPermission(familyCode: String, email: String, permission: Boolean): Task<Void>
+
+    // 가족장 변경하기
+    fun editManager(familyCode: String, email: String, isManager: Boolean): Task<Void>
 }
