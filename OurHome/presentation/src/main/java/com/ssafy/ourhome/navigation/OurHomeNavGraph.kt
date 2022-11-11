@@ -37,6 +37,7 @@ import com.ssafy.ourhome.screens.userpage.UserPageScreen
 import com.ssafy.ourhome.screens.userpage.UserPageViewModel
 import com.ssafy.ourhome.screens.userpage.setting.ManageFamilyScreen
 import com.ssafy.ourhome.screens.userpage.setting.SettingScreen
+import com.ssafy.ourhome.screens.userpage.setting.SettingViewModel
 
 
 @Composable
@@ -45,6 +46,7 @@ fun OurHomeNavGraph(navController: NavHostController) {
     val mapViewModel : MapViewModel = hiltViewModel()
     val userPageViewModel : UserPageViewModel = hiltViewModel()
     val homeViewModel : HomeViewModel = hiltViewModel()
+    val settingViewModel : SettingViewModel = hiltViewModel()
     NavHost(
         navController = navController,
         startDestination = OurHomeScreens.LoginScreen.name
@@ -147,8 +149,14 @@ fun OurHomeNavGraph(navController: NavHostController) {
             EditProfileScreen(navController = navController, userDTO = userDTO!!,vm = userPageViewModel)
         }
 
-        composable(OurHomeScreens.SettingScreen.name) {
-            SettingScreen(navController = navController)
+        composable("${OurHomeScreens.SettingScreen.name}/{permit}",
+        arguments = listOf(navArgument("permit"){
+            type = NavType.BoolType
+        })
+        ) {backStackEntry ->
+            backStackEntry.arguments?.getBoolean("permit").let {
+                SettingScreen(navController = navController, permit = it!!, vm = settingViewModel)
+            }
         }
 
         composable(OurHomeScreens.ManageFamilyScreen.name) {

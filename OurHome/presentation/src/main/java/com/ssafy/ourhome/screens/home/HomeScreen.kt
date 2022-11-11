@@ -49,6 +49,7 @@ import com.ssafy.ourhome.utils.Person
 import com.ssafy.ourhome.utils.Prefs
 import com.ssafy.ourhome.utils.Schedule
 import com.ssafy.ourhome.utils.personList
+import com.ssafy.ourhome.utils.*
 
 
 /** 맵 화면 이동 **/
@@ -102,11 +103,6 @@ fun HomeScreen(navController: NavController, vm: HomeViewModel) {
         mutableStateOf(false)
     }
 
-    /** 위치 권한 요청 코드 **/
-    val permissions = arrayOf(
-        Manifest.permission.ACCESS_COARSE_LOCATION,
-        Manifest.permission.ACCESS_FINE_LOCATION
-    )
 
     val launcherMultiplePermissions = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -180,10 +176,10 @@ fun HomeScreen(navController: NavController, vm: HomeViewModel) {
                         checkAndRequestLocationPermissions(
                             context,
                             permissions,
-                            launcherMultiplePermissions,
-                            navController,
-                            vm
-                        )
+                            launcherMultiplePermissions
+                        ) {
+                            moveMap(navController, vm)
+                        }
                     }
 
                     Spacer(modifier = Modifier.width(16.dp))
