@@ -42,13 +42,11 @@ import com.ssafy.ourhome.MainActivity.Companion.startWorkManager
 import com.ssafy.ourhome.R
 import com.ssafy.ourhome.components.OurHomeSurface
 import com.ssafy.ourhome.navigation.OurHomeScreens
-import com.ssafy.ourhome.utils.Person
-import com.ssafy.ourhome.utils.Schedule
-import com.ssafy.ourhome.utils.personList
+import com.ssafy.ourhome.utils.*
 
 
 /** 맵 화면 이동 **/
-fun moveMap(navController: NavController, vm : HomeViewModel){
+fun moveMap(navController: NavController, vm: HomeViewModel) {
     // 맵 화면이동
     navController.navigate(OurHomeScreens.MapScreen.name)
 
@@ -59,30 +57,6 @@ fun moveMap(navController: NavController, vm : HomeViewModel){
     startWorkManager()
 }
 
-/** 권한 체크, 요청 코드 **/
-fun checkAndRequestLocationPermissions(
-    context: Context,
-    permissions: Array<String>,
-    launcher: ManagedActivityResultLauncher<Array<String>, Map<String, Boolean>>,
-    navController: NavController,
-    vm : HomeViewModel
-) {
-    /** 권한이 이미 있는 경우 **/
-    if (
-        permissions.all {
-            ContextCompat.checkSelfPermission(
-                context,
-                it
-            ) == PackageManager.PERMISSION_GRANTED
-        }
-    ) {
-        moveMap(navController, vm)
-    }
-    /** 권한이 없는 경우 **/
-    else {
-        launcher.launch(permissions)
-    }
-}
 
 @Composable
 fun HomeScreen(navController: NavController, vm: HomeViewModel) {
@@ -95,11 +69,6 @@ fun HomeScreen(navController: NavController, vm: HomeViewModel) {
         navController.navigate(OurHomeScreens.ScheduleDetailScreen.name)
     }
 
-    /** 위치 권한 요청 코드 **/
-    val permissions = arrayOf(
-        Manifest.permission.ACCESS_COARSE_LOCATION,
-        Manifest.permission.ACCESS_FINE_LOCATION
-    )
 
     val launcherMultiplePermissions = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -173,10 +142,10 @@ fun HomeScreen(navController: NavController, vm: HomeViewModel) {
                         checkAndRequestLocationPermissions(
                             context,
                             permissions,
-                            launcherMultiplePermissions,
-                            navController,
-                            vm
-                        )
+                            launcherMultiplePermissions
+                        ) {
+                            moveMap(navController, vm)
+                        }
                     }
 
                     Spacer(modifier = Modifier.width(16.dp))
