@@ -1,10 +1,7 @@
 package com.ssafy.ourhome.screens.home
 
-import android.Manifest
-import android.content.Context
-import android.content.pm.PackageManager
+import android.util.Log
 import android.widget.Toast
-import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.*
@@ -33,24 +30,18 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.holix.android.bottomsheetdialog.compose.BottomSheetDialog
 import com.holix.android.bottomsheetdialog.compose.BottomSheetDialogProperties
 import com.kizitonwose.calendar.core.CalendarDay
+import com.ssafy.domain.model.user.DomainUserDTO
 import com.ssafy.ourhome.MainActivity.Companion.startWorkManager
 import com.ssafy.ourhome.R
 import com.ssafy.ourhome.components.OurHomeSurface
 import com.ssafy.ourhome.components.RoundedButton
 import com.ssafy.ourhome.navigation.OurHomeScreens
-import com.ssafy.ourhome.screens.home.invite.InviteDialog
-import com.ssafy.ourhome.utils.Person
-import com.ssafy.ourhome.utils.Prefs
-import com.ssafy.ourhome.utils.Schedule
-import com.ssafy.ourhome.utils.personList
 import com.ssafy.ourhome.utils.*
-
 
 /** 맵 화면 이동 **/
 fun moveMap(navController: NavController, vm: HomeViewModel) {
@@ -62,31 +53,6 @@ fun moveMap(navController: NavController, vm: HomeViewModel) {
 
     // 워크매니저 시작
     startWorkManager()
-}
-
-/** 권한 체크, 요청 코드 **/
-fun checkAndRequestLocationPermissions(
-    context: Context,
-    permissions: Array<String>,
-    launcher: ManagedActivityResultLauncher<Array<String>, Map<String, Boolean>>,
-    navController: NavController,
-    vm: HomeViewModel
-) {
-    /** 권한이 이미 있는 경우 **/
-    if (
-        permissions.all {
-            ContextCompat.checkSelfPermission(
-                context,
-                it
-            ) == PackageManager.PERMISSION_GRANTED
-        }
-    ) {
-        moveMap(navController, vm)
-    }
-    /** 권한이 없는 경우 **/
-    else {
-        launcher.launch(permissions)
-    }
 }
 
 @Composable
@@ -122,12 +88,20 @@ fun HomeScreen(navController: NavController, vm: HomeViewModel) {
     var selection = remember { mutableStateOf<CalendarDay?>(null) }
     val map = mutableMapOf<String, List<Schedule>>()
 
+    vm.getFamilyUsers()
+    when (vm.familyUsersProcessState.value) {
+        State.ERROR -> {
+            Toast.makeText(context, "가족 정보를 불러오는데 실패했습니다", Toast.LENGTH_SHORT).show()
+            vm.familyUsersProcessState.value = State.DEFAULT
+        }
+    }
+
     Scaffold(topBar = {
 
         /** 상단 바 */
         TopAppBar(
             modifier = Modifier
-                .height(200.dp)
+                .height(170.dp)
                 .shadow(
                     shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp),
                     elevation = 4.dp
@@ -141,11 +115,17 @@ fun HomeScreen(navController: NavController, vm: HomeViewModel) {
 
                 }
 
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
                 /** 구성원 리스트 */
-                PersonList(personList)
-                Spacer(modifier = Modifier.height(50.dp))
+                PersonList(vm.familyUsersState.value) {
+                    // todo: 프로필 사진 클릭
+
+                    if(it == Prefs.email) {
+                        // todo: 내 이미지 클릭했을 경우 바텀 네비 마이페이지로 이동
+                    }
+                }
+                Spacer(modifier = Modifier.height(24.dp))
             }
         }
     }) {
@@ -284,37 +264,41 @@ private fun HomeToolBar(
 
 /** 구성원 리스트 */
 @Composable
-private fun PersonList(personList: ArrayList<Person>) {
+private fun PersonList(personList: List<DomainUserDTO>, onImageClick: (String) -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight()
-            .padding(horizontal = 12.dp)
     ) {
         LazyRow(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            item { }
             items(items = personList, itemContent = { item ->
                 /** 구성원 리스트 아이템 */
-                PersonListItem(item)
+                PersonListItem(item, onImageClick)
             })
+            item { }
         }
     }
 }
 
 /** 구성원 리스트 아이템 */
 @Composable
-private fun PersonListItem(item: Person) {
+private fun PersonListItem(item: DomainUserDTO, onImageClick: (String) -> Unit) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
         /** 프사 */
         Image(
             modifier = Modifier
                 .size(64.dp)
-                .clip(CircleShape),
+                .clip(CircleShape)
+                .clickable { onImageClick(item.email) },
             contentScale = ContentScale.Crop,
-            painter = rememberAsyncImagePainter(item.imgUrl),
+            painter =
+            if (item.image == "default") painterResource(R.drawable.img_default_user)
+            else rememberAsyncImagePainter(item.image),
             contentDescription = "Profile Image"
         )
         Spacer(modifier = Modifier.height(12.dp))
@@ -561,9 +545,11 @@ fun InviteDialogContent(
         Spacer(modifier = Modifier.height(60.dp))
 
         /** 공유하기 버튼 */
-        RoundedButton(modifier = Modifier
-            .fillMaxWidth()
-            .height(48.dp), label = "카카오톡으로 공유") {
+        RoundedButton(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(48.dp), label = "카카오톡으로 공유"
+        ) {
             onShareClick()
         }
         Text(
