@@ -34,7 +34,7 @@ class MapWorkManager @AssistedInject constructor(
         // 2. 주기별로 보내기
         // 3. 위치 공유 조건에 따라 처리
 
-//        val location = getLatLng(appContext)
+        val location = getLatLng(appContext)
 
 //        sendLatLngUseCase.execute(
 //            "EX7342",
