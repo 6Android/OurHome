@@ -4,6 +4,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.ssafy.data.datasource.family.FamilyDataSource
 import com.ssafy.data.datasource.family.FamilyDataSourceImpl
+import com.ssafy.data.datasource.schedule.ScheduleDataSource
+import com.ssafy.data.datasource.schedule.ScheduleDataSourceImpl
 import com.ssafy.data.datasource.user.UserDataSource
 import com.ssafy.data.datasource.user.UserDataSourceImpl
 import dagger.Module
@@ -34,5 +36,15 @@ object DataSourceModule {
         fireAuth: FirebaseAuth
     ): FamilyDataSource {
         return FamilyDataSourceImpl(fireStore, fireAuth)
+    }
+
+    // ScheduleDataSource DI
+    @Provides
+    @Singleton
+    fun provideScheduleDataSource(
+        fireStore: FirebaseFirestore,
+        fireAuth: FirebaseAuth
+    ): ScheduleDataSource {
+        return ScheduleDataSourceImpl(fireStore, fireAuth)
     }
 }

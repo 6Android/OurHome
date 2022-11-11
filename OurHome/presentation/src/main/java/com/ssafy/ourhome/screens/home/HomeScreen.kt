@@ -1,6 +1,5 @@
 package com.ssafy.ourhome.screens.home
 
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -87,6 +86,16 @@ fun HomeScreen(navController: NavController, vm: HomeViewModel) {
     /** 달력에 필요한 데이터 */
     var selection = remember { mutableStateOf<CalendarDay?>(null) }
     val map = mutableMapOf<String, List<Schedule>>()
+    val onMonthChangeListener: (String) -> Unit = {
+        it.split("-").let {
+            val year = it[0].toInt()
+            val month = it[1].toInt()
+
+            // vm 호출
+            vm.getFamilySchedules(year, month)
+        }
+
+    }
 
     vm.getFamilyUsers()
     when (vm.familyUsersProcessState.value) {
@@ -121,7 +130,7 @@ fun HomeScreen(navController: NavController, vm: HomeViewModel) {
                 PersonList(vm.familyUsersState.value) {
                     // todo: 프로필 사진 클릭
 
-                    if(it == Prefs.email) {
+                    if (it == Prefs.email) {
                         // todo: 내 이미지 클릭했을 경우 바텀 네비 마이페이지로 이동
                     }
                 }
@@ -183,7 +192,8 @@ fun HomeScreen(navController: NavController, vm: HomeViewModel) {
                 CalendarCard(
                     visibleBottomSheetState = visibleBottomSheetState,
                     selection = selection,
-                    map = map
+                    map = vm.scheduleMap.value,
+                    onMonthChange = onMonthChangeListener
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
