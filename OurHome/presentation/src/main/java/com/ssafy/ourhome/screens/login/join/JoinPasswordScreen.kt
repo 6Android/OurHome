@@ -27,7 +27,11 @@ fun JoinPasswordScreen(
     vm: LoginViewModel
 ) {
     val joinPasswordSameState =
-        mutableStateOf(vm.joinPasswordState.value == vm.joinPasswordConfirmState.value && vm.joinPasswordState.value.isNotEmpty() && vm.joinPasswordConfirmState.value.isNotEmpty())
+        mutableStateOf(
+            vm.joinPasswordState.value == vm.joinPasswordConfirmState.value
+                    && vm.joinPasswordState.value.isNotEmpty()
+                    && vm.joinPasswordConfirmState.value.isNotEmpty()
+        )
 
     OurHomeSurface {
         Column(modifier = Modifier.fillMaxHeight()) {
@@ -67,7 +71,7 @@ fun JoinPasswordScreen(
                     imeAction = ImeAction.Next,
                     onAction = KeyboardActions(onNext = {
                         // todo: 다음 버튼
-                        if (joinPasswordSameState.value) {
+                        if (vm.joinPasswordState.value.length >= 6 &&joinPasswordSameState.value) {
                             navigateToNickNameScreen(navController)
                         }
                     })
@@ -76,16 +80,18 @@ fun JoinPasswordScreen(
                 Text(
                     modifier = Modifier.padding(start = 16.dp, top = 10.dp),
                     style = MaterialTheme.typography.caption.copy(color = Color.Red),
-                    text = if (joinPasswordSameState.value) {
-                        ""
-                    } else {
+                    text = if (vm.joinPasswordState.value.length < 6) {
+                        "비밀번호는 6자리 이상이어야 합나디."
+                    } else if (!joinPasswordSameState.value) {
                         "비밀번호와 비밀번호 확인이 일치하지 않습니다."
+                    } else {
+                        ""
                     }
                 )
             }
         }
 
-        if (joinPasswordSameState.value) {
+        if (vm.joinPasswordState.value.length >= 6 &&joinPasswordSameState.value) {
             /** 다음 버튼 */
             NextButton(title = "다음") {
                 navigateToNickNameScreen(navController)
