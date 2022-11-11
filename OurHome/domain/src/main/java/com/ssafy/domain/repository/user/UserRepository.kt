@@ -1,7 +1,5 @@
 package com.ssafy.domain.repository.user
 
-import com.google.android.gms.tasks.Task
-import com.google.firebase.firestore.DocumentReference
 import com.ssafy.domain.model.family.DomainFamilyDTO
 import com.ssafy.domain.model.user.DomainUserDTO
 import com.ssafy.domain.utils.ResultType
@@ -16,7 +14,12 @@ interface UserRepository {
     fun getFamilyUsers(familyCode: String): Flow<UsersResponse>
 
     // 이메일 회원 가입
-    fun joinEmail(email: String, password: String, nickname: String, birthday: String): Flow<ResultType<Unit>>
+    fun joinEmail(
+        email: String,
+        password: String,
+        nickname: String,
+        birthday: String
+    ): Flow<ResultType<Unit>>
 
     // 소셜 회원 가입
     fun joinSocial(email: String, nickname: String, birthday: String): Flow<ResultType<Unit>>
@@ -37,6 +40,12 @@ interface UserRepository {
         map: Map<String, Any>
     ): Flow<ResultType<Unit>>
 
+    // 가족방 참여
+    fun enterFamily(
+        familyCode: String,
+        email: String
+    ): Flow<ResultType<Unit>>
+
     // 유저 정보 가져오기
     fun getProfile(familyCode: String, email: String): Flow<UserResponse>
 
@@ -53,5 +62,9 @@ interface UserRepository {
     ): Flow<ResultType<Unit>>
 
     // 위치 공유 동의 여부 수정하기
-    fun editLocationPermission(familyCode: String, email: String, permission: Boolean): Flow<ResultType<Unit>>
+    fun editLocationPermission(
+        familyCode: String,
+        email: String,
+        permission: Boolean
+    ): Flow<ResultType<Unit>>
 }

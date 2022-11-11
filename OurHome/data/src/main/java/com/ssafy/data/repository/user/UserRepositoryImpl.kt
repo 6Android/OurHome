@@ -62,7 +62,13 @@ class UserRepositoryImpl @Inject constructor(
         callbackFlow {
             userDataSource.joinEmail(email, password).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    userDataSource.insertUser(DomainUserDTO(email = email, name = nickname, birthday = birthday))
+                    userDataSource.insertUser(
+                        DomainUserDTO(
+                            email = email,
+                            name = nickname,
+                            birthday = birthday
+                        )
+                    )
                         .addOnCompleteListener {
                             val response = if (it.isSuccessful) {
                                 ResultType.Success(Unit)
@@ -78,9 +84,19 @@ class UserRepositoryImpl @Inject constructor(
             awaitClose {}
         }
 
-    override fun joinSocial(email: String, nickname: String, birthday: String): Flow<ResultType<Unit>> =
+    override fun joinSocial(
+        email: String,
+        nickname: String,
+        birthday: String
+    ): Flow<ResultType<Unit>> =
         callbackFlow {
-            userDataSource.insertUser(DomainUserDTO(email = email, name = nickname, birthday = birthday))
+            userDataSource.insertUser(
+                DomainUserDTO(
+                    email = email,
+                    name = nickname,
+                    birthday = birthday
+                )
+            )
                 .addOnCompleteListener { task ->
                     val response = if (task.isSuccessful) {
                         ResultType.Success(Unit)
@@ -194,15 +210,69 @@ class UserRepositoryImpl @Inject constructor(
 
                 null
             }.addOnSuccessListener {
-                Log.d("TAG", "addOnSuccessListener: ")
                 trySend(ResultType.Success(Unit))
             }.addOnFailureListener {
-                Log.d("TAG", "addOnSuccessListener: $it")
                 trySend(ResultType.Error(Exception()))
             }
 
             awaitClose {}
         }
+
+    // 가족방 참여
+    override fun enterFamily(familyCode: String, email: String): Flow<ResultType<Unit>> =
+        callbackFlow {
+
+            // family Doc
+            val familyDocRef = familyDataSource.getFamilyDoc(familyCode)
+
+            // user Doc
+            val userDocRef = userDataSource.getUserDoc(email)
+
+            // family/user Doc
+            val familyUserDocRef =
+                familyDataSource.getFamilyUserDoc(familyCode = familyCode, email = email)
+
+            // 유저 정보 업데이트 시킬 맵
+            val map = mapOf<String, Any>(
+                FAMILY_CODE to familyCode
+            )
+
+            // 패밀리 코드가 이미 있는지 확인
+            familyDataSource.checkFamily(familyCode).addOnSuccessListener { documentSnapshot ->
+
+                // 가족방이 없는 코드인 경우
+                if (documentSnapshot?.data == null) {
+                    trySend(ResultType.Fail)
+                }
+                // 이미 있는 가족코드인 경우
+                else {
+                    fireStore.runTransaction { transaction ->
+
+                        // 유저 정보 doc에서 가져와서
+                        val userSnapshot = transaction.get(userDocRef)
+                        var user = userSnapshot.toObject(DomainUserDTO::class.java)!!
+
+                        // 유저 정보 doc 업데이트 (familycode update)
+                        transaction.update(userDocRef, map)
+
+                        // family/user 안에 doc 새로 추가
+                        user.apply {
+                            family_code = map[FAMILY_CODE].toString()
+                        }
+                        transaction.set(familyUserDocRef, user)
+
+                        null
+                    }.addOnSuccessListener {
+                        trySend(ResultType.Success(Unit))
+                    }.addOnFailureListener {
+                        trySend(ResultType.Error(Exception()))
+                    }
+                }
+            }
+
+            awaitClose {}
+        }
+
 
     // 유저 정보 수정하기
     override fun editProfile(familyCode: String, user: DomainUserDTO): Flow<ResultType<Unit>> =

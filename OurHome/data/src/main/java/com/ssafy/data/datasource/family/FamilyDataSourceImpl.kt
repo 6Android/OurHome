@@ -1,6 +1,8 @@
 package com.ssafy.data.datasource.family
 
+import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.ssafy.data.utils.FAMILY
 import com.ssafy.data.utils.QUESTION
@@ -23,4 +25,8 @@ class FamilyDataSourceImpl @Inject constructor(
     // family/question Doc (family Collection -> family_code Doc ->  question Collection -> seq Doc)
     override fun getFamilyQuestionDoc(familyCode: String, seq: String) =
         getFamilyDoc(familyCode).collection(QUESTION).document(seq)
+
+    // family 이미 있는지 검사
+    override fun checkFamily(familyCode: String): Task<DocumentSnapshot> =
+        fireStore.collection(FAMILY).document(familyCode).get()
 }

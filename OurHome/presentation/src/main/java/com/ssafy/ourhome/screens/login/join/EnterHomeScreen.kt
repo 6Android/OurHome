@@ -1,5 +1,6 @@
 package com.ssafy.ourhome.screens.login.join
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -8,6 +9,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -36,17 +38,26 @@ import com.ssafy.ourhome.utils.State
 
 @Composable
 fun EnterHomeScreen(navController: NavController, vm: LoginViewModel = hiltViewModel()) {
+    val context = LocalContext.current
 
     // 가족방 생성 되었는지 관찰 state
     when (vm.insertFamilyProcessState.value) {
         State.SUCCESS -> {
-            navController.navigate(BottomNavItem.Home.screenRoute){
+            navController.navigate(BottomNavItem.Home.screenRoute) {
                 popUpTo(OurHomeScreens.EnterHomeScreen.name) {
                     inclusive = true
                 }
             }
+            vm.insertFamilyProcessState.value = State.DEFAULT
         }
-        State.FAIL -> {}
+        State.FAIL -> {
+            Toast.makeText(context, "우리집 코드를 확인해주세요", Toast.LENGTH_SHORT).show()
+            vm.insertFamilyProcessState.value = State.DEFAULT
+        }
+        State.ERROR -> {
+            Toast.makeText(context, "에러가 발생했습니다", Toast.LENGTH_SHORT).show()
+            vm.insertFamilyProcessState.value = State.DEFAULT
+        }
     }
 
     val visibleState = remember {
@@ -89,9 +100,11 @@ fun EnterHomeScreen(navController: NavController, vm: LoginViewModel = hiltViewM
 
         /** 참여코드 다이얼로그 창 */
         if (visibleState.value) {
-            EnterDialog(onDismissRequest = { visibleState.value = false }) {
+            EnterDialog(
+                vm.enterFamilyCodeState,
+                onDismissRequest = { visibleState.value = false }) {
                 // todo: 입주하기 버튼 클릭
-                navController.navigate(BottomNavItem.Home.screenRoute)
+                vm.enterFamily()
             }
         }
     }
@@ -100,8 +113,9 @@ fun EnterHomeScreen(navController: NavController, vm: LoginViewModel = hiltViewM
 /** 참여코드 다이얼로그 창 */
 @Composable
 fun EnterDialog(
+    familyCodeState: MutableState<String>,
     onDismissRequest: () -> Unit = {},
-    onEnterClick: (String) -> Unit = {}
+    onEnterClick: () -> Unit = {}
 ) {
 
     Dialog(
@@ -115,18 +129,18 @@ fun EnterDialog(
             color = Color.White
         ) {
             /** 참여코드 다이얼로그 내용 */
-            DialogContent(onEnterClick, onDismissRequest)
+            DialogContent(familyCodeState, onEnterClick, onDismissRequest)
         }
     }
 }
 
 /** 참여코드 다이얼로그 내용 */
 @Composable
-fun DialogContent(onEnterClick: (String) -> Unit, onDismissRequest: () -> Unit) {
-
-    val codeState = remember {
-        mutableStateOf("")
-    }
+fun DialogContent(
+    familyCodeState: MutableState<String>,
+    onEnterClick: () -> Unit,
+    onDismissRequest: () -> Unit
+) {
 
     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(16.dp)) {
 
@@ -152,13 +166,13 @@ fun DialogContent(onEnterClick: (String) -> Unit, onDismissRequest: () -> Unit) 
         Spacer(modifier = Modifier.height(32.dp))
 
         /** 참여코드 입력창 */
-        TextInput(valueState = codeState, labelId = "코드", enabled = true)
+        TextInput(valueState = familyCodeState, labelId = "코드", enabled = true)
 
         Spacer(modifier = Modifier.height(60.dp))
 
         /** 입주하기 버튼 */
         RoundedButton(modifier = Modifier.fillMaxWidth(), label = "입주하기") {
-            onEnterClick(codeState.value)
+            onEnterClick()
         }
     }
 }
