@@ -171,7 +171,9 @@ fun DialogContent(
         Spacer(modifier = Modifier.height(60.dp))
 
         /** 입주하기 버튼 */
-        RoundedButton(modifier = Modifier.fillMaxWidth(), label = "입주하기") {
+        RoundedButton(modifier = Modifier
+            .fillMaxWidth()
+            .height(48.dp), label = "입주하기") {
             onEnterClick()
         }
     }

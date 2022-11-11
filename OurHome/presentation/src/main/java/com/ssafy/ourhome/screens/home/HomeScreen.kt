@@ -32,6 +32,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
@@ -41,14 +42,17 @@ import com.kizitonwose.calendar.core.CalendarDay
 import com.ssafy.ourhome.MainActivity.Companion.startWorkManager
 import com.ssafy.ourhome.R
 import com.ssafy.ourhome.components.OurHomeSurface
+import com.ssafy.ourhome.components.RoundedButton
 import com.ssafy.ourhome.navigation.OurHomeScreens
+import com.ssafy.ourhome.screens.home.invite.InviteDialog
 import com.ssafy.ourhome.utils.Person
+import com.ssafy.ourhome.utils.Prefs
 import com.ssafy.ourhome.utils.Schedule
 import com.ssafy.ourhome.utils.personList
 
 
 /** 맵 화면 이동 **/
-fun moveMap(navController: NavController, vm : HomeViewModel){
+fun moveMap(navController: NavController, vm: HomeViewModel) {
     // 맵 화면이동
     navController.navigate(OurHomeScreens.MapScreen.name)
 
@@ -65,7 +69,7 @@ fun checkAndRequestLocationPermissions(
     permissions: Array<String>,
     launcher: ManagedActivityResultLauncher<Array<String>, Map<String, Boolean>>,
     navController: NavController,
-    vm : HomeViewModel
+    vm: HomeViewModel
 ) {
     /** 권한이 이미 있는 경우 **/
     if (
@@ -93,6 +97,9 @@ fun HomeScreen(navController: NavController, vm: HomeViewModel) {
     }
     val onScheduleClick: (Schedule) -> Unit = { schedule ->
         navController.navigate(OurHomeScreens.ScheduleDetailScreen.name)
+    }
+    val visibleInviteDialogState = remember {
+        mutableStateOf(false)
     }
 
     /** 위치 권한 요청 코드 **/
@@ -191,6 +198,7 @@ fun HomeScreen(navController: NavController, vm: HomeViewModel) {
                         )
                     ) {
                         // todo: 초대하기 클릭
+                        visibleInviteDialogState.value = true
                     }
                 }
                 Spacer(modifier = Modifier.height(16.dp))
@@ -216,6 +224,17 @@ fun HomeScreen(navController: NavController, vm: HomeViewModel) {
                     ) {
                         visibleBottomSheetState.value = false
                     }
+                }
+
+                /** 초대하기 다이얼로그 */
+                if (visibleInviteDialogState.value) {
+                    InviteDialog(
+                        familyCode = Prefs.familyCode,
+                        onShareClick = {
+                            // todo: 카카오톡을 공유
+                        },
+                        onDismissRequest = { visibleInviteDialogState.value = false }
+                    )
                 }
             }
         }
@@ -277,7 +296,8 @@ private fun PersonList(personList: ArrayList<Person>) {
             .padding(horizontal = 12.dp)
     ) {
         LazyRow(
-            modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             items(items = personList, itemContent = { item ->
                 /** 구성원 리스트 아이템 */
@@ -493,13 +513,71 @@ fun moveToAddScheduleScreen(navController: NavController) {
     navController.navigate(OurHomeScreens.AddScheduleScreen.name)
 }
 
-/**
-Preview
- */
-//@Preview(showBackground = true)
-//@Composable
-//fun PreviewHomeScreen() {
-//    OurHomeTheme {
-//        HomeScreen(navController = NavController(LocalContext.current))
-//    }
-//}
+/** 초대하기 다이얼로그 창 */
+@Composable
+fun InviteDialog(
+    familyCode: String,
+    onShareClick: () -> Unit = {},
+    onDismissRequest: () -> Unit = {}
+) {
+    Dialog(
+        onDismissRequest = onDismissRequest
+    ) {
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight(),
+            shape = RoundedCornerShape(16.dp),
+            color = Color.White
+        ) {
+            /** 참여코드 다이얼로그 내용 */
+            InviteDialogContent(familyCode, onShareClick, onDismissRequest)
+        }
+    }
+}
+
+/** 초대하기 다이얼로그 내용 */
+@Composable
+fun InviteDialogContent(
+    familyCode: String,
+    onShareClick: () -> Unit,
+    onDismissRequest: () -> Unit
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.padding(16.dp)
+    ) {
+        /** 다이얼로그 헤더 */
+        Text(text = "우리집 코드", style = MaterialTheme.typography.subtitle1)
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        /** 우리집 코드 */
+        Text(
+            text = familyCode,
+            style = MaterialTheme.typography.h2.copy(
+                color = Color.Gray,
+                letterSpacing = 2.sp,
+                fontWeight = FontWeight.Bold
+            )
+        )
+
+        Spacer(modifier = Modifier.height(60.dp))
+
+        /** 공유하기 버튼 */
+        RoundedButton(modifier = Modifier
+            .fillMaxWidth()
+            .height(48.dp), label = "카카오톡으로 공유") {
+            onShareClick()
+        }
+        Text(
+            text = "닫기",
+            style = MaterialTheme.typography.button.copy(color = Color.Gray),
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { onDismissRequest() }
+                .padding(16.dp),
+            textAlign = TextAlign.Center
+        )
+    }
+}
