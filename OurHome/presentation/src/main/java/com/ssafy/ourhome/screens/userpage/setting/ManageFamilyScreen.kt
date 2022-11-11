@@ -1,8 +1,6 @@
 package com.ssafy.ourhome.screens.userpage.setting
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -11,38 +9,31 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material.SnackbarDefaults.backgroundColor
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
+import com.ssafy.domain.model.user.DomainUserDTO
 import com.ssafy.ourhome.R
 import com.ssafy.ourhome.components.MainAppBar
 import com.ssafy.ourhome.components.OurHomeSurface
-import com.ssafy.ourhome.components.RoundedButton
 import com.ssafy.ourhome.ui.theme.MainColor
-import com.ssafy.ourhome.ui.theme.OurHomeTheme
 
 
 @Composable
-fun ManageFamilyScreen(navController: NavController = NavController(LocalContext.current)) {
+fun ManageFamilyScreen(navController: NavController = NavController(LocalContext.current), vm: SettingViewModel) {
 
-    //TODO : 나중에 DTO로 변경
-    val tmp =
-        listOf(
-            listOf("default", "name"),
-            listOf("imageUrl1", "name1"),
-            listOf("imageUrl2", "name2")
-        )
+    // 가족원 전부 불러오기
+    vm.getFamilyUsers()
 
     Scaffold(topBar = {
         MainAppBar(title = "가족 관리", backIconEnable = true, onBackClick = {
@@ -57,9 +48,8 @@ fun ManageFamilyScreen(navController: NavController = NavController(LocalContext
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                items(items = tmp) { user ->
+                items(items = vm.users) { user ->
                     FamilyManageItem(user)
-
                 }
             }
         }
@@ -70,7 +60,7 @@ fun ManageFamilyScreen(navController: NavController = NavController(LocalContext
 
 @Composable
 fun FamilyManageItem(
-    user: List<String>
+    user: DomainUserDTO
 ) {
     Card(
         modifier = Modifier
@@ -88,9 +78,10 @@ fun FamilyManageItem(
                     .size(100.dp)
                     .clip(CircleShape)
                     .padding(12.dp),
+                contentScale = ContentScale.Crop,
                 painter =
-                if (user[0] == "default") painterResource(R.drawable.img_default_user)
-                else rememberAsyncImagePainter(user[0]),
+                if (user.image == "default") painterResource(R.drawable.img_default_user)
+                else rememberAsyncImagePainter(user.image),
                 contentDescription = "Profile Image"
             )
             Column(
@@ -100,7 +91,7 @@ fun FamilyManageItem(
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = user[1],
+                    text = user.name,
                     style = MaterialTheme.typography.body1.copy(fontWeight = FontWeight.Bold),
                     modifier = Modifier.padding(top = 8.dp)
                 )
@@ -134,13 +125,13 @@ fun FamilyManageItem(
 }
 
 
-@Preview
-@Composable
-private fun ManagePreview() {
-    OurHomeTheme {
-        ManageFamilyScreen()
-    }
-}
+//@Preview
+//@Composable
+//private fun ManagePreview() {
+//    OurHomeTheme {
+//        ManageFamilyScreen()
+//    }
+//}
 
 @Composable
 private fun RoundedTextButton(

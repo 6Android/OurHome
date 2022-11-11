@@ -2,7 +2,6 @@ package com.ssafy.ourhome.screens.userpage.setting
 
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -28,7 +27,6 @@ import androidx.navigation.NavController
 import com.ssafy.ourhome.MainActivity
 import com.ssafy.ourhome.components.MainAppBar
 import com.ssafy.ourhome.components.OurHomeSurface
-import com.ssafy.ourhome.navigation.BottomNavItem
 import com.ssafy.ourhome.navigation.OurHomeScreens
 import com.ssafy.ourhome.ui.theme.MainColor
 import com.ssafy.ourhome.utils.Prefs
@@ -38,74 +36,65 @@ import com.ssafy.ourhome.utils.permissions
 @Composable
 fun SettingScreen(navController: NavController, permit: Boolean, isManager: Boolean, vm: SettingViewModel) {
 
-    Log.d("test5", "SettingScreen: $isManager")
+    val switchChecked = remember {
+        mutableStateOf(permit)
+    }
+    val scrollState = rememberScrollState()
 
+    val context = LocalContext.current
     Scaffold(topBar = {
         MainAppBar(title = "설정", backIconEnable = true, onBackClick = {
-            navController.navigate(OurHomeScreens.MapScreen.name)
+            navController.popBackStack()
         })
-    }){
+    }) {
+        // TODO : 옵션 로직 작성
+        OurHomeSurface() {
+            Column(
+                modifier = Modifier
+                    .padding(horizontal = 24.dp)
+                    .verticalScroll(scrollState)
+            ) {
+                Spacer(modifier = Modifier.height(20.dp))
+                TextWithSwitch(title = "위치 공유 허용", isChecked = switchChecked, context) {
 
+                    if (it) {
+                        vm.editLocationPermission(true)
+                        MainActivity.startWorkManager()
+                    } else {
+                        vm.editLocationPermission(false)
+                        MainActivity.stopWorkManager()
+                    }
+
+                }
+
+                Spacer(modifier = Modifier.height(42.dp))
+                OurHomeSetting(code = Prefs.familyCode, navController, isManager, context)
+
+                Spacer(modifier = Modifier.height(42.dp))
+                Support()
+
+                Spacer(modifier = Modifier.height(56.dp))
+                ClickableText("로그아웃") {
+                    vm.logout()
+                    val intent = Intent(context,MainActivity::class.java)
+                    context.startActivity(intent)
+                    (context as MainActivity).finish()
+                }
+                Spacer(modifier = Modifier.height(32.dp))
+                ClickableText("회원탈퇴") {
+
+                }
+            }
+        }
     }
-
-//    val switchChecked = remember {
-//        mutableStateOf(permit)
-//    }
-//    val scrollState = rememberScrollState()
-//
-//    val context = LocalContext.current
-//    Scaffold(topBar = {
-//        MainAppBar(title = "설정", backIconEnable = true, onBackClick = {
-//            navController.popBackStack()
-//        })
-//    }) {
-//        // TODO : 옵션 로직 작성
-//        OurHomeSurface() {
-//            Column(
-//                modifier = Modifier
-//                    .padding(horizontal = 24.dp)
-//                    .verticalScroll(scrollState)
-//            ) {
-//                Spacer(modifier = Modifier.height(20.dp))
-//                TextWithSwitch(title = "위치 공유 허용", isChecked = switchChecked, context) {
-//
-//                    if (it) {
-//                        vm.editLocationPermission(true)
-//                        MainActivity.startWorkManager()
-//                    } else {
-//                        vm.editLocationPermission(false)
-//                        MainActivity.stopWorkManager()
-//                    }
-//
-//                }
-//
-//                Spacer(modifier = Modifier.height(42.dp))
-//                OurHomeSetting(code = Prefs.familyCode, navController)
-//
-//                Spacer(modifier = Modifier.height(42.dp))
-//                Support()
-//
-//                Spacer(modifier = Modifier.height(56.dp))
-//                ClickableText("로그아웃") {
-//                    vm.logout()
-//                    val intent = Intent(context,MainActivity::class.java)
-//                    context.startActivity(intent)
-//                    (context as MainActivity).finish()
-//                }
-//                Spacer(modifier = Modifier.height(32.dp))
-//                ClickableText("회원탈퇴") {
-//
-//                }
-//            }
-//        }
-//    }
 }
 
 @Composable
 private fun OurHomeSetting(
     code: String,
     navController: NavController,
-
+    isManager: Boolean,
+    context: Context
 ) {
     TextHeader(title = "가족 설정")
     Spacer(modifier = Modifier.height(26.dp))
@@ -121,7 +110,11 @@ private fun OurHomeSetting(
         }
         Spacer(modifier = Modifier.height(32.dp))
         TextWithNext(title = "가족 관리") {
-            navController.navigate(OurHomeScreens.ManageFamilyScreen.name)
+            if(isManager){
+                navController.navigate(OurHomeScreens.ManageFamilyScreen.name)
+            }else{
+                Toast.makeText(context, "가족장 권한이 필요합니다.", Toast.LENGTH_SHORT).show()
+            }
         }
         Spacer(modifier = Modifier.height(32.dp))
         TextWithNext(title = "가족 끊기") {
