@@ -3,6 +3,7 @@ package com.ssafy.ourhome.screens.userpage.setting
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
 import com.ssafy.domain.usecase.user.EditLocationPermissionUseCase
 import com.ssafy.domain.utils.ResultType
 import com.ssafy.ourhome.utils.Prefs
@@ -15,6 +16,9 @@ import javax.inject.Inject
 class SettingViewModel @Inject constructor(
     private val editLocationPermissionUseCase: EditLocationPermissionUseCase
 ) : ViewModel() {
+
+    @Inject
+    lateinit var firebaseAuth: FirebaseAuth
 
     fun editLocationPermission(permit : Boolean){
         viewModelScope.launch(Dispatchers.IO) {
@@ -31,7 +35,12 @@ class SettingViewModel @Inject constructor(
 
             }
         }
-
     }
 
+    fun logout(){
+        firebaseAuth.signOut()
+        Prefs.email = ""
+        Prefs.familyCode = ""
+
+    }
 }
