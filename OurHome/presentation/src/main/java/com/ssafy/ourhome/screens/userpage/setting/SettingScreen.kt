@@ -1,6 +1,7 @@
 package com.ssafy.ourhome.screens.userpage.setting
 
 import android.content.Context
+import android.content.Intent
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -10,29 +11,28 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.NavigateNext
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.ssafy.ourhome.MainActivity
 import com.ssafy.ourhome.components.MainAppBar
 import com.ssafy.ourhome.components.OurHomeSurface
+import com.ssafy.ourhome.navigation.BottomNavItem
 import com.ssafy.ourhome.navigation.OurHomeScreens
-import com.ssafy.ourhome.screens.home.moveMap
 import com.ssafy.ourhome.ui.theme.MainColor
-import com.ssafy.ourhome.ui.theme.OurHomeTheme
 import com.ssafy.ourhome.utils.Prefs
 import com.ssafy.ourhome.utils.checkAndRequestLocationPermissions
 import com.ssafy.ourhome.utils.permissions
-import org.checkerframework.checker.units.qual.m
 
 @Composable
 fun SettingScreen(navController: NavController, permit: Boolean, vm: SettingViewModel) {
@@ -56,12 +56,12 @@ fun SettingScreen(navController: NavController, permit: Boolean, vm: SettingView
                     .verticalScroll(scrollState)
             ) {
                 Spacer(modifier = Modifier.height(20.dp))
-                TextWithSwitch(title = "위치 공유 허용", isChecked = switchChecked, context){
+                TextWithSwitch(title = "위치 공유 허용", isChecked = switchChecked, context) {
 
-                    if(it){
+                    if (it) {
                         vm.editLocationPermission(true)
                         MainActivity.startWorkManager()
-                    }else{
+                    } else {
                         vm.editLocationPermission(false)
                         MainActivity.stopWorkManager()
                     }
@@ -76,9 +76,11 @@ fun SettingScreen(navController: NavController, permit: Boolean, vm: SettingView
 
                 Spacer(modifier = Modifier.height(56.dp))
                 ClickableText("로그아웃") {
-
+                    vm.logout()
+                    val intent = Intent(context,MainActivity::class.java)
+                    context.startActivity(intent)
+                    (context as MainActivity).finish()
                 }
-
                 Spacer(modifier = Modifier.height(32.dp))
                 ClickableText("회원탈퇴") {
 
@@ -157,7 +159,7 @@ private fun Support() {
 private fun TextWithSwitch(
     title: String,
     isChecked: MutableState<Boolean>,
-    context : Context,
+    context: Context,
     onClick: (Boolean) -> Unit
 ) {
 
@@ -190,16 +192,16 @@ private fun TextWithSwitch(
         Switch(
             checked = isChecked.value,
             onCheckedChange = {
-                if(it){
+                if (it) {
                     /** 위치 권한 체크 **/
                     checkAndRequestLocationPermissions(
-                        context, permissions,launcherMultiplePermissions
-                    ){
+                        context, permissions, launcherMultiplePermissions
+                    ) {
                         /** 이미 권한 있을 때 **/
                         onClick(true)
                         isChecked.value = it
                     }
-                }else{
+                } else {
                     onClick(false)
                     isChecked.value = it
                 }
