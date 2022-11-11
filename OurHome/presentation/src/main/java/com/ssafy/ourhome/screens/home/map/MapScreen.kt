@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -262,8 +263,9 @@ private fun UserImage(
 ) {
     Image(
         modifier = modifier
-            .size(100.dp)
+            .size(70.dp)
             .clip(CircleShape),
+        contentScale = ContentScale.Crop,
         painter =
         if (imageUrl == "default") painterResource(R.drawable.img_default_user)
         else rememberAsyncImagePainter(imageUrl),
