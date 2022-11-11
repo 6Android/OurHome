@@ -1,9 +1,11 @@
 package com.ssafy.ourhome.screens.question
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -24,7 +26,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImagePainter
+import coil.compose.AsyncImagePainter.State.Empty.painter
 import coil.compose.rememberAsyncImagePainter
+import com.ssafy.domain.model.pet.DomainFamilyPetDTO
+import com.ssafy.domain.model.question.DomainQuestionDTO
 import com.ssafy.ourhome.R
 import com.ssafy.ourhome.components.MainAppBar
 import com.ssafy.ourhome.components.OurHomeSurface
@@ -34,12 +39,15 @@ import com.ssafy.ourhome.ui.theme.MainColor
 import com.ssafy.ourhome.ui.theme.nanum
 import com.ssafy.ourhome.utils.CHATTING_ICON_BLACK
 import com.ssafy.ourhome.utils.SETTING_ICON
+import java.time.LocalDate
 
 @Composable
-fun QuestionScreen(navController: NavController) {
-    val painter =
-        rememberAsyncImagePainter("https://i.pinimg.com/222x/36/30/f7/3630f7d930f91e495d93c02833b4abfc.jpg")
+fun QuestionScreen(navController: NavController, vm : QuestionViewModel) {
+
     val scrollState = rememberScrollState()
+
+    initQuestionScreen(vm)
+
 
     Scaffold(topBar = { // TODO 세팅 아이콘 -> 채팅 아이콘
         MainAppBar(title = "질문", backIconEnable = false, icon = painterResource(id = CHATTING_ICON_BLACK), onIconClick = {
@@ -57,13 +65,13 @@ fun QuestionScreen(navController: NavController) {
 
                 CenterHorizontalColumn {
 
-                    PetSemiDetail(petName = "고라파덕", painter = painter, petLevel = "Lv. 2"){
+                    PetSemiDetail(vm.pet){
                         navController.navigate(OurHomeScreens.PetDetailScreen.name)
                     }
 
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    TodayQuestion(questionNumber = "Q4. ", questionContent = "오늘 점심 뭐 드셨나요?")
+                    TodayQuestion(questionNumber = vm.todayQuestion.question_seq.toString(), questionContent = vm.todayQuestion.question_content)
 
                     Spacer(modifier = Modifier.height(16.dp))
 
@@ -81,12 +89,18 @@ fun QuestionScreen(navController: NavController) {
                     navController.navigate(OurHomeScreens.QuestionListScreen.name)
                 }
 
-                QuestionLazyColumn(Modifier.height(260.dp))
+                QuestionLazyColumn(Modifier.height(260.dp), questionsList = vm.last3Questions)
 
                 Spacer(modifier = Modifier.height(16.dp))            }
         }
     }
 
+}
+
+fun initQuestionScreen(vm: QuestionViewModel){
+    vm.getFamiliyPet()
+    vm.getTodayQuestion()
+    vm.getLast3Questions()
 }
 
 fun navigateQuestionDetailScreen(navController: NavController){
@@ -121,7 +135,7 @@ fun TodayQuestion(questionNumber: String, questionContent: String) {
                     fontSize = 34.sp
                 )
             ) {
-                append(questionNumber)
+                append("Q" + questionNumber + ". ")
             }
             withStyle(
                 style = SpanStyle(
@@ -138,14 +152,14 @@ fun TodayQuestion(questionNumber: String, questionContent: String) {
 
 /** 펫 정보 (이름, 이미지, 레벨), 클릭 시 펫 상헤 화면 이동 **/
 @Composable
-fun PetSemiDetail(petName: String, painter: AsyncImagePainter, petLevel: String, onClick: () -> Unit = {}) {
+fun PetSemiDetail(pet: DomainFamilyPetDTO, onClick: () -> Unit = {}) {
     Column(modifier = Modifier
         .fillMaxWidth()
         .clickable {
             onClick.invoke()
         }, horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
-            text = petName,
+            text = pet.name,
             style = MaterialTheme.typography.h5.copy(fontWeight = FontWeight.Bold)
         )
 
@@ -153,14 +167,14 @@ fun PetSemiDetail(petName: String, painter: AsyncImagePainter, petLevel: String,
 
         Image(
             modifier = Modifier.size(250.dp),
-            painter = painter,
+            painter = rememberAsyncImagePainter(pet.image),
             contentDescription = "펫 이미지"
         )
 
         Spacer(modifier = Modifier.height(4.dp))
 
         Text(
-            text = petLevel,
+            text = "Lv. " + pet.pet_level.toString(),
             style = MaterialTheme.typography.body1.copy(fontWeight = FontWeight.Bold)
         )
     }
@@ -187,17 +201,17 @@ fun LastQuestionHeader(onClick: () -> Unit = {}) {
 
 /** 지난 질문 리스트  **/
 @Composable
-fun QuestionLazyColumn(modifier: Modifier = Modifier, size: Int = 3) {
+fun QuestionLazyColumn(modifier: Modifier = Modifier, questionsList: List<DomainQuestionDTO>) {
     LazyColumn(modifier = modifier) {
-        items(size) {
-            QuestionItem()
+        items(questionsList) {
+            QuestionItem(question = it)
         }
     }
 }
 
 /** 지난 질문 리스트 lazyColumn의 item **/
 @Composable
-fun QuestionItem(modifier: Modifier = Modifier.fillMaxWidth()) {
+fun QuestionItem(modifier: Modifier = Modifier.fillMaxWidth(), question: DomainQuestionDTO) {
     Card(
         modifier = modifier.padding(vertical = 8.dp), elevation = 2.dp
     ) {
@@ -216,7 +230,7 @@ fun QuestionItem(modifier: Modifier = Modifier.fillMaxWidth()) {
 
                 Text(
                     modifier = Modifier.padding(start = 8.dp),
-                    text = "2022.10.22",
+                    text = question.completed_date,
                     style = MaterialTheme.typography.caption.copy(fontWeight = FontWeight.Normal, letterSpacing = 0.sp),
                     color = Gray
                 )
@@ -225,7 +239,7 @@ fun QuestionItem(modifier: Modifier = Modifier.fillMaxWidth()) {
             Text(
                 modifier = modifier
                     .padding(start = 12.dp, bottom = 16.dp),
-                text = "Q3. 가족들에게 당신은 어떤 존재인가요?",
+                text = "Q" + question.question_seq + ". " + question.question_content,
                 style = MaterialTheme.typography.body1.copy(fontWeight = FontWeight.Bold)
             )
         }

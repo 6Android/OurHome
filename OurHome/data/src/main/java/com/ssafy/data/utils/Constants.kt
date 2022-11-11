@@ -9,6 +9,10 @@ const val MANAGER = "manager"
 
 const val QUESTION = "question"
 const val QUESTION_INFO = "question_info"
+const val QUESTION_CONTENT = "question_content"
+const val QUESTION_SEQ = "question_seq"
+const val QUESTION_ANSWER = "answers"
+const val COMPLETED_YEAR = "completed_year"
 const val COMPLETED = "completed"
 
 const val PET = "pet"

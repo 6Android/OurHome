@@ -4,6 +4,10 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.ssafy.data.datasource.family.FamilyDataSource
 import com.ssafy.data.datasource.family.FamilyDataSourceImpl
+import com.ssafy.data.datasource.pet.PetDataSource
+import com.ssafy.data.datasource.pet.PetDataSourceImpl
+import com.ssafy.data.datasource.question.QuestionDataSource
+import com.ssafy.data.datasource.question.QuestionDataSourceImpl
 import com.ssafy.data.datasource.user.UserDataSource
 import com.ssafy.data.datasource.user.UserDataSourceImpl
 import dagger.Module
@@ -34,5 +38,23 @@ object DataSourceModule {
         fireAuth: FirebaseAuth
     ): FamilyDataSource {
         return FamilyDataSourceImpl(fireStore, fireAuth)
+    }
+
+    // PetDataSource DI
+    @Provides
+    @Singleton
+    fun providePetDataSource(
+        fireStore: FirebaseFirestore
+    ) : PetDataSource{
+        return PetDataSourceImpl(fireStore)
+    }
+
+    // QuestionDataSource DI
+    @Provides
+    @Singleton
+    fun provideQuestionDataSource(
+        fireStore: FirebaseFirestore
+    ) : QuestionDataSource{
+        return QuestionDataSourceImpl(fireStore)
     }
 }

@@ -2,8 +2,15 @@ package com.ssafy.ourhome.di
 
 import com.google.firebase.firestore.FirebaseFirestore
 import com.ssafy.data.datasource.family.FamilyDataSource
+import com.ssafy.data.datasource.pet.PetDataSource
+import com.ssafy.data.datasource.pet.PetDataSourceImpl
+import com.ssafy.data.datasource.question.QuestionDataSource
 import com.ssafy.data.datasource.user.UserDataSource
+import com.ssafy.data.repository.pet.PetRepositoryImpl
+import com.ssafy.data.repository.question.QuestionRepositoryImpl
 import com.ssafy.data.repository.user.UserRepositoryImpl
+import com.ssafy.domain.repository.pet.PetRepository
+import com.ssafy.domain.repository.question.QuestionRepository
 import com.ssafy.domain.repository.user.UserRepository
 import dagger.Module
 import dagger.Provides
@@ -24,5 +31,23 @@ object RepositoryModule {
         familyDataSource: FamilyDataSource
     ): UserRepository {
         return UserRepositoryImpl(fireStore, userDataSource, familyDataSource)
+    }
+
+    // PetRepository DI
+    @Provides
+    @Singleton
+    fun providePetRepository(
+        petDataSource: PetDataSource
+    ) : PetRepository {
+        return PetRepositoryImpl(petDataSource)
+    }
+
+    // QuestionRepository DI
+    @Provides
+    @Singleton
+    fun provideQuestionRepository(
+        questionDataSource: QuestionDataSource
+    ) : QuestionRepository {
+        return QuestionRepositoryImpl(questionDataSource)
     }
 }
