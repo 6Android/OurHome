@@ -97,7 +97,6 @@ fun BirthDayCard(
     cardModifier: Modifier = Modifier,
     content: String,
 ) {
-    Log.d("test5", "BirthDayCard: $content")
     val split = content.split("-")
     val year = split[0]
     val month = split[1]
@@ -264,7 +263,7 @@ fun MBTICard(
             Text(
                 text = content,
                 modifier = Modifier.align(Alignment.BottomEnd),
-                style = MaterialTheme.typography.h5.copy(color = Color.White)
+                style = MaterialTheme.typography.h5.copy(color = Color.White, fontWeight = FontWeight.ExtraBold)
             )
         }
     }
