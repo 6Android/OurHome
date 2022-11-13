@@ -88,7 +88,7 @@ fun OurHomeNavGraph(navController: NavHostController) {
         }
 
         composable(OurHomeScreens.QuestionDetailScreen.name) {
-            QuestionDetailScreen(navController = navController)
+            QuestionDetailScreen(navController = navController, vm = questionViewModel)
         }
 
         composable(OurHomeScreens.PetDetailScreen.name) {

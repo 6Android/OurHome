@@ -1,6 +1,5 @@
 package com.ssafy.ourhome.screens.question
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -9,8 +8,10 @@ import androidx.lifecycle.viewModelScope
 import com.ssafy.domain.model.pet.DomainFamilyPetDTO
 import com.ssafy.domain.model.question.DomainQuestionAnswerDTO
 import com.ssafy.domain.model.question.DomainQuestionDTO
+import com.ssafy.domain.model.user.DomainUserDTO
 import com.ssafy.domain.usecase.pet.GetFamilyPetUseCase
 import com.ssafy.domain.usecase.question.*
+import com.ssafy.domain.usecase.user.GetFamilyUsersUseCase
 import com.ssafy.domain.utils.ResultType
 import com.ssafy.ourhome.utils.Prefs
 import com.ssafy.ourhome.utils.State
@@ -28,7 +29,8 @@ class QuestionViewModel @Inject constructor(
     private val getQuestionAnswersUseCase: GetQuestionAnswersUseCase,
     private val getLast3QuestionsUseCase: GetLast3QuestionsUseCase,
     private val getLastAllQuestionsUseCase: GetLastAllQuestionsUseCase,
-    private val updateTodayQuestion: UpdateTodayQuestion
+    private val updateTodayQuestionUseCase: UpdateTodayQuestionUseCase,
+    private val getFamilyUsersUseCase: GetFamilyUsersUseCase
 ): ViewModel(){
 
     var pet by mutableStateOf(DomainFamilyPetDTO())
@@ -46,6 +48,10 @@ class QuestionViewModel @Inject constructor(
     var lastAllQuestions by mutableStateOf(listOf<DomainQuestionDTO>())
         private set
 
+    var familyUsers by mutableStateOf<List<DomainUserDTO>>(emptyList())
+        private set
+
+    var familyUsersProcessState by mutableStateOf(State.DEFAULT)
 
     fun getFamiliyPet() = viewModelScope.launch(Dispatchers.IO) {
         getFamilyPetUseCase.execute(Prefs.familyCode).collect{
@@ -137,13 +143,31 @@ class QuestionViewModel @Inject constructor(
     }
 
     fun updateTodayQuestion(newQuestionSeq: Int) = viewModelScope.launch(Dispatchers.IO) {
-        updateTodayQuestion.execute(Prefs.familyCode, newQuestionSeq).collect{
+        updateTodayQuestionUseCase.execute(Prefs.familyCode, newQuestionSeq).collect{
             when(it) {
                 is ResultType.Uninitialized -> {}
                 is ResultType.Success -> {
 
                 }
                 is ResultType.Error -> {
+
+                }
+            }
+        }
+    }
+
+    fun getFamilyUsers() = viewModelScope.launch(Dispatchers.IO) {
+        getFamilyUsersUseCase.execute(Prefs.familyCode).collect{
+            when(it) {
+                is ResultType.Loading -> {}
+                is ResultType.Success -> {
+                    familyUsers = it.data
+                    familyUsersProcessState = State.SUCCESS
+                }
+                is ResultType.Error -> {
+                    familyUsersProcessState = State.ERROR
+                }
+                else -> {
 
                 }
             }
