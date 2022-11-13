@@ -29,8 +29,10 @@ import com.ssafy.ourhome.ui.theme.MainColor
 
 
 @Composable
-fun QuestionDetailScreen(navController: NavController){
+fun QuestionDetailScreen(navController: NavController, vm : QuestionViewModel){
     val scrollState = rememberScrollState()
+
+    initQuestionScreen(vm)
 
     // TODO NestedScrollView 필요
     Scaffold(topBar = {
@@ -46,7 +48,7 @@ fun QuestionDetailScreen(navController: NavController){
             ) {
                 Spacer(modifier = Modifier.height(16.dp))
 
-                TodayQuestion(questionNumber = "Q4. ", questionContent = "오늘 점심 뭐 드셨나요?")
+                TodayQuestion(questionNumber = vm.todayQuestion.question_seq.toString(), questionContent = vm.todayQuestion.question_content)
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -67,6 +69,8 @@ fun QuestionDetailScreen(navController: NavController){
         }
     }
 }
+
+
 
 /** 가족 답변 카드 **/
 @Composable

@@ -1,6 +1,8 @@
 package com.ssafy.ourhome.screens.question.pet
 
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -11,12 +13,13 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,16 +42,25 @@ import com.ssafy.ourhome.screens.question.CenterHorizontalColumn
 import com.ssafy.ourhome.screens.question.QuestionViewModel
 import com.ssafy.ourhome.ui.theme.Gray
 import com.ssafy.ourhome.ui.theme.MainColor
+import com.ssafy.ourhome.ui.theme.PieChartColors
 import com.ssafy.ourhome.ui.theme.nanum
+import com.ssafy.ourhome.utils.State
 
 
 @Composable
 fun PetDetailScreen(navController: NavController, vm: QuestionViewModel) {
     val scrollState = rememberScrollState()
-    val familyContributeList = PieChartData(listOf(Slice(0.5F, Color.Red, "아빠"), Slice(0.3F, Color.Blue, "엄마"), Slice(0.2F, Color.Green, "아들")))
+    val familyContributeList = remember {
+        mutableStateOf(PieChartData(listOf()))
+    }
+//        PieChartData(listOf(Slice(0.5F, Color.Red, "아빠"), Slice(0.3F, Color.Blue, "엄마"), Slice(0.2F, Color.Green, "아들")))
+    val context = LocalContext.current
+
+    initPetDetailScreen(vm)
+    initPetDetailViewModelCallback(vm, context, familyContributeList)
 
     Scaffold(topBar = {
-        MainAppBar(title = "캐릭터 상세", onBackClick = {
+        MainAppBar(title = "펫 상세", onBackClick = {
             navController.popBackStack()
     })}) {
         OurHomeSurface() {
@@ -91,13 +103,38 @@ fun PetDetailScreen(navController: NavController, vm: QuestionViewModel) {
 
 }
 
+fun initPetDetailScreen(vm: QuestionViewModel){
+    vm.getFamilyUsers()
+}
+
+fun initPetDetailViewModelCallback(vm: QuestionViewModel, context: Context, familyContributeList: MutableState<PieChartData>){
+
+    when (vm.familyUsersProcessState) {
+        State.ERROR -> {
+            Toast.makeText(context, "가족 정보를 불러오는데 실패했습니다", Toast.LENGTH_SHORT).show()
+            vm.familyUsersProcessState = State.DEFAULT
+        }
+        State.SUCCESS -> {
+            var totalContributePoint = 0L
+            for(user in vm.familyUsers){
+                totalContributePoint += user.contribute_point
+            }
+
+            val dataList = mutableListOf<Slice>()
+            for(i in 0 until vm.familyUsers.size){
+                dataList.add(Slice(1F * vm.familyUsers.get(i).contribute_point / totalContributePoint, PieChartColors[i], vm.familyUsers.get(i).name))
+            }
+            familyContributeList.value = PieChartData(dataList)
+        }
+    }
+}
 
 /** 가족 경험치 기여도 정보 리스트 **/
 @Composable
-fun FamilyExpLazyRow(familyContributeList: PieChartData){
+fun FamilyExpLazyRow(familyContributeList: MutableState<PieChartData>){
     LazyRow{
-        items(familyContributeList.slices.size){
-            FamilyExpLazyRowItem(familyContributeList.slices.get(it))
+        items(familyContributeList.value.slices.size){
+            FamilyExpLazyRowItem(familyContributeList.value.slices.get(it))
         }
     }
 }
@@ -124,9 +161,9 @@ fun FamilyExpLazyRowItem(familyContributeList: Slice){
 
 /** 가족 경험치 기여도 piechart **/
 @Composable
-fun FamilyExpPieChart(familyContributeList: PieChartData){
+fun FamilyExpPieChart(familyContributeList: MutableState<PieChartData>){
     PieChart(
-        pieChartData = familyContributeList,
+        pieChartData = familyContributeList.value,
     modifier = Modifier
         .width(300.dp)
         .height(300.dp),
