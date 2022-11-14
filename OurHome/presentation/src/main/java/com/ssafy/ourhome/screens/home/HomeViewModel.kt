@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ssafy.domain.model.schedule.DomainScheduleDTO
 import com.ssafy.domain.model.user.DomainUserDTO
+import com.ssafy.domain.usecase.schedule.DeleteFamilyScheduleUseCase
 import com.ssafy.domain.usecase.schedule.GetFamilyScheduleUseCase
 import com.ssafy.domain.usecase.user.EditLocationPermissionUseCase
 import com.ssafy.domain.usecase.user.GetFamilyUsersUseCase
@@ -23,12 +24,19 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val editLocationPermissionUseCase: EditLocationPermissionUseCase,
     private val getFamilyUsersUseCase: GetFamilyUsersUseCase,
-    private val getFamilyScheduleUseCase: GetFamilyScheduleUseCase
+    private val getFamilyScheduleUseCase: GetFamilyScheduleUseCase,
+    private val deleteFamilyScheduleUseCase: DeleteFamilyScheduleUseCase
 ) : ViewModel() {
     val familyUsersState = mutableStateOf<List<DomainUserDTO>>(emptyList())
     val familyUsersProcessState = mutableStateOf(State.DEFAULT)
 
     val scheduleMap = mutableStateMapOf<String, List<DomainScheduleDTO>>()
+
+    val scheduleDetailState = mutableStateOf(DomainScheduleDTO())
+    var scheduleDetailPeople = listOf<DomainUserDTO>()
+
+    val deleteScheduleProcessState = mutableStateOf(State.DEFAULT)
+
 
     fun editLocationPermission(permission: Boolean) = viewModelScope.launch(Dispatchers.IO) {
         editLocationPermissionUseCase.execute(Prefs.familyCode, Prefs.email, permission)
@@ -74,8 +82,9 @@ class HomeViewModel @Inject constructor(
                     when (response) {
                         is ResultType.Success -> {
                             Log.d("TAG", "getFamilySchedules: ${response.data}")
+                            scheduleMap.clear()
                             scheduleMap.putAll(response.data.groupBy { schedule -> schedule.date })
-                            Log.d("TAG", "getFamilySchedules: ${scheduleMap}")
+                            Log.d("TAG", "getFamilySchedules: ${scheduleMap.entries}")
                         }
                         else -> {
                         }
@@ -84,4 +93,29 @@ class HomeViewModel @Inject constructor(
 
             }
         }
+
+    fun setScheduleDetail(schedule: DomainScheduleDTO) {
+        scheduleDetailState.value = schedule
+        scheduleDetailPeople = familyUsersState.value.filter { user ->
+            schedule.participants.any { email ->
+                email == user.email
+            }
+        }
+    }
+
+    // 일정 삭제
+    fun deleteScheduleDetail() = viewModelScope.launch(Dispatchers.IO) {
+
+        deleteFamilyScheduleUseCase.execute(Prefs.familyCode, scheduleDetailState.value.uid)
+            .collect { response ->
+                when (response) {
+                    is ResultType.Success -> {
+                        deleteScheduleProcessState.value = State.SUCCESS
+                    }
+                    else -> {
+                        deleteScheduleProcessState.value = State.FAIL
+                    }
+                }
+            }
+    }
 }

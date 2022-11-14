@@ -25,7 +25,12 @@ class ScheduleRepositoryImpl @Inject constructor(
     ): Flow<ScheduleListResponse> = callbackFlow {
         scheduleDataSource.getFamilySchedules(familyCode, year, month)
             .addOnSuccessListener {
-                val schedules = it.toObjects(DomainScheduleDTO::class.java)
+                val schedules =
+                    it.documents.map { document ->
+                        document.toObject(DomainScheduleDTO::class.java)?.apply {
+                            uid = document.id
+                        }!!
+                    }
                 trySend(ResultType.Success(schedules))
             }
             .addOnFailureListener {
@@ -33,5 +38,19 @@ class ScheduleRepositoryImpl @Inject constructor(
             }
         awaitClose {}
     }
+
+    override fun deleteFamilySchedule(familyCode: String, uid: String): Flow<ResultType<Unit>> =
+        callbackFlow {
+            scheduleDataSource.deleteFamilySchedule(familyCode, uid)
+                .addOnCompleteListener {
+                    val response = if (it.isSuccessful) {
+                        ResultType.Success(Unit)
+                    } else {
+                        ResultType.Fail
+                    }
+                    trySend(response)
+                }
+            awaitClose {}
+        }
 
 }

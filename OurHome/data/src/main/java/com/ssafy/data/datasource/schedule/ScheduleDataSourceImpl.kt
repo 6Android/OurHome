@@ -24,4 +24,9 @@ class ScheduleDataSourceImpl @Inject constructor(
             MONTH, month
         ).get()
 
+    // family/schedule Doc에서 해당 id 삭제
+    override fun deleteFamilySchedule(familyCode: String, uid: String) =
+        fireStore.collection(FAMILY).document(familyCode).collection(SCHEDULE).document(uid)
+            .delete()
+
 }

@@ -106,10 +106,10 @@ fun AddScheduleScreen(navController: NavController) {
 
                         Spacer(modifier = Modifier.height(8.dp))
 
-                        /** 함께하는 가족들 리스트 */
-                        PersonList(personList = personList) {
-                            navController.navigate(OurHomeScreens.AddMemberScreen.name)
-                        }
+//                        /** 함께하는 가족들 리스트 */
+//                        PersonList(personList = personList) {
+//                            navController.navigate(OurHomeScreens.AddMemberScreen.name)
+//                        }
                     }
                 }
 

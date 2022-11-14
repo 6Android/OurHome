@@ -20,6 +20,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
+import com.ssafy.domain.model.user.DomainUserDTO
 import com.ssafy.ourhome.components.TextInput
 import com.ssafy.ourhome.utils.Person
 import java.time.LocalDate
@@ -74,14 +75,14 @@ fun WriteContent(contentState: MutableState<String>, isEditable: Boolean = true)
     )
     TextInput(
         valueState = contentState,
-        labelId = "간단한 내용을 작성해주세요.",
+        placeholder = "간단한 내용을 작성해주세요.",
         enabled = isEditable
     )
 }
 
 /** 함께하는 가족들 리스트 */
 @Composable
-fun PersonList(personList: ArrayList<Person>, isEditable: Boolean = true, onAddClick: () -> Unit) {
+fun PersonList(personList: List<DomainUserDTO>, isEditable: Boolean = true, onAddClick: () -> Unit) {
     Row {
         LazyRow(
             horizontalArrangement = Arrangement.spacedBy(16.dp)
@@ -94,7 +95,7 @@ fun PersonList(personList: ArrayList<Person>, isEditable: Boolean = true, onAddC
                 /** 구성원 리스트 아이템 */
                 PersonListItem(item, isEditable)
             })
-            if(isEditable) {
+            if (isEditable) {
                 item {
 
                     /** 가족 추가 버튼 */
@@ -122,7 +123,7 @@ fun PersonList(personList: ArrayList<Person>, isEditable: Boolean = true, onAddC
 
 /** 함께하는 가족들 리스트 아이템 */
 @Composable
-fun PersonListItem(item: Person, isEditable: Boolean = true) {
+fun PersonListItem(item: DomainUserDTO, isEditable: Boolean = true) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
         Box() {
@@ -133,12 +134,12 @@ fun PersonListItem(item: Person, isEditable: Boolean = true) {
                     .size(64.dp)
                     .clip(CircleShape),
                 contentScale = ContentScale.Crop,
-                painter = rememberAsyncImagePainter(item.imgUrl),
+                painter = rememberAsyncImagePainter(item.image),
                 contentDescription = "Profile Image"
             )
 
             /** 가족 구성원 삭제 버튼 */
-            if(isEditable) {
+            if (isEditable) {
                 Image(
                     modifier = Modifier
                         .size(20.dp)

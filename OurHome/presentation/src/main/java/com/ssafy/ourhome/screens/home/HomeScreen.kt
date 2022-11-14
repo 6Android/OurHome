@@ -66,6 +66,7 @@ fun HomeScreen(navController: NavController, vm: HomeViewModel) {
         mutableStateOf(false)
     }
     val onScheduleClick: (DomainScheduleDTO) -> Unit = { schedule ->
+        vm.setScheduleDetail(schedule)
         navController.navigate(OurHomeScreens.ScheduleDetailScreen.name)
     }
     val visibleInviteDialogState = remember {
