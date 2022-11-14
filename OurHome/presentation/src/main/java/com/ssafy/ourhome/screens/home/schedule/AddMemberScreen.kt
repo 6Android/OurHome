@@ -23,24 +23,22 @@ import com.ssafy.ourhome.R
 import com.ssafy.ourhome.components.MainAppBar
 import com.ssafy.ourhome.components.OurHomeSurface
 import com.ssafy.ourhome.components.RoundedButton
-import com.ssafy.ourhome.utils.Person
-import com.ssafy.ourhome.utils.personList
+import com.ssafy.ourhome.model.schedule.ParticipantDTO
+import com.ssafy.ourhome.screens.home.HomeViewModel
 
 @SuppressLint("UnrememberedMutableState")
 @Composable
-fun AddMemberScreen(navController: NavController) {
-    var familyState = mutableStateListOf<Person>()
-    familyState.addAll(personList)
+fun AddMemberScreen(navController: NavController, vm: HomeViewModel) {
 
-    val onPersonClick: (Person) -> Unit = { person ->
+    val onParticipantClick: (ParticipantDTO) -> Unit = { participant ->
         var idx = 0
-        familyState.forEachIndexed { index, it ->
-            if (it.id == person.id) {
+        vm.addScheduleParticipantsState.forEachIndexed { index, it ->
+            if (it.email == participant.email) {
                 idx = index
                 return@forEachIndexed
             }
         }
-        familyState[idx] = familyState[idx].copy(checked = !person.checked)
+        vm.addScheduleParticipantsState[idx] = vm.addScheduleParticipantsState[idx].copy(checked = !participant.checked)
     }
 
     Scaffold(
@@ -54,7 +52,7 @@ fun AddMemberScreen(navController: NavController) {
     ) {
         OurHomeSurface {
             /** 가족 리스트  */
-            FamilyList(familyState, onPersonClick)
+            FamilyList(vm.addScheduleParticipantsState, onParticipantClick)
 
             /** 확인 버튼 */
             ConfirmButton {
@@ -67,14 +65,14 @@ fun AddMemberScreen(navController: NavController) {
 
 /** 가족 리스트  */
 @Composable
-fun FamilyList(list: List<Person>, onItemClick: (Person) -> Unit) {
+fun FamilyList(participants: List<ParticipantDTO>, onItemClick: (ParticipantDTO) -> Unit) {
     LazyColumn(
         modifier = Modifier.fillMaxHeight(0.9f),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         item { }
-        items(list) { person ->
-            FamilyListItem(person = person, onItemClick = onItemClick)
+        items(participants) { participant ->
+            FamilyListItem(participant = participant, onItemClick = onItemClick)
         }
         item { }
     }
@@ -82,11 +80,11 @@ fun FamilyList(list: List<Person>, onItemClick: (Person) -> Unit) {
 
 /** 가족 리스트 아이템 */
 @Composable
-fun FamilyListItem(person: Person, onItemClick: (Person) -> Unit) {
+fun FamilyListItem(participant: ParticipantDTO, onItemClick: (ParticipantDTO) -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onItemClick(person) }
+            .clickable { onItemClick(participant) }
             .padding(horizontal = 24.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
@@ -97,13 +95,13 @@ fun FamilyListItem(person: Person, onItemClick: (Person) -> Unit) {
                     .size(64.dp)
                     .clip(CircleShape),
                 contentScale = ContentScale.Crop,
-                painter = rememberAsyncImagePainter(person.imgUrl),
+                painter = rememberAsyncImagePainter(participant.image),
                 contentDescription = "Profile Image"
             )
             Spacer(modifier = Modifier.width(16.dp))
-            Text(text = person.name, style = MaterialTheme.typography.body2)
+            Text(text = participant.name, style = MaterialTheme.typography.body2)
         }
-        if (person.checked) {
+        if (participant.checked) {
             Image(
                 modifier = Modifier.size(24.dp),
                 painter = painterResource(id = R.drawable.ic_checked),

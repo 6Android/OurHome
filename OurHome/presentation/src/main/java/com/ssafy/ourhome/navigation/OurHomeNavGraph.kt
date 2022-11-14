@@ -183,7 +183,7 @@ fun OurHomeNavGraph(navController: NavHostController) {
         }
 
         composable(OurHomeScreens.AddMemberScreen.name) {
-            AddMemberScreen(navController = navController)
+            AddMemberScreen(navController = navController, vm = homeViewModel)
         }
 
         composable(OurHomeScreens.ScheduleDetailScreen.name) {

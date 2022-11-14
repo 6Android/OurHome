@@ -103,14 +103,16 @@ fun HomeScreen(navController: NavController, vm: HomeViewModel) {
 
     vm.getFamilyUsers()
     when (vm.familyUsersProcessState.value) {
+        State.SUCCESS -> {
+            // 스케줄 추가 상태 초기화
+            vm.initAddSchedule()
+            vm.familyUsersProcessState.value = State.DEFAULT
+        }
         State.ERROR -> {
             Toast.makeText(context, "가족 정보를 불러오는데 실패했습니다", Toast.LENGTH_SHORT).show()
             vm.familyUsersProcessState.value = State.DEFAULT
         }
     }
-
-    // 스케줄 추가 상태 초기화
-    vm.initAddSchedule()
 
     Scaffold(topBar = {
 

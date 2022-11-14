@@ -14,6 +14,7 @@ import com.ssafy.domain.usecase.schedule.GetFamilyScheduleUseCase
 import com.ssafy.domain.usecase.user.EditLocationPermissionUseCase
 import com.ssafy.domain.usecase.user.GetFamilyUsersUseCase
 import com.ssafy.domain.utils.ResultType
+import com.ssafy.ourhome.model.schedule.ParticipantDTO
 import com.ssafy.ourhome.utils.Prefs
 import com.ssafy.ourhome.utils.State
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -45,7 +46,7 @@ class HomeViewModel @Inject constructor(
     val addScheduleTitleState = mutableStateOf("")
     val addScheduleContentState = mutableStateOf("")
     val addScheduleDateState = mutableStateOf(LocalDate.now())
-    val addScheduleParticipants = mutableStateListOf<String>()
+    val addScheduleParticipantsState = mutableStateListOf<ParticipantDTO>()
 
 
     fun editLocationPermission(permission: Boolean) = viewModelScope.launch(Dispatchers.IO) {
@@ -71,6 +72,7 @@ class HomeViewModel @Inject constructor(
             when (response) {
                 is ResultType.Loading -> {}
                 is ResultType.Success -> {
+                    familyUsersProcessState.value = State.SUCCESS
                     familyUsersState.value = response.data
                 }
                 is ResultType.Error -> {
@@ -137,7 +139,7 @@ class HomeViewModel @Inject constructor(
             day = addScheduleDateState.value.dayOfMonth,
             title = addScheduleTitleState.value,
             content = addScheduleContentState.value,
-            participants = addScheduleParticipants
+            participants = addScheduleParticipantsState.filter { it.checked }.map { it.email }
         )
 
         addFamilyScheduleUseCase.execute(Prefs.familyCode, schedule).collect { response ->
@@ -157,6 +159,15 @@ class HomeViewModel @Inject constructor(
         addScheduleTitleState.value = ""
         addScheduleContentState.value = ""
         addScheduleDateState.value = LocalDate.now()
-        addScheduleParticipants.clear()
+        addScheduleParticipantsState.clear()
+        addScheduleParticipantsState.addAll(
+            familyUsersState.value.map {
+                ParticipantDTO(
+                    name = it.name,
+                    email = it.email,
+                    image = it.image
+                )
+            }
+        )
     }
 }
