@@ -7,12 +7,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ssafy.domain.model.schedule.DomainScheduleDTO
 import com.ssafy.domain.model.user.DomainUserDTO
+import com.ssafy.domain.usecase.schedule.DeleteFamilyScheduleUseCase
 import com.ssafy.domain.usecase.schedule.GetFamilyScheduleUseCase
 import com.ssafy.domain.usecase.user.EditLocationPermissionUseCase
 import com.ssafy.domain.usecase.user.GetFamilyUsersUseCase
 import com.ssafy.domain.utils.ResultType
 import com.ssafy.ourhome.utils.Prefs
-import com.ssafy.ourhome.utils.Schedule
 import com.ssafy.ourhome.utils.State
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -24,7 +24,8 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val editLocationPermissionUseCase: EditLocationPermissionUseCase,
     private val getFamilyUsersUseCase: GetFamilyUsersUseCase,
-    private val getFamilyScheduleUseCase: GetFamilyScheduleUseCase
+    private val getFamilyScheduleUseCase: GetFamilyScheduleUseCase,
+    private val deleteFamilyScheduleUseCase: DeleteFamilyScheduleUseCase
 ) : ViewModel() {
     val familyUsersState = mutableStateOf<List<DomainUserDTO>>(emptyList())
     val familyUsersProcessState = mutableStateOf(State.DEFAULT)
@@ -33,6 +34,9 @@ class HomeViewModel @Inject constructor(
 
     val scheduleDetailState = mutableStateOf(DomainScheduleDTO())
     var scheduleDetailPeople = listOf<DomainUserDTO>()
+
+    val deleteScheduleProcessState = mutableStateOf(State.DEFAULT)
+
 
     fun editLocationPermission(permission: Boolean) = viewModelScope.launch(Dispatchers.IO) {
         editLocationPermissionUseCase.execute(Prefs.familyCode, Prefs.email, permission)
@@ -78,8 +82,9 @@ class HomeViewModel @Inject constructor(
                     when (response) {
                         is ResultType.Success -> {
                             Log.d("TAG", "getFamilySchedules: ${response.data}")
+                            scheduleMap.clear()
                             scheduleMap.putAll(response.data.groupBy { schedule -> schedule.date })
-                            Log.d("TAG", "getFamilySchedules: ${scheduleMap}")
+                            Log.d("TAG", "getFamilySchedules: ${scheduleMap.entries}")
                         }
                         else -> {
                         }
@@ -96,5 +101,21 @@ class HomeViewModel @Inject constructor(
                 email == user.email
             }
         }
+    }
+
+    // 일정 삭제
+    fun deleteScheduleDetail() = viewModelScope.launch(Dispatchers.IO) {
+
+        deleteFamilyScheduleUseCase.execute(Prefs.familyCode, scheduleDetailState.value.uid)
+            .collect { response ->
+                when (response) {
+                    is ResultType.Success -> {
+                        deleteScheduleProcessState.value = State.SUCCESS
+                    }
+                    else -> {
+                        deleteScheduleProcessState.value = State.FAIL
+                    }
+                }
+            }
     }
 }

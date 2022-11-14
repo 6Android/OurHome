@@ -1,6 +1,6 @@
 package com.ssafy.ourhome.screens.home.schedule
 
-import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
@@ -15,17 +15,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.ssafy.domain.model.schedule.DomainScheduleDTO
 import com.ssafy.ourhome.components.MainAppBar
 import com.ssafy.ourhome.components.OurHomeSurface
 import com.ssafy.ourhome.navigation.OurHomeScreens
 import com.ssafy.ourhome.screens.home.HomeViewModel
-import com.ssafy.ourhome.utils.personList
+import com.ssafy.ourhome.utils.State
 import java.time.LocalDate
 
 @Composable
 fun ScheduleDetailScreen(navController: NavHostController, vm: HomeViewModel) {
+    val context = LocalContext.current
+
     val titleState = remember {
         mutableStateOf(vm.scheduleDetailState.value.title)
     }
@@ -36,7 +40,17 @@ fun ScheduleDetailScreen(navController: NavHostController, vm: HomeViewModel) {
         mutableStateOf(LocalDate.parse(vm.scheduleDetailState.value.date))
     }
 
-
+    when (vm.deleteScheduleProcessState.value) {
+        State.SUCCESS -> {
+            Toast.makeText(context, "일정을 삭제했습니다", Toast.LENGTH_SHORT).show()
+            navController.popBackStack()
+            vm.deleteScheduleProcessState.value = State.DEFAULT
+        }
+        State.FAIL -> {
+            Toast.makeText(context, "일정 삭제에 실패했습니다", Toast.LENGTH_SHORT).show()
+            vm.deleteScheduleProcessState.value = State.DEFAULT
+        }
+    }
 
     Scaffold(topBar = {
         MainAppBar(
@@ -45,8 +59,8 @@ fun ScheduleDetailScreen(navController: NavHostController, vm: HomeViewModel) {
             icon = rememberVectorPainter(Icons.Default.Delete),
             onBackClick = { navController.popBackStack() },
             onIconClick = {
-                // todo: 일정 사게 버튼 클릭시
-
+                // todo: 일정 삭제 버튼 클릭시
+                vm.deleteScheduleDetail()
             })
     }) {
         OurHomeSurface() {

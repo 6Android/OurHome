@@ -9,4 +9,6 @@ interface ScheduleDataSource {
     // year, month에 해당하는 doc 리스트 받음
     fun getFamilySchedules(familyCode: String, year: Int, month: Int): Task<QuerySnapshot>
 
+    // family/schedule Doc에서 해당 id 삭제
+    fun deleteFamilySchedule(familyCode: String, uid: String): Task<Void>
 }

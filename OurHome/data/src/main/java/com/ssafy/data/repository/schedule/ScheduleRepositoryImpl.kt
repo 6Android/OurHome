@@ -39,4 +39,18 @@ class ScheduleRepositoryImpl @Inject constructor(
         awaitClose {}
     }
 
+    override fun deleteFamilySchedule(familyCode: String, uid: String): Flow<ResultType<Unit>> =
+        callbackFlow {
+            scheduleDataSource.deleteFamilySchedule(familyCode, uid)
+                .addOnCompleteListener {
+                    val response = if (it.isSuccessful) {
+                        ResultType.Success(Unit)
+                    } else {
+                        ResultType.Fail
+                    }
+                    trySend(response)
+                }
+            awaitClose {}
+        }
+
 }

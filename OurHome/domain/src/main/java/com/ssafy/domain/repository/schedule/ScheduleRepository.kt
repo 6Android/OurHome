@@ -11,4 +11,7 @@ interface ScheduleRepository {
     // family/schedule Doc (family Collection -> family_code Doc ->  schedule Collection -> schedule Doc)
     // year, month에 해당하는 doc 리스트 받음
     fun getFamilySchedules(familyCode: String, year: Int, month: Int): Flow<ScheduleListResponse>
+
+    // family/schedule Doc에서 해당 id 삭제
+    fun deleteFamilySchedule(familyCode: String, uid: String): Flow<ResultType<Unit>>
 }
