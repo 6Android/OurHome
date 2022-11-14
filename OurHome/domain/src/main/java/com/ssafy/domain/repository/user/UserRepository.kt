@@ -10,6 +10,7 @@ typealias UsersResponse = ResultType<Users>
 
 typealias UserResponse = ResultType<DomainUserDTO>
 
+/** 2개 이상의 메서드를 레포에서 묶는다. **/
 interface UserRepository {
     fun getFamilyUsers(familyCode: String): Flow<UsersResponse>
 
@@ -67,4 +68,12 @@ interface UserRepository {
         email: String,
         permission: Boolean
     ): Flow<ResultType<Unit>>
+
+    // 가족장 변경하기
+    fun editManager(familyCode: String,
+                    myEmail: String,
+                    otherEmail: String): Flow<ResultType<Unit>>
+
+    // 가족 정보 이전 후 삭제
+    fun transferUserData(user: DomainUserDTO): Flow<ResultType<Unit>>
 }

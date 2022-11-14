@@ -8,6 +8,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -27,7 +28,9 @@ fun MyPageScreen(
 ) {
     val scrollState = rememberScrollState()
 
-    vm.getProfile(Prefs.email)
+    LaunchedEffect(key1 = true) {
+        vm.setJob(vm.getProfile(Prefs.email))
+    }
 
     Scaffold(topBar = {
         MainAppBar(
@@ -35,8 +38,7 @@ fun MyPageScreen(
             backIconEnable = false,
             icon = painterResource(id = SETTING_ICON),
             onIconClick = {
-//                navController.navigate(OurHomeScreens.UserPageScreen.name + "/b@naver.com")
-                navController.navigate(OurHomeScreens.SettingScreen.name+"/${vm.user.location_permit}")
+                navController.navigate(OurHomeScreens.SettingScreen.name)
             }
         )
     }) {
@@ -49,7 +51,9 @@ fun MyPageScreen(
             ) {
                 Spacer(modifier = Modifier.padding(top = 16.dp))
 
-                UserInfoCard(userDTO = vm.user, navController)
+                UserInfoCard(userDTO = vm.user) {
+                    navController.navigate(OurHomeScreens.EditProfileScreen.name)
+                }
 
                 Spacer(modifier = Modifier.height(16.dp))
                 UserColorCardList(userDTO = vm.user)
@@ -60,6 +64,7 @@ fun MyPageScreen(
         }
     }
 }
+
 
 //@Preview(showBackground = true)
 //@Composable

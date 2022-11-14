@@ -24,25 +24,33 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.ssafy.domain.model.user.DomainUserDTO
 import com.ssafy.ourhome.MainActivity
 import com.ssafy.ourhome.components.MainAppBar
 import com.ssafy.ourhome.components.OurHomeSurface
-import com.ssafy.ourhome.navigation.BottomNavItem
 import com.ssafy.ourhome.navigation.OurHomeScreens
+import com.ssafy.ourhome.screens.userpage.UserPageViewModel
 import com.ssafy.ourhome.ui.theme.MainColor
 import com.ssafy.ourhome.utils.Prefs
 import com.ssafy.ourhome.utils.checkAndRequestLocationPermissions
 import com.ssafy.ourhome.utils.permissions
 
 @Composable
-fun SettingScreen(navController: NavController, permit: Boolean, vm: SettingViewModel) {
+fun SettingScreen(navController: NavController, vm: UserPageViewModel) {
 
     val switchChecked = remember {
-        mutableStateOf(permit)
+        mutableStateOf(vm.user.location_permit)
     }
     val scrollState = rememberScrollState()
 
     val context = LocalContext.current
+
+    if(vm.transferSuccess){
+        val intent = Intent(context, MainActivity::class.java)
+        context.startActivity(intent)
+        (context as MainActivity).finish()
+        vm.setTransferSuccess()
+    }
     Scaffold(topBar = {
         MainAppBar(title = "설정", backIconEnable = true, onBackClick = {
             navController.popBackStack()
@@ -69,7 +77,16 @@ fun SettingScreen(navController: NavController, permit: Boolean, vm: SettingView
                 }
 
                 Spacer(modifier = Modifier.height(42.dp))
-                OurHomeSetting(code = Prefs.familyCode, navController)
+                OurHomeSetting(
+                    code = Prefs.familyCode,
+                    navAction = { navController.navigate(OurHomeScreens.ManageFamilyScreen.name) },
+                    vm.user.manager,
+                    context
+                ) {
+                    vm.job.cancel()
+                    vm.transferUserData(vm.user)
+
+                }
 
                 Spacer(modifier = Modifier.height(42.dp))
                 Support()
@@ -77,13 +94,49 @@ fun SettingScreen(navController: NavController, permit: Boolean, vm: SettingView
                 Spacer(modifier = Modifier.height(56.dp))
                 ClickableText("로그아웃") {
                     vm.logout()
-                    val intent = Intent(context,MainActivity::class.java)
+                    val intent = Intent(context, MainActivity::class.java)
                     context.startActivity(intent)
                     (context as MainActivity).finish()
                 }
                 Spacer(modifier = Modifier.height(32.dp))
-                ClickableText("회원탈퇴") {
 
+                // TEST : 유저 넣기
+                ClickableText("회원탈퇴") {
+                    vm.insertUser(
+                        DomainUserDTO(
+                            email = "test1@naver.com",
+                            name = "테스트1",
+                            family_code = "TEST"
+                        )
+                    )
+                    vm.insertUser(
+                        DomainUserDTO(
+                            email = "test2@naver.com",
+                            name = "테스트2",
+                            family_code = "TEST"
+                        )
+                    )
+                    vm.insertUser(
+                        DomainUserDTO(
+                            email = "test3@naver.com",
+                            name = "테스트3",
+                            family_code = "TEST"
+                        )
+                    )
+                    vm.insertUser(
+                        DomainUserDTO(
+                            email = "test4@naver.com",
+                            name = "테스트4",
+                            family_code = "TEST"
+                        )
+                    )
+                    vm.insertUser(
+                        DomainUserDTO(
+                            email = "test5@naver.com",
+                            name = "테스트5",
+                            family_code = "TEST"
+                        )
+                    )
                 }
             }
         }
@@ -93,7 +146,10 @@ fun SettingScreen(navController: NavController, permit: Boolean, vm: SettingView
 @Composable
 private fun OurHomeSetting(
     code: String,
-    navController: NavController
+    navAction: () -> Unit,
+    isManager: Boolean,
+    context: Context,
+    transfer: () -> Unit
 ) {
     TextHeader(title = "가족 설정")
     Spacer(modifier = Modifier.height(26.dp))
@@ -109,11 +165,16 @@ private fun OurHomeSetting(
         }
         Spacer(modifier = Modifier.height(32.dp))
         TextWithNext(title = "가족 관리") {
-            navController.navigate(OurHomeScreens.ManageFamilyScreen.name)
+            if (isManager) {
+                navAction()
+
+            } else {
+                Toast.makeText(context, "가족장 권한이 필요합니다.", Toast.LENGTH_SHORT).show()
+            }
         }
         Spacer(modifier = Modifier.height(32.dp))
         TextWithNext(title = "가족 끊기") {
-
+            transfer()
         }
     }
 }

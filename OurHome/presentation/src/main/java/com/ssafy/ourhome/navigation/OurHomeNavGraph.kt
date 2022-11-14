@@ -37,17 +37,18 @@ import com.ssafy.ourhome.screens.userpage.UserPageScreen
 import com.ssafy.ourhome.screens.userpage.UserPageViewModel
 import com.ssafy.ourhome.screens.userpage.setting.ManageFamilyScreen
 import com.ssafy.ourhome.screens.userpage.setting.SettingScreen
-import com.ssafy.ourhome.screens.userpage.setting.SettingViewModel
 
 
 @Composable
 fun OurHomeNavGraph(navController: NavHostController) {
     val loginViewModel: LoginViewModel = hiltViewModel()
-    val mapViewModel: MapViewModel = hiltViewModel()
-    val userPageViewModel: UserPageViewModel = hiltViewModel()
-    val homeViewModel: HomeViewModel = hiltViewModel()
-    val settingViewModel: SettingViewModel = hiltViewModel()
-    val questionViewModel: QuestionViewModel = hiltViewModel()
+
+
+    val mapViewModel : MapViewModel = hiltViewModel()
+    val userPageViewModel : UserPageViewModel = hiltViewModel()
+    val homeViewModel : HomeViewModel = hiltViewModel()
+    val questionViewModel : QuestionViewModel = hiltViewModel()
+
 
     NavHost(
         navController = navController,
@@ -149,29 +150,20 @@ fun OurHomeNavGraph(navController: NavHostController) {
 
         composable(OurHomeScreens.EditProfileScreen.name)
         {
-            var userDTO =
-                navController.previousBackStackEntry?.arguments?.getParcelable<DomainUserDTO>("userDTO")
-            Log.d("UserPageScreen_", "navigation: $userDTO ")
             EditProfileScreen(
                 navController = navController,
-                userDTO = userDTO!!,
                 vm = userPageViewModel
             )
         }
 
-        composable(
-            "${OurHomeScreens.SettingScreen.name}/{permit}",
-            arguments = listOf(navArgument("permit") {
-                type = NavType.BoolType
-            })
-        ) { backStackEntry ->
-            backStackEntry.arguments?.getBoolean("permit").let {
-                SettingScreen(navController = navController, permit = it!!, vm = settingViewModel)
-            }
+        composable("${OurHomeScreens.SettingScreen.name}") {
+            SettingScreen(
+                navController = navController,
+                vm = userPageViewModel)
         }
 
         composable(OurHomeScreens.ManageFamilyScreen.name) {
-            ManageFamilyScreen(navController = navController)
+            ManageFamilyScreen(navController = navController, vm = userPageViewModel)
         }
 
         composable(OurHomeScreens.EnterHomeScreen.name) {

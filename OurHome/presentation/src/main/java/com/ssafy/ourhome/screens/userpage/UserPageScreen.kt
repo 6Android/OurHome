@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.ssafy.ourhome.components.MainAppBar
 import com.ssafy.ourhome.components.OurHomeSurface
+import com.ssafy.ourhome.navigation.OurHomeScreens
 
 @Composable
 fun UserPageScreen(
@@ -42,7 +43,9 @@ fun UserPageScreen(
             ) {
                 Spacer(modifier = Modifier.padding(top = 16.dp))
 
-                UserInfoCard(userDTO = vm.user, navController)
+                UserInfoCard(userDTO = vm.user) {
+                    navController.navigate(OurHomeScreens.EditProfileScreen.name)
+                }
 
                 Spacer(modifier = Modifier.height(16.dp))
                 UserColorCardList(userDTO = vm.user)
