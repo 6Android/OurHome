@@ -22,12 +22,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import coil.compose.AsyncImagePainter
-import coil.compose.AsyncImagePainter.State.Empty.painter
 import coil.compose.rememberAsyncImagePainter
 import com.ssafy.domain.model.pet.DomainFamilyPetDTO
 import com.ssafy.ourhome.components.MainAppBar
@@ -37,13 +34,11 @@ import com.ssafy.ourhome.components.pie.PieChartData
 import com.ssafy.ourhome.components.pie.PieChartData.Slice
 import com.ssafy.ourhome.components.pie.animation.simpleChartAnimation
 import com.ssafy.ourhome.components.pie.renderer.SimpleSliceDrawer
-import com.ssafy.ourhome.navigation.OurHomeScreens
 import com.ssafy.ourhome.screens.question.CenterHorizontalColumn
 import com.ssafy.ourhome.screens.question.QuestionViewModel
 import com.ssafy.ourhome.ui.theme.Gray
 import com.ssafy.ourhome.ui.theme.MainColor
 import com.ssafy.ourhome.ui.theme.PieChartColors
-import com.ssafy.ourhome.ui.theme.nanum
 import com.ssafy.ourhome.utils.State
 
 
@@ -109,20 +104,22 @@ fun initPetDetailScreen(vm: QuestionViewModel){
 
 fun initPetDetailViewModelCallback(vm: QuestionViewModel, context: Context, familyContributeList: MutableState<PieChartData>){
 
-    when (vm.familyUsersProcessState) {
+    when (vm.familyPetProcessState) {
         State.ERROR -> {
-            Toast.makeText(context, "가족 정보를 불러오는데 실패했습니다", Toast.LENGTH_SHORT).show()
-            vm.familyUsersProcessState = State.DEFAULT
+            Toast.makeText(context, "펫 정보를 불러오는데 실패했습니다", Toast.LENGTH_SHORT).show()
+            vm.familyPetProcessState = State.DEFAULT
         }
         State.SUCCESS -> {
             var totalContributePoint = 0L
-            for(user in vm.familyUsers){
-                totalContributePoint += user.contribute_point
+            for(key in vm.familyUsers.value.keys){
+                totalContributePoint += vm.familyUsers.value.get(key)!!.contribute_point
             }
 
             val dataList = mutableListOf<Slice>()
-            for(i in 0 until vm.familyUsers.size){
-                dataList.add(Slice(1F * vm.familyUsers.get(i).contribute_point / totalContributePoint, PieChartColors[i], vm.familyUsers.get(i).name))
+            var i = 0
+            for(key in vm.familyUsers.value.keys){
+                dataList.add(Slice(1F * vm.familyUsers.value.get(key)!!.contribute_point / totalContributePoint, PieChartColors[i], vm.familyUsers.value.get(key)!!.name))
+                i++
             }
             familyContributeList.value = PieChartData(dataList)
         }

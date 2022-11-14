@@ -4,8 +4,10 @@ import android.net.Uri
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.ssafy.data.utils.CONTRIBUTION
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.UploadTask
 import com.ssafy.data.utils.FAMILY
@@ -82,6 +84,11 @@ class UserDataSourceImpl @Inject constructor(
     ): Task<Void> =
         fireStore.collection(FAMILY).document(familyCode).collection(USER).document(email)
             .update("location_permit", permission)
+
+    // 펫 기여도 수정
+    override fun editUserContribution(familyCode: String, email: String, point: Long): Task<Void> =
+        fireStore.collection(FAMILY).document(familyCode).collection(USER).document(email).update(
+            CONTRIBUTION, FieldValue.increment(point))
 
     // 가족장 변경하기
     override fun editManager(familyCode: String, email: String, isManager: Boolean): Task<Void> =

@@ -355,6 +355,27 @@ class UserRepositoryImpl @Inject constructor(
             }
         }
 
+    // 펫 기여도 수정
+    override fun editUserContribution(
+        familyCode: String,
+        email: String,
+        point: Long
+    ): Flow<ResultType<Unit>> = callbackFlow {
+        userDataSource.editUserContribution(familyCode, email, point).addOnCompleteListener {
+            val response = if (it.isSuccessful) {
+                ResultType.Success(Unit)
+            } else if (it.exception != null) {
+                ResultType.Error(it.exception)
+            } else {
+                ResultType.Loading
+            }
+            trySend(response)
+        }
+        awaitClose {
+
+        }
+    }
+
     // 가족장 변경하기
     override fun editManager(
         familyCode: String,

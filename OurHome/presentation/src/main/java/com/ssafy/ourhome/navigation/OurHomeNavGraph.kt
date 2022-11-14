@@ -90,7 +90,7 @@ fun OurHomeNavGraph(navController: NavHostController) {
             QuestionListScreen(navController = navController, vm = questionViewModel)
         }
 
-        composable(OurHomeScreens.QuestionDetailScreen.name) {
+        composable(OurHomeScreens.QuestionDetailScreen.name){
             QuestionDetailScreen(navController = navController, vm = questionViewModel)
         }
 

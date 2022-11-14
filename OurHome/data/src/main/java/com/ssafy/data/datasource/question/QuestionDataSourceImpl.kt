@@ -4,7 +4,11 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.QuerySnapshot
+import com.google.firebase.firestore.SetOptions
 import com.ssafy.data.utils.*
+import com.ssafy.domain.model.question.DomainQuestionAnswerDTO
+import com.ssafy.domain.model.question.DomainQuestionDTO
 import javax.inject.Inject
 
 class QuestionDataSourceImpl @Inject constructor(
@@ -14,9 +18,9 @@ class QuestionDataSourceImpl @Inject constructor(
     override fun getTodayQuestion(familyCode: String): Query =
         firestore.collection(FAMILY).document(familyCode).collection(QUESTION).orderBy(QUESTION_SEQ).limitToLast(1)
 
-    override fun getQuestionAnswers(familyCode: String, questionSeq: Int): Query =
+    override fun getQuestionAnswers(familyCode: String, questionSeq: Int): Task<QuerySnapshot> =
         firestore.collection(FAMILY).document(familyCode).collection(QUESTION).document(questionSeq.toString()).collection(
-            QUESTION_ANSWER)
+            QUESTION_ANSWER).get()
 
     override fun getLast3Questions(familyCode: String): Query =
         firestore.collection(FAMILY).document(familyCode).collection(QUESTION).whereGreaterThan(COMPLETED_YEAR, 1).orderBy(COMPLETED_YEAR).limitToLast(3)
@@ -42,5 +46,15 @@ class QuestionDataSourceImpl @Inject constructor(
 
         }
 
+    override fun answerQuestion(familyCode: String, questionSeq: Int, answer: DomainQuestionAnswerDTO): Task<Void> =
+        firestore.collection(FAMILY).document(familyCode).collection(QUESTION).document(questionSeq.toString()).collection(
+            QUESTION_ANSWER).document(answer.email).set(answer)
+
+    override fun completeTodayQuestion(
+        familyCode: String,
+        questionSeq: Int,
+        questionsMap: Map<String, Any>
+    ): Task<Void> =
+        firestore.collection(FAMILY).document(familyCode).collection(QUESTION).document(questionSeq.toString()).set(questionsMap, SetOptions.merge())
 
 }

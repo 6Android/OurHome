@@ -6,6 +6,7 @@ const val FAMILY_CODE = "family_code"
 const val USER = "user"
 const val EMAIL = "email"
 const val MANAGER = "manager"
+const val CONTRIBUTION = "contribute_point"
 
 const val QUESTION = "question"
 const val QUESTION_INFO = "question_info"
