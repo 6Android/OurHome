@@ -1,7 +1,9 @@
 package com.ssafy.data.datasource.schedule
 
 import com.google.android.gms.tasks.Task
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.QuerySnapshot
+import com.ssafy.domain.model.schedule.DomainScheduleDTO
 
 interface ScheduleDataSource {
 
@@ -11,4 +13,7 @@ interface ScheduleDataSource {
 
     // family/schedule Doc에서 해당 id 삭제
     fun deleteFamilySchedule(familyCode: String, uid: String): Task<Void>
+
+    // family/schedule 에 데이터 추가
+    fun addFamilySchedule(familyCode: String, scheduleDTO: DomainScheduleDTO ): Task<DocumentReference>
 }

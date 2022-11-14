@@ -171,11 +171,11 @@ fun OurHomeNavGraph(navController: NavHostController) {
         }
 
         composable(OurHomeScreens.AddScheduleScreen.name) {
-            AddScheduleScreen(navController = navController)
+            AddScheduleScreen(navController = navController, vm = homeViewModel)
         }
 
         composable(OurHomeScreens.AddMemberScreen.name) {
-            AddMemberScreen(navController = navController)
+            AddMemberScreen(navController = navController, vm = homeViewModel)
         }
 
         composable(OurHomeScreens.ScheduleDetailScreen.name) {

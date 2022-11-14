@@ -53,4 +53,19 @@ class ScheduleRepositoryImpl @Inject constructor(
             awaitClose {}
         }
 
+    override fun addFamilySchedule(
+        familyCode: String,
+        scheduleDTO: DomainScheduleDTO
+    ) = callbackFlow {
+        scheduleDataSource.addFamilySchedule(familyCode, scheduleDTO)
+            .addOnCompleteListener {
+                val response = if (it.isSuccessful) {
+                    ResultType.Success(Unit)
+                } else {
+                    ResultType.Fail
+                }
+                trySend(response)
+            }
+        awaitClose { }
+    }
 }
