@@ -52,4 +52,11 @@ class UserPageViewModel @Inject constructor(
             }
         }
     }
+
+    fun setEditSuccess(){
+        editSuccess = false
+    }
+    fun setGetProfileFail(){
+        editSuccess = false
+    }
 }

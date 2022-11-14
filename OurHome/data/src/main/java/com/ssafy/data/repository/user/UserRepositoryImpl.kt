@@ -341,4 +341,50 @@ class UserRepositoryImpl @Inject constructor(
 
             }
         }
+
+    // 가족장 변경하기
+    override fun editManager(
+        familyCode: String,
+        myEmail: String,
+        otherEmail: String
+    ): Flow<ResultType<Unit>> =
+        callbackFlow {
+
+            // 내 가족장 위임
+            userDataSource.editManager(familyCode, myEmail, false).addOnCompleteListener { my ->
+                if (my.isSuccessful) {
+                    // 가족장 전달받음
+                    userDataSource.editManager(familyCode, otherEmail, true).addOnSuccessListener {
+                        val response2 = ResultType.Success(Unit)
+                        trySend(response2)
+                    }.addOnFailureListener {
+                        trySend(ResultType.Error(it))
+                    }
+                } else {
+                    trySend(ResultType.Fail)
+                }
+            }
+            awaitClose {
+            }
+        }
+
+
+    // 가족 정보 이전 후 삭제
+    override fun transferUserData(user: DomainUserDTO): Flow<ResultType<Unit>> = callbackFlow {
+        userDataSource.moveUserData(user.copy(family_code = "")).addOnCompleteListener { move ->
+        // 정보 이동 성공 시
+            if (move.isSuccessful) {
+                // 가족 정보에 있는 유저 정보 지움
+                userDataSource.outUsers(user.family_code, user.email).addOnSuccessListener {
+                    val response = ResultType.Success(Unit)
+                    trySend(response)
+                }.addOnFailureListener {
+                    trySend(ResultType.Error(it))
+                }
+            } else {
+                trySend(ResultType.Fail)
+            }
+        }
+        awaitClose {}
+    }
 }

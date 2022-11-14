@@ -27,7 +27,6 @@ import androidx.navigation.NavController
 import com.ssafy.ourhome.MainActivity
 import com.ssafy.ourhome.components.MainAppBar
 import com.ssafy.ourhome.components.OurHomeSurface
-import com.ssafy.ourhome.navigation.BottomNavItem
 import com.ssafy.ourhome.navigation.OurHomeScreens
 import com.ssafy.ourhome.ui.theme.MainColor
 import com.ssafy.ourhome.utils.Prefs
@@ -35,7 +34,7 @@ import com.ssafy.ourhome.utils.checkAndRequestLocationPermissions
 import com.ssafy.ourhome.utils.permissions
 
 @Composable
-fun SettingScreen(navController: NavController, permit: Boolean, vm: SettingViewModel) {
+fun SettingScreen(navController: NavController, permit: Boolean, isManager: Boolean, vm: SettingViewModel) {
 
     val switchChecked = remember {
         mutableStateOf(permit)
@@ -69,7 +68,7 @@ fun SettingScreen(navController: NavController, permit: Boolean, vm: SettingView
                 }
 
                 Spacer(modifier = Modifier.height(42.dp))
-                OurHomeSetting(code = Prefs.familyCode, navController)
+                OurHomeSetting(code = Prefs.familyCode, navController, isManager, context)
 
                 Spacer(modifier = Modifier.height(42.dp))
                 Support()
@@ -93,7 +92,9 @@ fun SettingScreen(navController: NavController, permit: Boolean, vm: SettingView
 @Composable
 private fun OurHomeSetting(
     code: String,
-    navController: NavController
+    navController: NavController,
+    isManager: Boolean,
+    context: Context
 ) {
     TextHeader(title = "가족 설정")
     Spacer(modifier = Modifier.height(26.dp))
@@ -109,7 +110,11 @@ private fun OurHomeSetting(
         }
         Spacer(modifier = Modifier.height(32.dp))
         TextWithNext(title = "가족 관리") {
-            navController.navigate(OurHomeScreens.ManageFamilyScreen.name)
+            if(isManager){
+                navController.navigate(OurHomeScreens.ManageFamilyScreen.name)
+            }else{
+                Toast.makeText(context, "가족장 권한이 필요합니다.", Toast.LENGTH_SHORT).show()
+            }
         }
         Spacer(modifier = Modifier.height(32.dp))
         TextWithNext(title = "가족 끊기") {
