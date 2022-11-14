@@ -38,7 +38,6 @@ import com.ssafy.ourhome.ui.theme.Gray
 import com.ssafy.ourhome.ui.theme.Green
 import com.ssafy.ourhome.ui.theme.MainColor
 import com.ssafy.ourhome.ui.theme.nanum
-import com.ssafy.ourhome.utils.Schedule
 import com.ssafy.ourhome.utils.displayText
 import com.ssafy.ourhome.utils.rememberFirstVisibleMonthAfterScroll
 import kotlinx.coroutines.launch
@@ -51,8 +50,8 @@ import java.util.*
 @Composable
 fun TodayScheduleList(
     modifier: Modifier = Modifier,
-    list: List<Schedule>,
-    onScheduleClick: (Schedule) -> Unit,
+    list: List<DomainScheduleDTO>,
+    onScheduleClick: (DomainScheduleDTO) -> Unit,
 ) {
     LazyColumn(modifier = modifier) {
         items(list) { item ->
@@ -66,8 +65,8 @@ fun TodayScheduleList(
 @Composable
 fun TodayScheduleListItem(
     modifier: Modifier = Modifier.fillMaxWidth(),
-    schedule: Schedule,
-    onScheduleClick: (Schedule) -> Unit
+    schedule: DomainScheduleDTO,
+    onScheduleClick: (DomainScheduleDTO) -> Unit
 ) {
     Card(
         modifier = modifier

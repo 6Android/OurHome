@@ -34,13 +34,17 @@ import coil.compose.rememberAsyncImagePainter
 import com.holix.android.bottomsheetdialog.compose.BottomSheetDialog
 import com.holix.android.bottomsheetdialog.compose.BottomSheetDialogProperties
 import com.kizitonwose.calendar.core.CalendarDay
+import com.ssafy.domain.model.schedule.DomainScheduleDTO
 import com.ssafy.domain.model.user.DomainUserDTO
 import com.ssafy.ourhome.MainActivity.Companion.startWorkManager
 import com.ssafy.ourhome.R
 import com.ssafy.ourhome.components.OurHomeSurface
 import com.ssafy.ourhome.components.RoundedButton
 import com.ssafy.ourhome.navigation.OurHomeScreens
-import com.ssafy.ourhome.utils.*
+import com.ssafy.ourhome.utils.Prefs
+import com.ssafy.ourhome.utils.State
+import com.ssafy.ourhome.utils.checkAndRequestLocationPermissions
+import com.ssafy.ourhome.utils.permissions
 
 /** 맵 화면 이동 **/
 fun moveMap(navController: NavController, vm: HomeViewModel) {
@@ -61,7 +65,7 @@ fun HomeScreen(navController: NavController, vm: HomeViewModel) {
     val visibleBottomSheetState = remember {
         mutableStateOf(false)
     }
-    val onScheduleClick: (Schedule) -> Unit = { schedule ->
+    val onScheduleClick: (DomainScheduleDTO) -> Unit = { schedule ->
         navController.navigate(OurHomeScreens.ScheduleDetailScreen.name)
     }
     val visibleInviteDialogState = remember {
@@ -85,7 +89,6 @@ fun HomeScreen(navController: NavController, vm: HomeViewModel) {
 
     /** 달력에 필요한 데이터 */
     var selection = remember { mutableStateOf<CalendarDay?>(null) }
-    val map = mutableMapOf<String, List<Schedule>>()
     val onMonthChangeListener: (String) -> Unit = {
         it.split("-").let {
             val year = it[0].toInt()
@@ -201,7 +204,7 @@ fun HomeScreen(navController: NavController, vm: HomeViewModel) {
                 /** 바텀 시트 */
                 if (visibleBottomSheetState.value) {
                     BottomSheet(
-                        list = map.getOrDefault(
+                        list = vm.scheduleMap.getOrDefault(
                             "${selection.value!!.date.year}-${selection.value!!.date.monthValue}-${selection.value!!.date.dayOfMonth}",
                             emptyList()
                         ),
@@ -375,9 +378,9 @@ fun HomeCard(
 /** 바텀 시트 */
 @Composable
 fun BottomSheet(
-    list: List<Schedule>,
+    list: List<DomainScheduleDTO>,
     onAddScheduleClick: () -> Unit,
-    onScheduleClick: (Schedule) -> Unit,
+    onScheduleClick: (DomainScheduleDTO) -> Unit,
     onDismissRequest: () -> Unit
 ) {
     BottomSheetDialog(
@@ -431,9 +434,9 @@ fun BottomSheet(
 /** 일정이 있을 경우 바텀시트 */
 @Composable
 private fun ScheduleList(
-    list: List<Schedule>,
+    list: List<DomainScheduleDTO>,
     onAddScheduleClick: () -> Unit,
-    onScheduleClick: (Schedule) -> Unit
+    onScheduleClick: (DomainScheduleDTO) -> Unit
 ) {
     Row(
         modifier = Modifier
