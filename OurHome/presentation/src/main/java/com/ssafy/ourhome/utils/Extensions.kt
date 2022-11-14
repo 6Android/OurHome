@@ -3,18 +3,17 @@ package com.ssafy.ourhome.utils
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.input.pointer.pointerInput
 import com.kizitonwose.calendar.compose.CalendarState
 import kotlinx.coroutines.flow.filter
 import java.time.Month
 import java.time.YearMonth
 import java.time.format.TextStyle
 import java.util.*
-import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusManager
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalFocusManager
 
 fun Context.findActivity(): Activity {
     var context = this
@@ -27,12 +26,18 @@ fun Context.findActivity(): Activity {
 
 /** 캘린더 */
 @Composable
-fun rememberFirstVisibleMonthAfterScroll(state: CalendarState): YearMonth {
+fun rememberFirstVisibleMonthAfterScroll(
+    state: CalendarState,
+    onChange: (String) -> Unit
+): YearMonth {
     val visibleMonth = remember(state) { mutableStateOf(state.firstVisibleMonth.yearMonth) }
     LaunchedEffect(state) {
         snapshotFlow { state.isScrollInProgress }
             .filter { scrolling -> !scrolling }
-            .collect { visibleMonth.value = state.firstVisibleMonth.yearMonth }
+            .collect {
+                visibleMonth.value = state.firstVisibleMonth.yearMonth
+                onChange("${state.firstVisibleMonth.yearMonth}")
+            }
     }
     return visibleMonth.value
 }
