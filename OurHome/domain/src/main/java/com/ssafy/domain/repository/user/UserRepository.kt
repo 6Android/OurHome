@@ -1,5 +1,6 @@
 package com.ssafy.domain.repository.user
 
+import android.net.Uri
 import com.ssafy.domain.model.family.DomainFamilyDTO
 import com.ssafy.domain.model.user.DomainUserDTO
 import com.ssafy.domain.utils.ResultType
@@ -10,6 +11,7 @@ typealias UsersResponse = ResultType<Users>
 
 typealias UserResponse = ResultType<DomainUserDTO>
 
+/** 2개 이상의 메서드를 레포에서 묶는다. **/
 interface UserRepository {
     fun getFamilyUsers(familyCode: String): Flow<UsersResponse>
 
@@ -50,7 +52,7 @@ interface UserRepository {
     fun getProfile(familyCode: String, email: String): Flow<UserResponse>
 
     // 유저 정보 수정하기
-    fun editProfile(familyCode: String, user: DomainUserDTO): Flow<ResultType<Unit>>
+    fun editUserProfile(imageUri : Uri,user: DomainUserDTO) : Flow<ResultType<Unit>>
 
     // 현재 위치 전송하기
     fun sendLatLng(
@@ -70,4 +72,12 @@ interface UserRepository {
 
     // 펫 기여도 수정
     fun editUserContribution(familyCode: String, email: String, point: Long): Flow<ResultType<Unit>>
+
+    // 가족장 변경하기
+    fun editManager(familyCode: String,
+                    myEmail: String,
+                    otherEmail: String): Flow<ResultType<Unit>>
+
+    // 가족 정보 이전 후 삭제
+    fun transferUserData(user: DomainUserDTO): Flow<ResultType<Unit>>
 }

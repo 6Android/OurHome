@@ -6,8 +6,8 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class EditProfileUseCase @Inject constructor(
+class TransferUserDataUseCase @Inject constructor(
     private val userRepository: UserRepository
-){
-    fun execute(familyCode: String, user: DomainUserDTO) = userRepository.editProfile(familyCode, user)
+) {
+    fun execute(user: DomainUserDTO) = userRepository.transferUserData(user)
 }

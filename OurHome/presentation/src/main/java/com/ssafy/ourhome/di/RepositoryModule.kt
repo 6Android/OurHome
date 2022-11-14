@@ -1,16 +1,19 @@
 package com.ssafy.ourhome.di
 
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import com.ssafy.data.datasource.family.FamilyDataSource
 import com.ssafy.data.datasource.pet.PetDataSource
-import com.ssafy.data.datasource.pet.PetDataSourceImpl
 import com.ssafy.data.datasource.question.QuestionDataSource
+import com.ssafy.data.datasource.schedule.ScheduleDataSource
 import com.ssafy.data.datasource.user.UserDataSource
 import com.ssafy.data.repository.pet.PetRepositoryImpl
 import com.ssafy.data.repository.question.QuestionRepositoryImpl
+import com.ssafy.data.repository.schedule.ScheduleRepositoryImpl
 import com.ssafy.data.repository.user.UserRepositoryImpl
 import com.ssafy.domain.repository.pet.PetRepository
 import com.ssafy.domain.repository.question.QuestionRepository
+import com.ssafy.domain.repository.schedule.ScheduleRepository
 import com.ssafy.domain.repository.user.UserRepository
 import dagger.Module
 import dagger.Provides
@@ -30,7 +33,17 @@ object RepositoryModule {
         userDataSource: UserDataSource,
         familyDataSource: FamilyDataSource
     ): UserRepository {
-        return UserRepositoryImpl(fireStore, userDataSource, familyDataSource)
+        return UserRepositoryImpl(fireStore,userDataSource, familyDataSource)
+    }
+
+    // ScheduleRepository DI
+    @Provides
+    @Singleton
+    fun provideScheduleRepository(
+        fireStore: FirebaseFirestore,
+        scheduleDataSource: ScheduleDataSource
+    ): ScheduleRepository {
+        return ScheduleRepositoryImpl(fireStore, scheduleDataSource)
     }
 
     // PetRepository DI
@@ -38,7 +51,7 @@ object RepositoryModule {
     @Singleton
     fun providePetRepository(
         petDataSource: PetDataSource
-    ) : PetRepository {
+    ): PetRepository {
         return PetRepositoryImpl(petDataSource)
     }
 
@@ -47,7 +60,7 @@ object RepositoryModule {
     @Singleton
     fun provideQuestionRepository(
         questionDataSource: QuestionDataSource
-    ) : QuestionRepository {
+    ): QuestionRepository {
         return QuestionRepositoryImpl(questionDataSource)
     }
 }

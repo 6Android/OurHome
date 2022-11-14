@@ -2,8 +2,11 @@ package com.ssafy.ourhome.di
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import com.ssafy.data.datasource.family.FamilyDataSource
 import com.ssafy.data.datasource.family.FamilyDataSourceImpl
+import com.ssafy.data.datasource.schedule.ScheduleDataSource
+import com.ssafy.data.datasource.schedule.ScheduleDataSourceImpl
 import com.ssafy.data.datasource.pet.PetDataSource
 import com.ssafy.data.datasource.pet.PetDataSourceImpl
 import com.ssafy.data.datasource.question.QuestionDataSource
@@ -25,9 +28,10 @@ object DataSourceModule {
     @Singleton
     fun provideUserDataSource(
         fireStore: FirebaseFirestore,
+        firebaseStorage: FirebaseStorage,
         fireAuth: FirebaseAuth
     ): UserDataSource {
-        return UserDataSourceImpl(fireStore, fireAuth)
+        return UserDataSourceImpl(fireStore, firebaseStorage, fireAuth)
     }
 
     // FamilyDataSource DI
@@ -40,12 +44,22 @@ object DataSourceModule {
         return FamilyDataSourceImpl(fireStore, fireAuth)
     }
 
+    // ScheduleDataSource DI
+    @Provides
+    @Singleton
+    fun provideScheduleDataSource(
+        fireStore: FirebaseFirestore,
+        fireAuth: FirebaseAuth
+    ): ScheduleDataSource {
+        return ScheduleDataSourceImpl(fireStore, fireAuth)
+    }
+
     // PetDataSource DI
     @Provides
     @Singleton
     fun providePetDataSource(
         fireStore: FirebaseFirestore
-    ) : PetDataSource{
+    ): PetDataSource {
         return PetDataSourceImpl(fireStore)
     }
 
@@ -54,7 +68,7 @@ object DataSourceModule {
     @Singleton
     fun provideQuestionDataSource(
         fireStore: FirebaseFirestore
-    ) : QuestionDataSource{
+    ): QuestionDataSource {
         return QuestionDataSourceImpl(fireStore)
     }
 }

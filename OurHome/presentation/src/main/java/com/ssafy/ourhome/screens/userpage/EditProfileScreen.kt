@@ -1,7 +1,10 @@
 package com.ssafy.ourhome.screens.userpage
 
+import android.net.Uri
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -19,6 +22,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -30,7 +34,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.squaredem.composecalendar.ComposeCalendar
-import com.ssafy.domain.model.user.DomainUserDTO
 import com.ssafy.ourhome.R
 import com.ssafy.ourhome.components.MainAppBar
 import com.ssafy.ourhome.components.OurHomeSurface
@@ -39,50 +42,33 @@ import java.time.LocalDate
 @Composable
 fun EditProfileScreen(
     navController: NavController = NavController(LocalContext.current),
-    userDTO: DomainUserDTO = DomainUserDTO(),
     vm: UserPageViewModel
 ) {
     val scrollState = rememberScrollState()
 
-    Log.d("EditProfileScreen", "Recompose: ")
-    var user = userDTO
-
-    val nicknameState = remember {
-        mutableStateOf(userDTO.name)
-    }
-    val phoneState = remember {
-        mutableStateOf(userDTO.phone)
-    }
-
-    val birthDayState = remember {
-        mutableStateOf(LocalDate.parse(userDTO.birthday))
-    }
-
-    val bloodTypeState = remember {
-        mutableStateOf(userDTO.blood_type)
-    }
-
-    val MBTIState = remember {
-        mutableStateOf(userDTO.mbti)
-    }
-
-    val jobState = remember {
-        mutableStateOf(userDTO.job)
-    }
-
-    val interestState = remember {
-        mutableStateOf(userDTO.interest)
-    }
-
-    val hobbyState = remember {
-        mutableStateOf(userDTO.hobby)
-    }
-
     val showDialog = rememberSaveable { mutableStateOf(false) }
 
+    LaunchedEffect(true) {
+        // 에디트텍스트 초기화
+        vm.setData()
+    }
+
+    var hasImage by remember {
+        mutableStateOf(false)
+    }
+
+
+    val imagePicker = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent(),
+        onResult = { uri ->
+            hasImage = uri != null
+            vm.imageUri.value = uri.toString()
+        }
+    )
     // 에디트 성공
     if (vm.editSuccess) {
         Toast.makeText(LocalContext.current, "정보 수정에 성공하였습니다.", Toast.LENGTH_SHORT).show()
+        vm.setEditSuccess()
         navController.popBackStack()
     }
 
@@ -90,7 +76,8 @@ fun EditProfileScreen(
         ComposeCalendar(
             onDone = { it: LocalDate ->
                 // Hide dialog
-                birthDayState.value = it
+                Log.d("test5", "EditProfileScreen: $it")
+                vm.birthDayState.value = it
                 showDialog.value = false
                 // Do something with the date
             },
@@ -109,16 +96,7 @@ fun EditProfileScreen(
                 onBackClick = { navController.popBackStack() },
                 icon = painterResource(R.drawable.ic_check),
                 onIconClick = {
-                    user.name = nicknameState.value
-                    user.phone = phoneState.value
-                    user.birthday = birthDayState.value.toString()
-                    user.blood_type = bloodTypeState.value
-                    user.mbti = MBTIState.value
-                    user.job = jobState.value
-                    user.interest = interestState.value
-                    user.hobby = hobbyState.value
-
-                    vm.editProfile(user)
+                    vm.editProfile()
                 }
             )
         }) {
@@ -137,8 +115,13 @@ fun EditProfileScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    UserImage(userDTO.image)
-                    TextFieldWithClear(nicknameState)
+                    UserImage(vm.imageUri.value) {
+                        imagePicker.launch("image/*")
+
+                    }
+
+                    TextFieldWithClear(vm.nicknameState)
+                    Log.d("test5", "EditProfileScreen: ${vm.nicknameState}")
                 }
 
                 Divider(
@@ -152,11 +135,11 @@ fun EditProfileScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(24.dp)
                 ) {
-                    TextWithText("이메일", userDTO.email)
-                    TextWithTextField("전화번호", phoneState)
-                    BirthDaySelect(title = "생일", birthDayState, showDialog)
+                    TextWithText("이메일", vm.user.email)
+                    TextWithTextField("전화번호", vm.phoneState, KeyboardType.Number)
+                    BirthDaySelect(title = "생일", vm.birthDayState, showDialog)
                     TextWithDropDown(
-                        title = "혈액형", textState = bloodTypeState, itemList =
+                        title = "혈액형", textState = vm.bloodTypeState, itemList =
                         listOf(
                             "Rh+ A",
                             "Rh- A",
@@ -169,15 +152,15 @@ fun EditProfileScreen(
                         )
                     )
                     TextWithDropDown(
-                        title = "MBTI", textState = MBTIState, itemList =
+                        title = "MBTI", textState = vm.MBTIState, itemList =
                         listOf(
                             "ENFP", "ENFJ", "ENTP", "ENTJ", "ESFP", "ESFJ", "ESTP", "ESTJ",
                             "INFP", "INFJ", "INTP", "INTJ", "ISFP", "ISFJ", "ISTP", "ISTJ", "MBTI",
                         )
                     )
-                    TextWithTextField("직업", jobState)
-                    TextWithTextField("관심사", interestState)
-                    TextWithTextField("취미", hobbyState)
+                    TextWithTextField("직업", vm.jobState)
+                    TextWithTextField("관심사", vm.interestState)
+                    TextWithTextField("취미", vm.hobbyState)
                 }
                 Spacer(modifier = Modifier.height(16.dp))
             }
@@ -211,8 +194,6 @@ private fun BirthDaySelect(
                 style = MaterialTheme.typography.body2.copy(fontWeight = FontWeight.Bold)
             )
         }
-
-
     }
 }
 
@@ -228,7 +209,6 @@ private fun TextWithDropDown(
     }
 
     var selectedIndex by remember {
-
         mutableStateOf(itemList.indexOf(textState.value))
     }
 
@@ -242,43 +222,6 @@ private fun TextWithDropDown(
                 .fillMaxHeight()
                 .weight(2f)
         ) {
-
-//            ExposedDropdownMenuBox(
-//                expanded = expanded,
-//                onExpandedChange = {
-//                    expanded = !expanded
-//                },
-//                modifier = Modifier.wrapContentHeight()
-//            ) {
-//                TextField(
-//                    readOnly = true,
-//                    value = itemList[selectedIndex],
-//                    onValueChange = { },
-//                    trailingIcon = {
-//                        ExposedDropdownMenuDefaults.TrailingIcon(
-//                            expanded = expanded
-//                        )
-//                    },
-//                    colors = ExposedDropdownMenuDefaults.textFieldColors()
-//                )
-//                ExposedDropdownMenu(
-//                    expanded = expanded,
-//                    onDismissRequest = {
-//                        expanded = false
-//                    }
-//                ) {
-//                    itemList.forEachIndexed { idx, selectionOption ->
-//                        DropdownMenuItem(
-//                            onClick = {
-//                               selectedIndex = idx
-//                                expanded = false
-//                            }
-//                        ) {
-//                            Text(text = selectionOption, style = MaterialTheme.typography.h6)
-//                        }
-//                    }
-//                }
-//            }
             Row(
                 Modifier
                     .fillMaxWidth()
@@ -312,6 +255,7 @@ private fun TextWithDropDown(
                 itemList.forEachIndexed { index, item ->
                     DropdownMenuItem(modifier = Modifier.wrapContentHeight(), onClick = {
                         selectedIndex = index
+                        textState.value = item
                         expanded = false
                     }) {
                         Text(text = item, style = MaterialTheme.typography.h6)
@@ -369,7 +313,8 @@ private fun TextWithText(
 @Composable
 private fun TextWithTextField(
     title: String,
-    textState: MutableState<String>
+    textState: MutableState<String>,
+    keyboardType: KeyboardType = KeyboardType.Text
 ) {
     Row(modifier = Modifier.fillMaxWidth()) {
         Text(
@@ -380,20 +325,24 @@ private fun TextWithTextField(
             modifier = Modifier.weight(4f),
             valueState = textState,
             isAlignCenter = false,
+            keyboardType = keyboardType,
             enabled = true,
-            maxLength = 10
+            maxLength = 20
         )
     }
 }
 
 @Composable
 private fun UserImage(
-    imageUrl: String
+    imageUrl: String,
+    onClick: () -> Unit
 ) {
     Image(
         modifier = Modifier
             .size(100.dp)
-            .clip(CircleShape),
+            .clip(CircleShape)
+            .clickable { onClick() },
+        contentScale = ContentScale.Crop,
         painter =
         if (imageUrl == "default") painterResource(R.drawable.img_default_user)
         else rememberAsyncImagePainter(imageUrl),

@@ -1,6 +1,9 @@
 package com.ssafy.ourhome.screens.userpage
 
-import android.util.Log
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -18,6 +21,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -25,11 +29,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.ssafy.domain.model.user.DomainUserDTO
 import com.ssafy.ourhome.R
-import com.ssafy.ourhome.navigation.OurHomeScreens
 import com.ssafy.ourhome.ui.theme.BirthDayColor
 import com.ssafy.ourhome.ui.theme.BloodTypeColor
 import com.ssafy.ourhome.ui.theme.MBTIColor
@@ -38,6 +40,7 @@ import com.ssafy.ourhome.utils.Prefs
 
 @Composable
 fun UserColorCardList(userDTO: DomainUserDTO) {
+
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
@@ -55,6 +58,7 @@ fun UserCommonCard(
     title: String,
     content: String
 ) {
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -98,7 +102,6 @@ fun BirthDayCard(
     cardModifier: Modifier = Modifier,
     content: String,
 ) {
-    Log.d("test5", "BirthDayCard: $content")
     val split = content.split("-")
     val year = split[0]
     val month = split[1]
@@ -265,7 +268,10 @@ fun MBTICard(
             Text(
                 text = content,
                 modifier = Modifier.align(Alignment.BottomEnd),
-                style = MaterialTheme.typography.h5.copy(color = Color.White)
+                style = MaterialTheme.typography.h5.copy(
+                    color = Color.White,
+                    fontWeight = FontWeight.ExtraBold
+                )
             )
         }
     }
@@ -274,7 +280,8 @@ fun MBTICard(
 @Composable
 fun UserInfoCard(
     userDTO: DomainUserDTO,
-    navController: NavController
+    context : Context,
+    navAction: () -> Unit,
 ) {
     Card(
         modifier = Modifier
@@ -325,6 +332,16 @@ fun UserInfoCard(
                 // TODO : 전화걸기 기능 추가
                 modifier = Modifier.clickable {
 
+                    val u = Uri.parse("tel:" + userDTO.phone)
+                    val i = Intent(Intent.ACTION_DIAL,u)
+
+                    try{
+                        context.startActivity(i)
+                    }catch (s: SecurityException) {
+
+                        Toast.makeText(context, " 에러", Toast.LENGTH_SHORT)
+                            .show()
+                    }
                 }
             ) {
                 Image(
@@ -345,8 +362,8 @@ fun UserInfoCard(
                     modifier = Modifier
                         .fillMaxWidth(),
                     onClick = {
-                        navController.currentBackStackEntry?.arguments?.putParcelable("userDTO", userDTO)
-                        navController.navigate(OurHomeScreens.EditProfileScreen.name) },
+                        navAction()
+                    },
                     shape = RoundedCornerShape(8.dp),
                     border = BorderStroke(2.dp, Color.LightGray)
                 ) {
@@ -359,3 +376,4 @@ fun UserInfoCard(
         }
     }
 }
+

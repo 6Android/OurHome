@@ -14,6 +14,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -35,6 +36,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.holix.android.bottomsheetdialog.compose.BottomSheetDialog
 import com.holix.android.bottomsheetdialog.compose.BottomSheetDialogProperties
 import com.kizitonwose.calendar.core.CalendarDay
+import com.ssafy.domain.model.schedule.DomainScheduleDTO
 import com.ssafy.domain.model.user.DomainUserDTO
 import com.ssafy.ourhome.MainActivity.Companion.startWorkManager
 import com.ssafy.ourhome.R
@@ -62,7 +64,8 @@ fun HomeScreen(navController: NavController, vm: HomeViewModel) {
     val visibleBottomSheetState = remember {
         mutableStateOf(false)
     }
-    val onScheduleClick: (Schedule) -> Unit = { schedule ->
+    val onScheduleClick: (DomainScheduleDTO) -> Unit = { schedule ->
+        vm.setScheduleDetail(schedule)
         navController.navigate(OurHomeScreens.ScheduleDetailScreen.name)
     }
     val visibleInviteDialogState = remember {
@@ -86,10 +89,26 @@ fun HomeScreen(navController: NavController, vm: HomeViewModel) {
 
     /** 달력에 필요한 데이터 */
     var selection = remember { mutableStateOf<CalendarDay?>(null) }
-    val map = mutableMapOf<String, List<Schedule>>()
+    val onMonthChangeListener: (String) -> Unit = {
+        it.split("-").let {
+            val year = it[0].toInt()
+            val month = it[1].toInt()
 
-    vm.getFamilyUsers()
+            // vm 호출
+            vm.getFamilySchedules(year, month)
+        }
+
+    }
+    LaunchedEffect(key1 = "") {
+        vm.getFamilyUsers()
+    }
+
     when (vm.familyUsersProcessState.value) {
+        State.SUCCESS -> {
+            // 스케줄 추가 상태 초기화
+            vm.initAddSchedule()
+            vm.familyUsersProcessState.value = State.DEFAULT
+        }
         State.ERROR -> {
             Toast.makeText(context, "가족 정보를 불러오는데 실패했습니다", Toast.LENGTH_SHORT).show()
             vm.familyUsersProcessState.value = State.DEFAULT
@@ -121,7 +140,7 @@ fun HomeScreen(navController: NavController, vm: HomeViewModel) {
                 PersonList(vm.familyUsersState.value) {
                     // todo: 프로필 사진 클릭
 
-                    if(it == Prefs.email) {
+                    if (it == Prefs.email) {
                         // todo: 내 이미지 클릭했을 경우 바텀 네비 마이페이지로 이동
                     }
                 }
@@ -183,7 +202,8 @@ fun HomeScreen(navController: NavController, vm: HomeViewModel) {
                 CalendarCard(
                     visibleBottomSheetState = visibleBottomSheetState,
                     selection = selection,
-                    map = map
+                    map = vm.scheduleMap,
+                    onMonthChange = onMonthChangeListener
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -191,11 +211,14 @@ fun HomeScreen(navController: NavController, vm: HomeViewModel) {
                 /** 바텀 시트 */
                 if (visibleBottomSheetState.value) {
                     BottomSheet(
-                        list = map.getOrDefault(
-                            "${selection.value!!.date.year}-${selection.value!!.date.monthValue}-${selection.value!!.date.dayOfMonth}",
+                        list = vm.scheduleMap.getOrDefault(
+                            "${selection.value!!.date.year}-${selection.value!!.date.monthValue.toFillZeroString()}-${selection.value!!.date.dayOfMonth.toFillZeroString()}",
                             emptyList()
                         ),
-                        onAddScheduleClick = { moveToAddScheduleScreen(navController) },
+                        onAddScheduleClick = {
+                            vm.addScheduleDateState.value = selection.value!!.date
+                            moveToAddScheduleScreen(navController)
+                        },
                         onScheduleClick = onScheduleClick
                     ) {
                         visibleBottomSheetState.value = false
@@ -365,9 +388,9 @@ fun HomeCard(
 /** 바텀 시트 */
 @Composable
 fun BottomSheet(
-    list: List<Schedule>,
+    list: List<DomainScheduleDTO>,
     onAddScheduleClick: () -> Unit,
-    onScheduleClick: (Schedule) -> Unit,
+    onScheduleClick: (DomainScheduleDTO) -> Unit,
     onDismissRequest: () -> Unit
 ) {
     BottomSheetDialog(
@@ -421,9 +444,9 @@ fun BottomSheet(
 /** 일정이 있을 경우 바텀시트 */
 @Composable
 private fun ScheduleList(
-    list: List<Schedule>,
+    list: List<DomainScheduleDTO>,
     onAddScheduleClick: () -> Unit,
-    onScheduleClick: (Schedule) -> Unit
+    onScheduleClick: (DomainScheduleDTO) -> Unit
 ) {
     Row(
         modifier = Modifier

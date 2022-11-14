@@ -1,9 +1,8 @@
 package com.ssafy.ourhome.navigation
 
-import java.lang.IllegalStateException
-
 enum class OurHomeScreens {
 
+    SplashScreen,
     NextScreen,
     LoginScreen,
     JoinEmailScreen,
@@ -28,6 +27,7 @@ enum class OurHomeScreens {
 
     companion object {
         fun fromRoute(route: String?): OurHomeScreens = when (route?.substringBefore("/")) {
+            SplashScreen.name -> SplashScreen
             NextScreen.name -> NextScreen
             LoginScreen.name -> LoginScreen
             JoinEmailScreen.name -> JoinEmailScreen

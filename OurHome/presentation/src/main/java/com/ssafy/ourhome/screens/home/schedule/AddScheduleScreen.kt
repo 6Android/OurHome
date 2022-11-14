@@ -1,5 +1,6 @@
 package com.ssafy.ourhome.screens.home.schedule
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
@@ -10,34 +11,37 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.squaredem.composecalendar.ComposeCalendar
 import com.ssafy.ourhome.components.MainAppBar
 import com.ssafy.ourhome.components.OurHomeSurface
 import com.ssafy.ourhome.navigation.OurHomeScreens
-import com.ssafy.ourhome.ui.theme.OurHomeTheme
-import com.ssafy.ourhome.utils.personList
+import com.ssafy.ourhome.screens.home.HomeViewModel
+import com.ssafy.ourhome.utils.Prefs.email
+import com.ssafy.ourhome.utils.State
 import java.time.LocalDate
 
 @Composable
-fun AddScheduleScreen(navController: NavController) {
+fun AddScheduleScreen(navController: NavController, vm: HomeViewModel) {
+    val context = LocalContext.current
     val showDialog = rememberSaveable { mutableStateOf(false) }
-    val titleState = remember {
-        mutableStateOf("")
-    }
-    val contentState = remember {
-        mutableStateOf("")
-    }
-    val dateState = remember {
-        mutableStateOf(LocalDate.now())
+
+    when (vm.addScheduleProcessState.value) {
+        State.SUCCESS -> {
+            Toast.makeText(context, "일정을 등록했습니다", Toast.LENGTH_SHORT).show()
+            navController.popBackStack()
+            vm.addScheduleProcessState.value = State.DEFAULT
+        }
+        State.FAIL -> {
+            Toast.makeText(context, "일정 등록 실패했습니다", Toast.LENGTH_SHORT).show()
+            vm.addScheduleProcessState.value = State.DEFAULT
+        }
     }
 
     Scaffold(topBar = {
@@ -48,7 +52,11 @@ fun AddScheduleScreen(navController: NavController) {
             onBackClick = { navController.popBackStack() },
             onIconClick = {
                 // todo: 일정 추가 버튼 클릭시
-
+                if (vm.addScheduleTitleState.value.isBlank()) {
+                    Toast.makeText(context, "일정 제목을 입력해주세요", Toast.LENGTH_SHORT).show()
+                    return@MainAppBar
+                }
+                vm.addSchedule()
             })
     }) {
         OurHomeSurface() {
@@ -80,19 +88,19 @@ fun AddScheduleScreen(navController: NavController) {
                         ) {
 
                             /** 날짜 */
-                            SelectDate(dateState) {
+                            SelectDate(vm.addScheduleDateState) {
                                 showDialog.value = true
                             }
 
                             Spacer(modifier = Modifier.height(16.dp))
 
                             /** 제목 */
-                            WriteTitle(titleState)
+                            WriteTitle(vm.addScheduleTitleState)
 
                             Spacer(modifier = Modifier.height(16.dp))
 
                             /** 내용 */
-                            WriteContent(contentState)
+                            WriteContent(vm.addScheduleContentState)
 
                             Spacer(modifier = Modifier.height(16.dp))
 
@@ -107,9 +115,15 @@ fun AddScheduleScreen(navController: NavController) {
                         Spacer(modifier = Modifier.height(8.dp))
 
                         /** 함께하는 가족들 리스트 */
-                        PersonList(personList = personList) {
-                            navController.navigate(OurHomeScreens.AddMemberScreen.name)
-                        }
+                        PersonList(
+                            personList = vm.addScheduleParticipantsState
+                                .filter { it.checked }
+                                .map { it.toDomainUserDTO() },
+                            onAddClick = { navController.navigate(OurHomeScreens.AddMemberScreen.name) },
+                            onDeleteClick = { email ->
+                                vm.deleteParticipant(email)
+                            }
+                        )
                     }
                 }
 
@@ -118,7 +132,7 @@ fun AddScheduleScreen(navController: NavController) {
                     ComposeCalendar(
                         onDone = { it: LocalDate ->
                             // Hide dialog
-                            dateState.value = it
+                            vm.addScheduleDateState.value = it
                             showDialog.value = false
                             // Do something with the date
                         },
@@ -130,14 +144,5 @@ fun AddScheduleScreen(navController: NavController) {
                 }
             }
         }
-    }
-}
-
-
-@Preview(showBackground = true)
-@Composable
-fun PrevAddScheduleScreen() {
-    OurHomeTheme {
-        AddScheduleScreen(navController = NavController(LocalContext.current))
     }
 }
