@@ -24,20 +24,22 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.ssafy.domain.model.user.DomainUserDTO
 import com.ssafy.ourhome.MainActivity
 import com.ssafy.ourhome.components.MainAppBar
 import com.ssafy.ourhome.components.OurHomeSurface
 import com.ssafy.ourhome.navigation.OurHomeScreens
+import com.ssafy.ourhome.screens.userpage.UserPageViewModel
 import com.ssafy.ourhome.ui.theme.MainColor
 import com.ssafy.ourhome.utils.Prefs
 import com.ssafy.ourhome.utils.checkAndRequestLocationPermissions
 import com.ssafy.ourhome.utils.permissions
 
 @Composable
-fun SettingScreen(navController: NavController, permit: Boolean, isManager: Boolean, vm: SettingViewModel) {
+fun SettingScreen(navController: NavController, vm: UserPageViewModel) {
 
     val switchChecked = remember {
-        mutableStateOf(permit)
+        mutableStateOf(vm.user.location_permit)
     }
     val scrollState = rememberScrollState()
 
@@ -68,7 +70,7 @@ fun SettingScreen(navController: NavController, permit: Boolean, isManager: Bool
                 }
 
                 Spacer(modifier = Modifier.height(42.dp))
-                OurHomeSetting(code = Prefs.familyCode, navController, isManager, context)
+                OurHomeSetting(code = Prefs.familyCode, navController, vm.user.manager, context)
 
                 Spacer(modifier = Modifier.height(42.dp))
                 Support()
@@ -81,8 +83,14 @@ fun SettingScreen(navController: NavController, permit: Boolean, isManager: Bool
                     (context as MainActivity).finish()
                 }
                 Spacer(modifier = Modifier.height(32.dp))
-                ClickableText("회원탈퇴") {
 
+                // TEST : 유저 넣기
+                ClickableText("회원탈퇴") {
+                    vm.insertUser(DomainUserDTO(email= "test1@naver.com", name = "테스트1", family_code = "TEST"))
+                    vm.insertUser(DomainUserDTO(email= "test2@naver.com", name = "테스트2",family_code = "TEST"))
+                    vm.insertUser(DomainUserDTO(email= "test3@naver.com", name = "테스트3",family_code = "TEST"))
+                    vm.insertUser(DomainUserDTO(email= "test4@naver.com", name = "테스트4",family_code = "TEST"))
+                    vm.insertUser(DomainUserDTO(email= "test5@naver.com", name = "테스트5",family_code = "TEST"))
                 }
             }
         }

@@ -35,8 +35,7 @@ fun MyPageScreen(
             backIconEnable = false,
             icon = painterResource(id = SETTING_ICON),
             onIconClick = {
-//                navController.navigate(OurHomeScreens.UserPageScreen.name + "/b@naver.com")
-                navController.navigate(OurHomeScreens.SettingScreen.name+"/${vm.user.location_permit}/${vm.user.manager}")
+                navController.navigate(OurHomeScreens.SettingScreen.name)
             }
         )
     }) {

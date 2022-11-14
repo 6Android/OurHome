@@ -27,6 +27,7 @@ import com.ssafy.domain.model.user.DomainUserDTO
 import com.ssafy.ourhome.R
 import com.ssafy.ourhome.components.MainAppBar
 import com.ssafy.ourhome.components.OurHomeSurface
+import com.ssafy.ourhome.screens.userpage.UserPageViewModel
 import com.ssafy.ourhome.ui.theme.MainColor
 import com.ssafy.ourhome.utils.Prefs
 
@@ -34,17 +35,17 @@ import com.ssafy.ourhome.utils.Prefs
 @Composable
 fun ManageFamilyScreen(
     navController: NavController = NavController(LocalContext.current),
-    vm: SettingViewModel
+    vm: UserPageViewModel
 ) {
 
     // 가족원 전부 불러오기
     vm.getFamilyUsers()
 
     // 가족장 위임
-    if (vm.editSuccess) {
+    if (vm.delegateSuccess) {
         navController.popBackStack()
         navController.popBackStack()
-        vm.setEditSuccess()
+        vm.setDelegateSuccess()
         Toast.makeText(LocalContext.current, "가족장이 위임되었습니다.", Toast.LENGTH_SHORT).show()
     }
 

@@ -29,58 +29,28 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import coil.compose.AsyncImagePainter.State.Empty.painter
 import coil.compose.rememberAsyncImagePainter
 import com.squaredem.composecalendar.ComposeCalendar
-import com.ssafy.domain.model.user.DomainUserDTO
 import com.ssafy.ourhome.R
 import com.ssafy.ourhome.components.MainAppBar
 import com.ssafy.ourhome.components.OurHomeSurface
+import kotlinx.coroutines.delay
 import java.time.LocalDate
 
 @Composable
 fun EditProfileScreen(
     navController: NavController = NavController(LocalContext.current),
-    userDTO: DomainUserDTO = DomainUserDTO(),
     vm: UserPageViewModel
 ) {
     val scrollState = rememberScrollState()
 
-    Log.d("EditProfileScreen", "Recompose: ")
-    var user = userDTO
-
-    val nicknameState = remember {
-        mutableStateOf(userDTO.name)
-    }
-    val phoneState = remember {
-        mutableStateOf(userDTO.phone)
-    }
-
-    val birthDayState = remember {
-        mutableStateOf(LocalDate.parse(userDTO.birthday))
-    }
-
-    val bloodTypeState = remember {
-        mutableStateOf(userDTO.blood_type)
-    }
-
-    val MBTIState = remember {
-        mutableStateOf(userDTO.mbti)
-    }
-
-    val jobState = remember {
-        mutableStateOf(userDTO.job)
-    }
-
-    val interestState = remember {
-        mutableStateOf(userDTO.interest)
-    }
-
-    val hobbyState = remember {
-        mutableStateOf(userDTO.hobby)
-    }
-
     val showDialog = rememberSaveable { mutableStateOf(false) }
+
+    LaunchedEffect(true){
+        // 에디트텍스트 초기화
+        vm.setData()
+    }
+
 
     // 에디트 성공
     if (vm.editSuccess) {
@@ -93,7 +63,8 @@ fun EditProfileScreen(
         ComposeCalendar(
             onDone = { it: LocalDate ->
                 // Hide dialog
-                birthDayState.value = it
+                Log.d("test5", "EditProfileScreen: $it")
+                vm.birthDayState.value = it
                 showDialog.value = false
                 // Do something with the date
             },
@@ -112,17 +83,7 @@ fun EditProfileScreen(
                 onBackClick = { navController.popBackStack() },
                 icon = painterResource(R.drawable.ic_check),
                 onIconClick = {
-                    user.name = nicknameState.value
-                    user.phone = phoneState.value
-                    user.birthday = birthDayState.value.toString()
-                    user.blood_type = bloodTypeState.value
-                    user.mbti = MBTIState.value
-                    user.job = jobState.value
-                    user.interest = interestState.value
-                    user.hobby = hobbyState.value
-
-                    vm.editProfile(user)
-                    Log.d("test5", "EditProfileScreen: $user")
+                    vm.editProfile()
                 }
             )
         }) {
@@ -141,8 +102,8 @@ fun EditProfileScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    UserImage(userDTO.image)
-                    TextFieldWithClear(nicknameState)
+                    UserImage(vm.user.image)
+                    TextFieldWithClear(vm.nicknameState)
                 }
 
                 Divider(
@@ -156,11 +117,11 @@ fun EditProfileScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(24.dp)
                 ) {
-                    TextWithText("이메일", userDTO.email)
-                    TextWithTextField("전화번호", phoneState, KeyboardType.Number)
-                    BirthDaySelect(title = "생일", birthDayState, showDialog)
+                    TextWithText("이메일", vm.user.email)
+                    TextWithTextField("전화번호", vm.phoneState, KeyboardType.Number)
+                    BirthDaySelect(title = "생일", vm.birthDayState, showDialog)
                     TextWithDropDown(
-                        title = "혈액형", textState = bloodTypeState, itemList =
+                        title = "혈액형", textState = vm.bloodTypeState, itemList =
                         listOf(
                             "Rh+ A",
                             "Rh- A",
@@ -173,15 +134,15 @@ fun EditProfileScreen(
                         )
                     )
                     TextWithDropDown(
-                        title = "MBTI", textState = MBTIState, itemList =
+                        title = "MBTI", textState = vm.MBTIState, itemList =
                         listOf(
                             "ENFP", "ENFJ", "ENTP", "ENTJ", "ESFP", "ESFJ", "ESTP", "ESTJ",
                             "INFP", "INFJ", "INTP", "INTJ", "ISFP", "ISFJ", "ISTP", "ISTJ", "MBTI",
                         )
                     )
-                    TextWithTextField("직업", jobState)
-                    TextWithTextField("관심사", interestState)
-                    TextWithTextField("취미", hobbyState)
+                    TextWithTextField("직업", vm.jobState)
+                    TextWithTextField("관심사", vm.interestState)
+                    TextWithTextField("취미", vm.hobbyState)
                 }
                 Spacer(modifier = Modifier.height(16.dp))
             }
@@ -215,8 +176,6 @@ private fun BirthDaySelect(
                 style = MaterialTheme.typography.body2.copy(fontWeight = FontWeight.Bold)
             )
         }
-
-
     }
 }
 
