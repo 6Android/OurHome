@@ -1,5 +1,6 @@
 package com.ssafy.ourhome.screens.question
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -11,13 +12,14 @@ import com.ssafy.domain.model.question.DomainQuestionDTO
 import com.ssafy.domain.model.user.DomainUserDTO
 import com.ssafy.domain.usecase.pet.GetFamilyPetUseCase
 import com.ssafy.domain.usecase.question.*
+import com.ssafy.domain.usecase.user.EditUserContribution
 import com.ssafy.domain.usecase.user.GetFamilyUsersUseCase
+import com.ssafy.domain.usecase.user.GetProfileUseCase
 import com.ssafy.domain.utils.ResultType
 import com.ssafy.ourhome.utils.Prefs
 import com.ssafy.ourhome.utils.State
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import javax.inject.Inject
@@ -30,8 +32,14 @@ class QuestionViewModel @Inject constructor(
     private val getLast3QuestionsUseCase: GetLast3QuestionsUseCase,
     private val getLastAllQuestionsUseCase: GetLastAllQuestionsUseCase,
     private val updateTodayQuestionUseCase: UpdateTodayQuestionUseCase,
-    private val getFamilyUsersUseCase: GetFamilyUsersUseCase
+    private val getFamilyUsersUseCase: GetFamilyUsersUseCase,
+    private val answerQuestionUsecase: AnswerQuestionUsecase,
+    private val completeTodayQuestionUseCase: CompleteTodayQuestionUseCase,
+    private val editUserContribution: EditUserContribution
 ): ViewModel(){
+
+    var myProfile by mutableStateOf(DomainUserDTO())
+        private set
 
     var pet by mutableStateOf(DomainFamilyPetDTO())
         private set
@@ -39,8 +47,19 @@ class QuestionViewModel @Inject constructor(
     var todayQuestion by mutableStateOf(DomainQuestionDTO())
         private set
 
-    var questionAnswers by mutableStateOf(listOf<DomainQuestionAnswerDTO>())
+    var detailQuestionSeq by mutableStateOf(1)
+
+    var detailQuestion by mutableStateOf(DomainQuestionDTO())
         private set
+
+    var familyAnswers by mutableStateOf(mutableListOf<DomainQuestionAnswerDTO>())
+        private set
+
+    var myAnswer = mutableStateOf("")
+
+    var myAnswerPoint = 0
+
+    var myAnswerAddedState by mutableStateOf(false)
 
     var last3Questions by mutableStateOf(listOf<DomainQuestionDTO>())
         private set
@@ -48,10 +67,11 @@ class QuestionViewModel @Inject constructor(
     var lastAllQuestions by mutableStateOf(listOf<DomainQuestionDTO>())
         private set
 
-    var familyUsers by mutableStateOf<List<DomainUserDTO>>(emptyList())
-        private set
+    var familyUsers = mutableStateOf<MutableMap<String, DomainUserDTO>>(mutableMapOf())
 
-    var familyUsersProcessState by mutableStateOf(State.DEFAULT)
+    var familyPetProcessState by mutableStateOf(State.DEFAULT)
+
+    var answerCompleteState by mutableStateOf(State.DEFAULT)
 
     fun getFamiliyPet() = viewModelScope.launch(Dispatchers.IO) {
         getFamilyPetUseCase.execute(Prefs.familyCode).collect{
@@ -82,12 +102,45 @@ class QuestionViewModel @Inject constructor(
         }
     }
 
-    fun getQuestionAnswers(questionSeq: Int) = viewModelScope.launch(Dispatchers.IO) {
-        getQuestionAnswersUseCase.execute(Prefs.familyCode, questionSeq).collect{
+    fun getDetailQuestion() {
+        if(todayQuestion.question_seq == detailQuestionSeq){
+            detailQuestion = todayQuestion
+        }else{
+            for(question in last3Questions){
+                if(question.question_seq == detailQuestionSeq){
+                    detailQuestion = question
+                    return
+                }
+            }
+
+            for(question in lastAllQuestions){
+                if(question.question_seq == detailQuestionSeq){
+                    detailQuestion = question
+                    return
+                }
+            }
+        }
+    }
+
+    fun getQuestionAnswers() = viewModelScope.launch(Dispatchers.IO) {
+        getQuestionAnswersUseCase.execute(Prefs.familyCode, detailQuestionSeq).collect{
             when(it) {
                 is ResultType.Uninitialized -> {}
                 is ResultType.Success -> {
-                    questionAnswers = it.data!!
+                    val questionAnswers = it.data!!
+                    familyAnswers.clear()
+
+                    for(answer in questionAnswers){
+                        if(answer.email == Prefs.email){
+                            myAnswer.value = answer.content
+                            myAnswerPoint = answer.content.length
+                            Log.d("ddd", "getQuestionAnswers: $myAnswerPoint")
+                            myAnswerAddedState = true
+                        }else{
+                            familyAnswers.add(answer)
+                        }
+                    }
+
                 }
                 is ResultType.Error -> {
 
@@ -161,11 +214,19 @@ class QuestionViewModel @Inject constructor(
             when(it) {
                 is ResultType.Loading -> {}
                 is ResultType.Success -> {
-                    familyUsers = it.data
-                    familyUsersProcessState = State.SUCCESS
+                    val familyUserList = it.data
+
+                    for(user in familyUserList){
+                        familyUsers.value[user.email] = user
+                        if(user.email == Prefs.email){
+                            myProfile = user
+                        }
+                    }
+
+                    familyPetProcessState = State.SUCCESS
                 }
                 is ResultType.Error -> {
-                    familyUsersProcessState = State.ERROR
+                    familyPetProcessState = State.ERROR
                 }
                 else -> {
 
@@ -173,5 +234,113 @@ class QuestionViewModel @Inject constructor(
             }
         }
     }
+
+    fun modifyAnswer(){
+        val today = LocalDate.now()
+        var date = today.year.toString() + "."
+        if(today.monthValue < 10){
+            date += "0"
+        }
+        date = date + today.monthValue + "."
+
+        if(today.dayOfMonth < 10){
+            date += "0"
+        }
+        date += today.dayOfMonth
+
+        answerDetailQuestion(today, date)
+    }
+
+    fun answer() {
+        val today = LocalDate.now()
+        var date = today.year.toString() + "."
+        if(today.monthValue < 10){
+            date += "0"
+        }
+        date = date + today.monthValue + "."
+
+        if(today.dayOfMonth < 10){
+            date += "0"
+        }
+        date += today.dayOfMonth
+
+        answerDetailQuestion(today, date)
+
+        if(checkCompleteAnswer()){
+            completeTodayAnswer(today, date)
+        }
+    }
+
+    fun answerDetailQuestion(today: LocalDate, date: String) = viewModelScope.launch(Dispatchers.IO) {
+        answerQuestionUsecase.execute(Prefs.familyCode, detailQuestionSeq,
+            DomainQuestionAnswerDTO(Prefs.email, myAnswer.value, date, today.year, today.monthValue, today.dayOfMonth)
+        ).collect {
+            when(it) {
+                is ResultType.Loading -> {}
+                is ResultType.Success -> {
+                    answerCompleteState = State.SUCCESS
+                }
+                is ResultType.Error -> {
+                    answerCompleteState = State.ERROR
+                }
+                else -> {
+
+                }
+            }
+        }
+    }
+
+    fun checkCompleteAnswer() : Boolean{
+        if(familyAnswers.size + 1 == familyUsers.value.size){
+            return true
+        }
+        return false
+    }
+
+    fun completeTodayAnswer(today: LocalDate, date: String) = viewModelScope.launch(Dispatchers.IO) {
+        val questionMap = mapOf<String, Any>(
+            "question_seq" to detailQuestionSeq,
+            "question_content" to detailQuestion.question_content,
+            "completed_date" to date,
+            "completed_year" to today.year,
+            "completed_month" to today.monthValue,
+            "completed_day" to today.dayOfMonth
+        )
+        completeTodayQuestionUseCase.execute(Prefs.familyCode, detailQuestionSeq, questionMap).collect{
+            when(it) {
+                is ResultType.Loading -> {}
+                is ResultType.Success -> {
+
+                }
+                is ResultType.Error -> {
+
+                }
+                else -> {
+
+                }
+            }
+        }
+    }
+
+    fun editContribution() = viewModelScope.launch(Dispatchers.IO) {
+        Log.d("ddd", "editContribution: ${myAnswer.value.length}")
+        Log.d("ddd", "editContribution: ${myAnswerPoint}")
+
+        editUserContribution.execute(Prefs.familyCode, Prefs.email, 1L * myAnswer.value.length - myAnswerPoint).collect{
+            when(it) {
+                is ResultType.Loading -> {}
+                is ResultType.Success -> {
+
+                }
+                is ResultType.Error -> {
+
+                }
+                else -> {
+
+                }
+            }
+        }
+    }
+
 
 }

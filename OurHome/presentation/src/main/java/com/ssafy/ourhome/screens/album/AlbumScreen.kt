@@ -22,6 +22,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImagePainter.State.Empty.painter
 import coil.compose.rememberAsyncImagePainter
+import com.google.accompanist.systemuicontroller.SystemUiController
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.ssafy.ourhome.components.MainAppBar
 import com.ssafy.ourhome.components.OurHomeSurface
 import com.ssafy.ourhome.navigation.OurHomeScreens
@@ -33,6 +35,8 @@ import java.nio.charset.StandardCharsets
 
 @Composable
 fun AlbumScreen(navController : NavController){
+    val systemUiController: SystemUiController = rememberSystemUiController()
+    systemUiController.isStatusBarVisible = true // Status bar 안보이기
 
     Scaffold(topBar = { // TODO 세팅 아이콘 -> 채팅 아이콘
         MainAppBar(title = "앨범", backIconEnable = false, icon = painterResource(id = CHATTING_ICON_BLACK), onIconClick = {

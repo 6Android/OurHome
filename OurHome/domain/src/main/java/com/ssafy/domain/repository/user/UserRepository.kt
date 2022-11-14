@@ -67,4 +67,7 @@ interface UserRepository {
         email: String,
         permission: Boolean
     ): Flow<ResultType<Unit>>
+
+    // 펫 기여도 수정
+    fun editUserContribution(familyCode: String, email: String, point: Long): Flow<ResultType<Unit>>
 }

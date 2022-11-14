@@ -36,19 +36,16 @@ class QuestionRepositoryImpl @Inject constructor(
         familyCode: String,
         questionSeq: Int
     ): Flow<QuestionAnswerResponse> = callbackFlow {
-        val snapshotListener =
-            questionDataSource.getQuestionAnswers(familyCode, questionSeq).addSnapshotListener { snapshot, e ->
-                val response = if (snapshot != null) {
-                    val answers = snapshot.toObjects(DomainQuestionAnswerDTO::class.java)
-                    ResultType.Success(answers)
-                } else {
-                    ResultType.Error(e)
+            questionDataSource.getQuestionAnswers(familyCode, questionSeq).addOnCompleteListener {
+                if(it.isSuccessful){
+                    trySend(ResultType.Success(it.result.toObjects(DomainQuestionAnswerDTO::class.java)))
+                }else{
+                    trySend(ResultType.Error(it.exception))
                 }
-                trySend(response)
+            }.addOnFailureListener {
+                trySend(ResultType.Error(it))
             }
-        awaitClose {
-            snapshotListener.remove()
-        }
+        awaitClose {  }
     }
 
     override fun getLast3Questions(familyCode: String): Flow<QuestionResponse> = callbackFlow {
@@ -93,6 +90,40 @@ class QuestionRepositoryImpl @Inject constructor(
         }.addOnFailureListener {
             trySend(ResultType.Error(it))
         }
+        awaitClose {  }
     }
 
+    override fun answerQuestion(
+        familyCode: String,
+        questionSeq: Int,
+        answer: DomainQuestionAnswerDTO
+    ): Flow<ResultType<Unit>> = callbackFlow {
+        questionDataSource.answerQuestion(familyCode, questionSeq, answer).addOnCompleteListener {
+            if(it.isSuccessful){
+                trySend(ResultType.Success(Unit))
+            }else{
+                trySend(ResultType.Error(it.exception))
+            }
+        }.addOnFailureListener {
+            trySend(ResultType.Error(it))
+        }
+        awaitClose {  }
+    }
+
+    override fun completeTodayQuestion(
+        familyCode: String,
+        questionSeq: Int,
+        questionsMap: Map<String, Any>
+    ): Flow<ResultType<Unit>> = callbackFlow {
+        questionDataSource.completeTodayQuestion(familyCode, questionSeq, questionsMap).addOnCompleteListener {
+            if(it.isSuccessful){
+                trySend(ResultType.Success(Unit))
+            }else{
+                trySend(ResultType.Error(it.exception))
+            }
+        }.addOnFailureListener {
+            trySend(ResultType.Error(it))
+        }
+        awaitClose {  }
+    }
 }

@@ -29,7 +29,7 @@ fun QuestionListScreen(navController: NavController, vm : QuestionViewModel){
                 //QuestionLazyColumn 에 위아래 패딩 8dp 있어서 8dp만
                 Spacer(modifier = Modifier.height(8.dp))
 
-                QuestionLazyColumn(questionsList = vm.lastAllQuestions)
+                QuestionLazyColumn(questionsList = vm.lastAllQuestions, navController = navController, vm = vm)
 
                 Spacer(modifier = Modifier.height(8.dp))
 

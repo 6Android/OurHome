@@ -34,6 +34,7 @@ import com.ssafy.ourhome.R
 import com.ssafy.ourhome.components.MainAppBar
 import com.ssafy.ourhome.components.OurHomeSurface
 import com.ssafy.ourhome.navigation.OurHomeScreens
+import com.ssafy.ourhome.screens.album.encodeUrlForNavigate
 import com.ssafy.ourhome.ui.theme.Gray
 import com.ssafy.ourhome.ui.theme.MainColor
 import com.ssafy.ourhome.ui.theme.nanum
@@ -80,7 +81,7 @@ fun QuestionScreen(navController: NavController, vm : QuestionViewModel) {
                         label = "답변 하기",
                         onClick = {
                             navigateQuestionDetailScreen(navController)
-                        })
+                        }, vm = vm)
                 }
 
                 Spacer(modifier = Modifier.height(36.dp))
@@ -89,7 +90,7 @@ fun QuestionScreen(navController: NavController, vm : QuestionViewModel) {
                     navController.navigate(OurHomeScreens.QuestionListScreen.name)
                 }
 
-                QuestionLazyColumn(Modifier.height(260.dp), questionsList = vm.last3Questions)
+                QuestionLazyColumn(Modifier.height(260.dp), questionsList = vm.last3Questions, navController = navController, vm = vm)
 
                 Spacer(modifier = Modifier.height(16.dp))            }
         }
@@ -201,22 +202,27 @@ fun LastQuestionHeader(onClick: () -> Unit = {}) {
 
 /** 지난 질문 리스트  **/
 @Composable
-fun QuestionLazyColumn(modifier: Modifier = Modifier, questionsList: List<DomainQuestionDTO>) {
+fun QuestionLazyColumn(modifier: Modifier = Modifier, questionsList: List<DomainQuestionDTO>, navController: NavController, vm: QuestionViewModel) {
     LazyColumn(modifier = modifier) {
         items(questionsList) {
-            QuestionItem(question = it)
+            QuestionItem(question = it, navController = navController, vm = vm)
         }
     }
 }
 
 /** 지난 질문 리스트 lazyColumn의 item **/
 @Composable
-fun QuestionItem(modifier: Modifier = Modifier.fillMaxWidth(), question: DomainQuestionDTO) {
+fun QuestionItem(modifier: Modifier = Modifier.fillMaxWidth(), question: DomainQuestionDTO, navController: NavController, vm: QuestionViewModel) {
     Card(
-        modifier = modifier.padding(vertical = 8.dp), elevation = 2.dp
+        modifier = modifier
+            .padding(vertical = 8.dp)
+            .clickable {
+                vm.detailQuestionSeq = question.question_seq
+                navigateQuestionDetailScreen(navController)
+            }, elevation = 2.dp
     ) {
         Column(
-            modifier = modifier
+            modifier = modifier,
         ) {
             Row(
                 modifier = modifier
@@ -255,7 +261,8 @@ fun ReplyQuestionButton(
     onClick: () -> Unit = {},
     buttonWidth: Int,
     buttonHeight: Int,
-    fontSize: Int
+    fontSize: Int,
+    vm: QuestionViewModel
 ) {
 
     Surface(
@@ -268,7 +275,10 @@ fun ReplyQuestionButton(
             modifier = Modifier
                 .width(buttonWidth.dp)
                 .heightIn(buttonHeight.dp)
-                .clickable { onClick.invoke() },
+                .clickable {
+                    vm.detailQuestionSeq = vm.todayQuestion.question_seq
+                    onClick.invoke()
+                           },
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
