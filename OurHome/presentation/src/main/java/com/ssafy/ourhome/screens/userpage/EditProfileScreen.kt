@@ -34,7 +34,6 @@ import com.squaredem.composecalendar.ComposeCalendar
 import com.ssafy.ourhome.R
 import com.ssafy.ourhome.components.MainAppBar
 import com.ssafy.ourhome.components.OurHomeSurface
-import kotlinx.coroutines.delay
 import java.time.LocalDate
 
 @Composable
@@ -46,7 +45,7 @@ fun EditProfileScreen(
 
     val showDialog = rememberSaveable { mutableStateOf(false) }
 
-    LaunchedEffect(true){
+    LaunchedEffect(true) {
         // 에디트텍스트 초기화
         vm.setData()
     }
@@ -104,6 +103,7 @@ fun EditProfileScreen(
                 ) {
                     UserImage(vm.user.image)
                     TextFieldWithClear(vm.nicknameState)
+                    Log.d("test5", "EditProfileScreen: ${vm.nicknameState}")
                 }
 
                 Divider(

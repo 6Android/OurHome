@@ -169,14 +169,14 @@ class UserPageViewModel @Inject constructor(
 
     // 에디트 텍스트 세팅
     fun setData(){
-        nicknameState = mutableStateOf(user.name)
-        phoneState = mutableStateOf(user.phone)
-        birthDayState = mutableStateOf(LocalDate.parse(user.birthday))
-        bloodTypeState = mutableStateOf(user.blood_type)
-        MBTIState = mutableStateOf(user.mbti)
-        jobState = mutableStateOf(user.job)
-        interestState = mutableStateOf(user.interest)
-        hobbyState = mutableStateOf(user.hobby)
+        nicknameState.value = user.name
+        phoneState.value = user.phone
+        birthDayState.value = LocalDate.parse(user.birthday)
+        bloodTypeState.value = user.blood_type
+        MBTIState.value = user.mbti
+        jobState.value = user.job
+        interestState.value = user.interest
+        hobbyState.value = user.hobby
     }
 
     fun logout() {

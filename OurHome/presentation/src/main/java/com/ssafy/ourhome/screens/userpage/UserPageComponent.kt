@@ -1,6 +1,5 @@
 package com.ssafy.ourhome.screens.userpage
 
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -25,11 +24,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.ssafy.domain.model.user.DomainUserDTO
 import com.ssafy.ourhome.R
-import com.ssafy.ourhome.navigation.OurHomeScreens
 import com.ssafy.ourhome.ui.theme.BirthDayColor
 import com.ssafy.ourhome.ui.theme.BloodTypeColor
 import com.ssafy.ourhome.ui.theme.MBTIColor
@@ -264,7 +261,10 @@ fun MBTICard(
             Text(
                 text = content,
                 modifier = Modifier.align(Alignment.BottomEnd),
-                style = MaterialTheme.typography.h5.copy(color = Color.White, fontWeight = FontWeight.ExtraBold)
+                style = MaterialTheme.typography.h5.copy(
+                    color = Color.White,
+                    fontWeight = FontWeight.ExtraBold
+                )
             )
         }
     }
@@ -273,7 +273,7 @@ fun MBTICard(
 @Composable
 fun UserInfoCard(
     userDTO: DomainUserDTO,
-    navController: NavController
+    navAction: () -> Unit,
 ) {
     Card(
         modifier = Modifier
@@ -344,8 +344,8 @@ fun UserInfoCard(
                     modifier = Modifier
                         .fillMaxWidth(),
                     onClick = {
-                        navController.currentBackStackEntry?.arguments?.putParcelable("userDTO", userDTO)
-                        navController.navigate(OurHomeScreens.EditProfileScreen.name) },
+                        navAction()
+                    },
                     shape = RoundedCornerShape(8.dp),
                     border = BorderStroke(2.dp, Color.LightGray)
                 ) {

@@ -48,7 +48,9 @@ fun MyPageScreen(
             ) {
                 Spacer(modifier = Modifier.padding(top = 16.dp))
 
-                UserInfoCard(userDTO = vm.user, navController)
+                UserInfoCard(userDTO = vm.user) {
+                    navController.navigate(OurHomeScreens.EditProfileScreen.name)
+                }
 
                 Spacer(modifier = Modifier.height(16.dp))
                 UserColorCardList(userDTO = vm.user)
