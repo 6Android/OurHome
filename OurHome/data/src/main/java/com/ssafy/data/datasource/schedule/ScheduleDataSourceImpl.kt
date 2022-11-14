@@ -1,11 +1,14 @@
 package com.ssafy.data.datasource.schedule
 
+import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.ssafy.data.utils.FAMILY
 import com.ssafy.data.utils.MONTH
 import com.ssafy.data.utils.SCHEDULE
 import com.ssafy.data.utils.YEAR
+import com.ssafy.domain.model.schedule.DomainScheduleDTO
 import javax.inject.Inject
 
 class ScheduleDataSourceImpl @Inject constructor(
@@ -28,5 +31,12 @@ class ScheduleDataSourceImpl @Inject constructor(
     override fun deleteFamilySchedule(familyCode: String, uid: String) =
         fireStore.collection(FAMILY).document(familyCode).collection(SCHEDULE).document(uid)
             .delete()
+
+    // family/schedule 에 데이터 추가
+    override fun addFamilySchedule(
+        familyCode: String,
+        scheduleDTO: DomainScheduleDTO
+    ): Task<DocumentReference> =
+        fireStore.collection(FAMILY).document(familyCode).collection(SCHEDULE).add(scheduleDTO)
 
 }

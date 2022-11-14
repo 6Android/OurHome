@@ -14,4 +14,10 @@ interface ScheduleRepository {
 
     // family/schedule Doc에서 해당 id 삭제
     fun deleteFamilySchedule(familyCode: String, uid: String): Flow<ResultType<Unit>>
+
+    // family/schedule 에 데이터 추가
+    fun addFamilySchedule(
+        familyCode: String,
+        scheduleDTO: DomainScheduleDTO
+    ): Flow<ResultType<Unit>>
 }

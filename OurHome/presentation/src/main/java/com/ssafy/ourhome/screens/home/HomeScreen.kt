@@ -109,6 +109,9 @@ fun HomeScreen(navController: NavController, vm: HomeViewModel) {
         }
     }
 
+    // 스케줄 추가 상태 초기화
+    vm.initAddSchedule()
+
     Scaffold(topBar = {
 
         /** 상단 바 */
@@ -209,7 +212,10 @@ fun HomeScreen(navController: NavController, vm: HomeViewModel) {
                             "${selection.value!!.date.year}-${selection.value!!.date.monthValue}-${selection.value!!.date.dayOfMonth}",
                             emptyList()
                         ),
-                        onAddScheduleClick = { moveToAddScheduleScreen(navController) },
+                        onAddScheduleClick = {
+                            vm.addScheduleDateState.value = selection.value!!.date
+                            moveToAddScheduleScreen(navController)
+                        },
                         onScheduleClick = onScheduleClick
                     ) {
                         visibleBottomSheetState.value = false

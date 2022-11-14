@@ -58,6 +58,7 @@ fun AddMemberScreen(navController: NavController) {
 
             /** 확인 버튼 */
             ConfirmButton {
+                // todo: 일정에 구성원 추가
                 navController.popBackStack()
             }
         }
