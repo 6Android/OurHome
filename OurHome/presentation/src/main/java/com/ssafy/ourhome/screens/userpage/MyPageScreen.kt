@@ -32,6 +32,9 @@ fun MyPageScreen(
         vm.setJob(vm.getProfile(Prefs.email))
     }
 
+
+    val context = LocalContext.current
+
     Scaffold(topBar = {
         MainAppBar(
             title = "마이페이지",
@@ -51,7 +54,7 @@ fun MyPageScreen(
             ) {
                 Spacer(modifier = Modifier.padding(top = 16.dp))
 
-                UserInfoCard(userDTO = vm.user) {
+                UserInfoCard(userDTO = vm.user,context = context) {
                     navController.navigate(OurHomeScreens.EditProfileScreen.name)
                 }
 

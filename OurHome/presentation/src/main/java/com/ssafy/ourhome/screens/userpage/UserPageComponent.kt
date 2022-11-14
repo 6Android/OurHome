@@ -1,5 +1,9 @@
 package com.ssafy.ourhome.screens.userpage
 
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -17,6 +21,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -35,6 +40,7 @@ import com.ssafy.ourhome.utils.Prefs
 
 @Composable
 fun UserColorCardList(userDTO: DomainUserDTO) {
+
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
@@ -52,6 +58,7 @@ fun UserCommonCard(
     title: String,
     content: String
 ) {
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -273,6 +280,7 @@ fun MBTICard(
 @Composable
 fun UserInfoCard(
     userDTO: DomainUserDTO,
+    context : Context,
     navAction: () -> Unit,
 ) {
     Card(
@@ -324,6 +332,16 @@ fun UserInfoCard(
                 // TODO : 전화걸기 기능 추가
                 modifier = Modifier.clickable {
 
+                    val u = Uri.parse("tel:" + userDTO.phone)
+                    val i = Intent(Intent.ACTION_DIAL,u)
+
+                    try{
+                        context.startActivity(i)
+                    }catch (s: SecurityException) {
+
+                        Toast.makeText(context, " 에러", Toast.LENGTH_SHORT)
+                            .show()
+                    }
                 }
             ) {
                 Image(
@@ -358,3 +376,4 @@ fun UserInfoCard(
         }
     }
 }
+
