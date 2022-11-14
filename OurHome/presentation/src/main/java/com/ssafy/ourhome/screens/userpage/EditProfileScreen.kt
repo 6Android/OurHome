@@ -1,7 +1,10 @@
 package com.ssafy.ourhome.screens.userpage
 
+import android.net.Uri
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -50,7 +53,18 @@ fun EditProfileScreen(
         vm.setData()
     }
 
+    var hasImage by remember {
+        mutableStateOf(false)
+    }
 
+
+    val imagePicker = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent(),
+        onResult = { uri ->
+            hasImage = uri != null
+            vm.imageUri.value = uri.toString()
+        }
+    )
     // 에디트 성공
     if (vm.editSuccess) {
         Toast.makeText(LocalContext.current, "정보 수정에 성공하였습니다.", Toast.LENGTH_SHORT).show()
@@ -101,7 +115,11 @@ fun EditProfileScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    UserImage(vm.user.image)
+                    UserImage(vm.imageUri.value) {
+                        imagePicker.launch("image/*")
+
+                    }
+
                     TextFieldWithClear(vm.nicknameState)
                     Log.d("test5", "EditProfileScreen: ${vm.nicknameState}")
                 }
@@ -316,12 +334,14 @@ private fun TextWithTextField(
 
 @Composable
 private fun UserImage(
-    imageUrl: String
+    imageUrl: String,
+    onClick: () -> Unit
 ) {
     Image(
         modifier = Modifier
             .size(100.dp)
-            .clip(CircleShape),
+            .clip(CircleShape)
+            .clickable { onClick() },
         contentScale = ContentScale.Crop,
         painter =
         if (imageUrl == "default") painterResource(R.drawable.img_default_user)

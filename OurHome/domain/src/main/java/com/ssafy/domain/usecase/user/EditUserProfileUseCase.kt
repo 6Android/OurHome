@@ -1,13 +1,14 @@
 package com.ssafy.domain.usecase.user
 
+import android.net.Uri
 import com.ssafy.domain.model.user.DomainUserDTO
 import com.ssafy.domain.repository.user.UserRepository
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class EditProfileUseCase @Inject constructor(
+class EditUserProfileUseCase @Inject constructor(
     private val userRepository: UserRepository
 ){
-    fun execute(familyCode: String, user: DomainUserDTO) = userRepository.editProfile(familyCode, user)
+    fun execute(imageUri: Uri, user: DomainUserDTO) = userRepository.editUserProfile(imageUri, user)
 }

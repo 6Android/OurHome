@@ -1,17 +1,22 @@
 package com.ssafy.data.datasource.user
 
+import android.net.Uri
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.UploadTask
 import com.ssafy.data.utils.FAMILY
+import com.ssafy.data.utils.PROFILE_IMAGE
 import com.ssafy.data.utils.USER
 import com.ssafy.domain.model.user.DomainUserDTO
 import javax.inject.Inject
 
 class UserDataSourceImpl @Inject constructor(
     private val fireStore: FirebaseFirestore,
+    private val firebaseStorage: FirebaseStorage,
     private val fireAuth: FirebaseAuth,
 ) : UserDataSource {
     override fun getFamilyUsers(familyCode: String): Query =
@@ -45,9 +50,18 @@ class UserDataSourceImpl @Inject constructor(
         fireStore.collection(FAMILY).document(familyCode).collection(USER).document(email)
 
     // 유저 정보 수정하기
-    override fun editProfile(familyCode: String, user: DomainUserDTO): Task<Void> =
+    override fun editUserInfo(familyCode: String, user: DomainUserDTO): Task<Void> =
         fireStore.collection(FAMILY).document(familyCode).collection(USER).document(user.email)
             .set(user)
+
+    //유저 프로필 사진 업로드
+    override fun editProfileImage(email: String, imageUrl: Uri): UploadTask {
+        val storageRef =
+            firebaseStorage.reference.child(PROFILE_IMAGE)
+                .child(email)
+        return storageRef.putFile(imageUrl)
+
+    }
 
     // 현재 위치 전송하기
     override fun sendLatLng(
@@ -61,7 +75,11 @@ class UserDataSourceImpl @Inject constructor(
             .update("latitude", latitude, "longitude", longitude, "location_updated", time)
 
     // 위치 공유 동의 여부 수정하기
-    override fun editLocationPermission(familyCode: String, email: String, permission: Boolean): Task<Void> =
+    override fun editLocationPermission(
+        familyCode: String,
+        email: String,
+        permission: Boolean
+    ): Task<Void> =
         fireStore.collection(FAMILY).document(familyCode).collection(USER).document(email)
             .update("location_permit", permission)
 
