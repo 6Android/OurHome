@@ -277,23 +277,29 @@ class UserRepositoryImpl @Inject constructor(
 
             awaitClose {}
         }
-    
+
     // 유저 정보 수정하기
     override fun editUserProfile(imageUri: Uri, user: DomainUserDTO): Flow<ResultType<Unit>> =
         callbackFlow {
-            userDataSource.editProfileImage(user.email, imageUri).addOnSuccessListener {
-                it.metadata?.reference?.downloadUrl?.addOnSuccessListener { uri ->
-                    Log.d("test5", "editUserProfile: $uri")
-                    userDataSource.editUserInfo(user.family_code, user.copy(image = uri.toString()))
-                        .addOnCompleteListener {
-                            Log.d("test5", "success")
-                            trySend(ResultType.Success(Unit))
-                        }
+
+            if(imageUri.toString() != user.image){
+                userDataSource.editProfileImage(user.email, imageUri).addOnSuccessListener {
+                    it.metadata?.reference?.downloadUrl?.addOnSuccessListener { uri ->
+                        Log.d("test5", "editUserProfile: $uri")
+                        userDataSource.editUserInfo(user.family_code, user.copy(image = uri.toString()))
+                            .addOnCompleteListener {
+                                Log.d("test5", "successWithImage")
+                                trySend(ResultType.Success(Unit))
+                            }
+                    }
                 }
-
-
+            }else{
+                userDataSource.editUserInfo(user.family_code, user)
+                    .addOnCompleteListener {
+                        Log.d("test5", "successWithOutImage")
+                        trySend(ResultType.Success(Unit))
+                    }
             }
-
             awaitClose {
 
             }
