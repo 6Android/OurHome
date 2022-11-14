@@ -1,6 +1,7 @@
 package com.ssafy.ourhome.screens.home
 
 import android.util.Log
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -27,7 +28,7 @@ class HomeViewModel @Inject constructor(
     val familyUsersState = mutableStateOf<List<DomainUserDTO>>(emptyList())
     val familyUsersProcessState = mutableStateOf(State.DEFAULT)
 
-    val scheduleMap = mutableStateOf<MutableMap<String, List<DomainScheduleDTO>>>(mutableMapOf())
+    val scheduleMap = mutableStateMapOf<String, List<DomainScheduleDTO>>()
 
     fun editLocationPermission(permission: Boolean) = viewModelScope.launch(Dispatchers.IO) {
         editLocationPermissionUseCase.execute(Prefs.familyCode, Prefs.email, permission)
@@ -73,8 +74,8 @@ class HomeViewModel @Inject constructor(
                     when (response) {
                         is ResultType.Success -> {
                             Log.d("TAG", "getFamilySchedules: ${response.data}")
-                            scheduleMap.value.putAll(response.data.groupBy { schedule -> schedule.date })
-                            Log.d("TAG", "getFamilySchedules: ${scheduleMap.value}")
+                            scheduleMap.putAll(response.data.groupBy { schedule -> schedule.date })
+                            Log.d("TAG", "getFamilySchedules: ${scheduleMap}")
                         }
                         else -> {
                         }

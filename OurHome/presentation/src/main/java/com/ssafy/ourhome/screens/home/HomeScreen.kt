@@ -192,7 +192,7 @@ fun HomeScreen(navController: NavController, vm: HomeViewModel) {
                 CalendarCard(
                     visibleBottomSheetState = visibleBottomSheetState,
                     selection = selection,
-                    map = vm.scheduleMap.value,
+                    map = vm.scheduleMap,
                     onMonthChange = onMonthChangeListener
                 )
 
