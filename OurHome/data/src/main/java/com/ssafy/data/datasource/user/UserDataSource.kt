@@ -1,11 +1,14 @@
 package com.ssafy.data.datasource.user
 
+import android.net.Uri
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.Query
+import com.google.firebase.storage.UploadTask
 import com.ssafy.domain.model.user.DomainUserDTO
+import java.net.URL
 
 interface UserDataSource {
     fun getFamilyUsers(familyCode: String): Query
@@ -32,7 +35,10 @@ interface UserDataSource {
     fun getProfile(familyCode: String, email: String): DocumentReference
 
     // 유저 정보 수정하기
-    fun editProfile(familyCode: String, user: DomainUserDTO): Task<Void>
+    fun editUserInfo(familyCode: String, user: DomainUserDTO): Task<Void>
+
+    //유저 프로필 사진 업로드
+    fun editProfileImage(email : String, imageUrl : Uri ) : UploadTask
 
     // 현재 위치 전송하기
     fun sendLatLng(familyCode: String, email :String, latitude : Double, longitude : Double, time: Long) : Task<Void>
@@ -48,4 +54,5 @@ interface UserDataSource {
 
     // 가족원 제외 (family 삭제)
     fun outUsers(familyCode: String, email: String): Task<Void>
+
 }

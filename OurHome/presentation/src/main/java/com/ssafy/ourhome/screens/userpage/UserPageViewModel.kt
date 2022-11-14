@@ -5,11 +5,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.ssafy.domain.model.user.DomainUserDTO
-import com.ssafy.domain.repository.user.UserResponse
 import com.ssafy.domain.usecase.user.*
 import com.ssafy.domain.utils.ResultType
 import com.ssafy.ourhome.utils.Prefs
@@ -28,7 +28,7 @@ class UserPageViewModel @Inject constructor(
     private val transferUserDataUseCase: TransferUserDataUseCase,
     private val insertUserUseCase: InsertUserUseCase,
     private val getProfileUseCase: GetProfileUseCase,
-    private val editProfileUseCase: EditProfileUseCase
+    private val editUserProfileUseCase: EditUserProfileUseCase
 ) : ViewModel() {
 
     @Inject
@@ -48,6 +48,8 @@ class UserPageViewModel @Inject constructor(
     var jobState = mutableStateOf(user.job)
     var interestState = mutableStateOf(user.interest)
     var hobbyState = mutableStateOf(user.hobby)
+    var imageUri = mutableStateOf(user.image)
+
 
     var getProfileFail by mutableStateOf(false) // true = 실패
         private set
@@ -92,7 +94,7 @@ class UserPageViewModel @Inject constructor(
         tmp.interest = interestState.value
         tmp.hobby = hobbyState.value
 
-        editProfileUseCase.execute(Prefs.familyCode, tmp).collect {
+        editUserProfileUseCase.execute(imageUri.value.toUri(), tmp).collect {
             if (it is ResultType.Success) {
                 editSuccess = true
             }
@@ -171,6 +173,7 @@ class UserPageViewModel @Inject constructor(
         }
     }
 
+
     // 에디트 텍스트 세팅
     fun setData() {
         nicknameState.value = user.name
@@ -181,6 +184,7 @@ class UserPageViewModel @Inject constructor(
         jobState.value = user.job
         interestState.value = user.interest
         hobbyState.value = user.hobby
+        imageUri.value = user.image
     }
 
     fun logout() {
@@ -189,7 +193,7 @@ class UserPageViewModel @Inject constructor(
         Prefs.familyCode = ""
     }
 
-    fun setJob(job : Job){
+    fun setJob(job: Job) {
         this.job = job
     }
 

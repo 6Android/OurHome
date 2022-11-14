@@ -29,3 +29,5 @@ const val MONTH = "month"
 const val DAY = "day"
 
 const val CHAT = "chat"
+
+const val PROFILE_IMAGE = "profile_image"

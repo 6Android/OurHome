@@ -1,7 +1,9 @@
 package com.ssafy.data.repository.user
 
+import android.net.Uri
 import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import com.ssafy.data.datasource.family.FamilyDataSource
 import com.ssafy.data.datasource.user.UserDataSource
 import com.ssafy.data.utils.EMAIL
@@ -276,19 +278,27 @@ class UserRepositoryImpl @Inject constructor(
             awaitClose {}
         }
 
-
     // 유저 정보 수정하기
-    override fun editProfile(familyCode: String, user: DomainUserDTO): Flow<ResultType<Unit>> =
+    override fun editUserProfile(imageUri: Uri, user: DomainUserDTO): Flow<ResultType<Unit>> =
         callbackFlow {
-            userDataSource.editProfile(familyCode, user).addOnCompleteListener {
-                val response = if (it.isSuccessful) {
-                    ResultType.Success(Unit)
-                } else if (it.exception != null) {
-                    ResultType.Error(it.exception)
-                } else {
-                    ResultType.Loading
+
+            if(imageUri.toString() != user.image){
+                userDataSource.editProfileImage(user.email, imageUri).addOnSuccessListener {
+                    it.metadata?.reference?.downloadUrl?.addOnSuccessListener { uri ->
+                        Log.d("test5", "editUserProfile: $uri")
+                        userDataSource.editUserInfo(user.family_code, user.copy(image = uri.toString()))
+                            .addOnCompleteListener {
+                                Log.d("test5", "successWithImage")
+                                trySend(ResultType.Success(Unit))
+                            }
+                    }
                 }
-                trySend(response)
+            }else{
+                userDataSource.editUserInfo(user.family_code, user)
+                    .addOnCompleteListener {
+                        Log.d("test5", "successWithOutImage")
+                        trySend(ResultType.Success(Unit))
+                    }
             }
             awaitClose {
 
@@ -375,7 +385,7 @@ class UserRepositoryImpl @Inject constructor(
     // 가족 정보 이전 후 삭제
     override fun transferUserData(user: DomainUserDTO): Flow<ResultType<Unit>> = callbackFlow {
         userDataSource.moveUserData(user.copy(family_code = "")).addOnCompleteListener { move ->
-        // 정보 이동 성공 시
+            // 정보 이동 성공 시
             if (move.isSuccessful) {
                 // 가족 정보에 있는 유저 정보 지움
                 userDataSource.outUsers(user.family_code, user.email).addOnSuccessListener {

@@ -1,5 +1,6 @@
 package com.ssafy.domain.repository.user
 
+import android.net.Uri
 import com.ssafy.domain.model.family.DomainFamilyDTO
 import com.ssafy.domain.model.user.DomainUserDTO
 import com.ssafy.domain.utils.ResultType
@@ -51,7 +52,7 @@ interface UserRepository {
     fun getProfile(familyCode: String, email: String): Flow<UserResponse>
 
     // 유저 정보 수정하기
-    fun editProfile(familyCode: String, user: DomainUserDTO): Flow<ResultType<Unit>>
+    fun editUserProfile(imageUri : Uri,user: DomainUserDTO) : Flow<ResultType<Unit>>
 
     // 현재 위치 전송하기
     fun sendLatLng(
