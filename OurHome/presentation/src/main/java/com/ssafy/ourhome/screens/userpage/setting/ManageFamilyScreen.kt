@@ -28,6 +28,7 @@ import com.ssafy.ourhome.R
 import com.ssafy.ourhome.components.MainAppBar
 import com.ssafy.ourhome.components.OurHomeSurface
 import com.ssafy.ourhome.ui.theme.MainColor
+import com.ssafy.ourhome.utils.Prefs
 
 
 @Composable
@@ -40,11 +41,17 @@ fun ManageFamilyScreen(
     vm.getFamilyUsers()
 
     // 가족장 위임
-    if(vm.editSuccess){
+    if (vm.editSuccess) {
         navController.popBackStack()
         navController.popBackStack()
         vm.setEditSuccess()
         Toast.makeText(LocalContext.current, "가족장이 위임되었습니다.", Toast.LENGTH_SHORT).show()
+    }
+
+    // 가족 내보내기
+    if (vm.transferSuccess) {
+        vm.setTransferSuccess()
+        Toast.makeText(LocalContext.current, "가족원을 내보냈습니다.", Toast.LENGTH_SHORT).show()
     }
 
     Scaffold(topBar = {
@@ -58,12 +65,17 @@ fun ManageFamilyScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 items(items = vm.users) { user ->
-                    FamilyManageItem(user, editManager = {
-                        vm.editManager(it)
-                    })
+                    if (Prefs.email != user.email) {
+                        FamilyManageItem(user, editManager = {
+                            vm.editManager(it)
+                        },
+                            transferUser = {
+                                vm.transferUserData(it)
+                            })
+                        Spacer(modifier = Modifier.height(12.dp))
+                    }
                 }
             }
         }
@@ -75,7 +87,8 @@ fun ManageFamilyScreen(
 @Composable
 fun FamilyManageItem(
     user: DomainUserDTO,
-    editManager: (String) -> Unit
+    editManager: (String) -> Unit,
+    transferUser: (DomainUserDTO) -> Unit
 ) {
     Card(
         modifier = Modifier
@@ -115,12 +128,9 @@ fun FamilyManageItem(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    //버튼 2개
-
                     RoundedTextButton(
                         label = "가족장 위임", modifier = Modifier
                             .weight(1f)
-
                     ) {
                         editManager.invoke(user.email)
                     }
@@ -130,8 +140,9 @@ fun FamilyManageItem(
                             .weight(1f),
                         backGroundColor = Color(0xFFD9D9D9)
                     ) {
-                        //TODO : 가족 내보내기 클릭이벤트
+                        transferUser.invoke(user)
                     }
+
                 }
             }
 

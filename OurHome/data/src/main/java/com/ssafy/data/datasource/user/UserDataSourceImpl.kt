@@ -69,4 +69,12 @@ class UserDataSourceImpl @Inject constructor(
     override fun editManager(familyCode: String, email: String, isManager: Boolean): Task<Void> =
         fireStore.collection(FAMILY).document(familyCode).collection(USER).document(email)
             .update("manager", isManager)
+
+    // 가족 데이터 추가하기 (family => user)
+    override fun moveUserData(userDTO: DomainUserDTO): Task<Void> =
+        fireStore.collection(USER).document(userDTO.email).set(userDTO)
+
+    // 가족원 제외 (family 삭제)
+    override fun outUsers(familyCode: String, email: String): Task<Void> =
+        fireStore.collection(FAMILY).document(familyCode).collection(USER).document(email).delete()
 }
