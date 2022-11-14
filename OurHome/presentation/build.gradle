@@ -120,4 +120,7 @@ dependencies {
 
     implementation 'androidx.hilt:hilt-work:1.0.0'
     implementation 'com.google.android.gms:play-services-auth:20.3.0'
+
+    // lottie
+    implementation 'com.airbnb.android:lottie-compose:5.2.0'
 }

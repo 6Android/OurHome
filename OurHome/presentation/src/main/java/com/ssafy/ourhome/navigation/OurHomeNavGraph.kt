@@ -1,6 +1,5 @@
 package com.ssafy.ourhome.navigation
 
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -8,8 +7,8 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navArgument
-import com.ssafy.domain.model.user.DomainUserDTO
 import com.ssafy.ourhome.screens.NextScreen
+import com.ssafy.ourhome.screens.SplashScreen
 import com.ssafy.ourhome.screens.album.AlbumDetailScreen
 import com.ssafy.ourhome.screens.album.AlbumScreen
 import com.ssafy.ourhome.screens.chat.ChatScreen
@@ -44,16 +43,20 @@ fun OurHomeNavGraph(navController: NavHostController) {
     val loginViewModel: LoginViewModel = hiltViewModel()
 
 
-    val mapViewModel : MapViewModel = hiltViewModel()
-    val userPageViewModel : UserPageViewModel = hiltViewModel()
-    val homeViewModel : HomeViewModel = hiltViewModel()
-    val questionViewModel : QuestionViewModel = hiltViewModel()
+    val mapViewModel: MapViewModel = hiltViewModel()
+    val userPageViewModel: UserPageViewModel = hiltViewModel()
+    val homeViewModel: HomeViewModel = hiltViewModel()
+    val questionViewModel: QuestionViewModel = hiltViewModel()
 
 
     NavHost(
         navController = navController,
-        startDestination = OurHomeScreens.LoginScreen.name
+        startDestination = OurHomeScreens.SplashScreen.name
     ) {
+        composable(OurHomeScreens.SplashScreen.name) {
+            SplashScreen(navController = navController, loginViewModel)
+        }
+
         composable(BottomNavItem.Home.screenRoute) {
             HomeScreen(navController = navController, vm = homeViewModel)
         }
@@ -159,7 +162,8 @@ fun OurHomeNavGraph(navController: NavHostController) {
         composable("${OurHomeScreens.SettingScreen.name}") {
             SettingScreen(
                 navController = navController,
-                vm = userPageViewModel)
+                vm = userPageViewModel
+            )
         }
 
         composable(OurHomeScreens.ManageFamilyScreen.name) {
