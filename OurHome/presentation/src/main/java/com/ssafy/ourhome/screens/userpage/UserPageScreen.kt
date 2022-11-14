@@ -9,6 +9,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.ssafy.ourhome.components.MainAppBar
@@ -25,6 +26,7 @@ fun UserPageScreen(
 
     vm.getProfile(email)
 
+    val context = LocalContext.current
     Scaffold(topBar = {
         MainAppBar(
             title = "유저 정보",
@@ -43,7 +45,7 @@ fun UserPageScreen(
             ) {
                 Spacer(modifier = Modifier.padding(top = 16.dp))
 
-                UserInfoCard(userDTO = vm.user) {
+                UserInfoCard(userDTO = vm.user, context = context) {
                     navController.navigate(OurHomeScreens.EditProfileScreen.name)
                 }
 
