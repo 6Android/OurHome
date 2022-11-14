@@ -30,6 +30,7 @@ import com.ssafy.ourhome.screens.login.join.JoinPasswordScreen
 import com.ssafy.ourhome.screens.question.QuestionDetailScreen
 import com.ssafy.ourhome.screens.question.QuestionListScreen
 import com.ssafy.ourhome.screens.question.QuestionScreen
+import com.ssafy.ourhome.screens.question.QuestionViewModel
 import com.ssafy.ourhome.screens.question.pet.PetDetailScreen
 import com.ssafy.ourhome.screens.userpage.EditProfileScreen
 import com.ssafy.ourhome.screens.userpage.MyPageScreen
@@ -47,6 +48,8 @@ fun OurHomeNavGraph(navController: NavHostController) {
     val userPageViewModel : UserPageViewModel = hiltViewModel()
     val homeViewModel : HomeViewModel = hiltViewModel()
     val settingViewModel : SettingViewModel = hiltViewModel()
+    val questionViewModel : QuestionViewModel = hiltViewModel()
+
     NavHost(
         navController = navController,
         startDestination = OurHomeScreens.LoginScreen.name
@@ -55,7 +58,7 @@ fun OurHomeNavGraph(navController: NavHostController) {
             HomeScreen(navController = navController, vm = homeViewModel)
         }
         composable(BottomNavItem.Question.screenRoute) {
-            QuestionScreen(navController = navController)
+            QuestionScreen(navController = navController, vm = questionViewModel)
         }
         composable(BottomNavItem.Album.screenRoute) {
             AlbumScreen(navController = navController)
@@ -81,15 +84,15 @@ fun OurHomeNavGraph(navController: NavHostController) {
         }
 
         composable(OurHomeScreens.QuestionListScreen.name) {
-            QuestionListScreen(navController = navController)
+            QuestionListScreen(navController = navController, vm = questionViewModel)
         }
 
         composable(OurHomeScreens.QuestionDetailScreen.name) {
-            QuestionDetailScreen(navController = navController)
+            QuestionDetailScreen(navController = navController, vm = questionViewModel)
         }
 
         composable(OurHomeScreens.PetDetailScreen.name) {
-            PetDetailScreen(navController = navController)
+            PetDetailScreen(navController = navController, vm = questionViewModel)
         }
 
         composable(OurHomeScreens.ChatScreen.name) {

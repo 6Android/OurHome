@@ -1,6 +1,8 @@
 package com.ssafy.ourhome.screens.question.pet
 
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -11,12 +13,13 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -24,7 +27,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImagePainter
+import coil.compose.AsyncImagePainter.State.Empty.painter
 import coil.compose.rememberAsyncImagePainter
+import com.ssafy.domain.model.pet.DomainFamilyPetDTO
 import com.ssafy.ourhome.components.MainAppBar
 import com.ssafy.ourhome.components.OurHomeSurface
 import com.ssafy.ourhome.components.pie.PieChart
@@ -34,21 +39,28 @@ import com.ssafy.ourhome.components.pie.animation.simpleChartAnimation
 import com.ssafy.ourhome.components.pie.renderer.SimpleSliceDrawer
 import com.ssafy.ourhome.navigation.OurHomeScreens
 import com.ssafy.ourhome.screens.question.CenterHorizontalColumn
+import com.ssafy.ourhome.screens.question.QuestionViewModel
 import com.ssafy.ourhome.ui.theme.Gray
 import com.ssafy.ourhome.ui.theme.MainColor
+import com.ssafy.ourhome.ui.theme.PieChartColors
 import com.ssafy.ourhome.ui.theme.nanum
+import com.ssafy.ourhome.utils.State
 
 
 @Composable
-fun PetDetailScreen(navController: NavController) {
-    val painter =
-        rememberAsyncImagePainter("https://i.pinimg.com/222x/36/30/f7/3630f7d930f91e495d93c02833b4abfc.jpg")
+fun PetDetailScreen(navController: NavController, vm: QuestionViewModel) {
     val scrollState = rememberScrollState()
-    val familyContributeList = PieChartData(listOf(Slice(0.5F, Color.Red, "아빠"), Slice(0.3F, Color.Blue, "엄마"), Slice(0.2F, Color.Green, "아들")))
+    val familyContributeList = remember {
+        mutableStateOf(PieChartData(listOf()))
+    }
+//        PieChartData(listOf(Slice(0.5F, Color.Red, "아빠"), Slice(0.3F, Color.Blue, "엄마"), Slice(0.2F, Color.Green, "아들")))
+    val context = LocalContext.current
 
+    initPetDetailScreen(vm)
+    initPetDetailViewModelCallback(vm, context, familyContributeList)
 
     Scaffold(topBar = {
-        MainAppBar(title = "캐릭터 상세", onBackClick = {
+        MainAppBar(title = "펫 상세", onBackClick = {
             navController.popBackStack()
     })}) {
         OurHomeSurface() {
@@ -63,14 +75,13 @@ fun PetDetailScreen(navController: NavController) {
 
                 CenterHorizontalColumn{
 
-                    PetDetail(petName = "고라파덕", painter = painter, petLevel = "Lv. 2",
-                        petDescription = "고라파덕은 물 속성 포켓몬이다.\n골덕으로 진화한다.", petQuest = "성장요인 : 가족 답변쓰기, 가족 앨범 등록")
+                    PetDetail(vm.pet)
 
                 }
 
                 Spacer(modifier = Modifier.height(32.dp))
 
-                PetExp()
+                PetExp(vm.pet)
 
                 Spacer(modifier = Modifier.height(24.dp))
 
@@ -92,13 +103,38 @@ fun PetDetailScreen(navController: NavController) {
 
 }
 
+fun initPetDetailScreen(vm: QuestionViewModel){
+    vm.getFamilyUsers()
+}
+
+fun initPetDetailViewModelCallback(vm: QuestionViewModel, context: Context, familyContributeList: MutableState<PieChartData>){
+
+    when (vm.familyUsersProcessState) {
+        State.ERROR -> {
+            Toast.makeText(context, "가족 정보를 불러오는데 실패했습니다", Toast.LENGTH_SHORT).show()
+            vm.familyUsersProcessState = State.DEFAULT
+        }
+        State.SUCCESS -> {
+            var totalContributePoint = 0L
+            for(user in vm.familyUsers){
+                totalContributePoint += user.contribute_point
+            }
+
+            val dataList = mutableListOf<Slice>()
+            for(i in 0 until vm.familyUsers.size){
+                dataList.add(Slice(1F * vm.familyUsers.get(i).contribute_point / totalContributePoint, PieChartColors[i], vm.familyUsers.get(i).name))
+            }
+            familyContributeList.value = PieChartData(dataList)
+        }
+    }
+}
 
 /** 가족 경험치 기여도 정보 리스트 **/
 @Composable
-fun FamilyExpLazyRow(familyContributeList: PieChartData){
+fun FamilyExpLazyRow(familyContributeList: MutableState<PieChartData>){
     LazyRow{
-        items(familyContributeList.slices.size){
-            FamilyExpLazyRowItem(familyContributeList.slices.get(it))
+        items(familyContributeList.value.slices.size){
+            FamilyExpLazyRowItem(familyContributeList.value.slices.get(it))
         }
     }
 }
@@ -125,9 +161,9 @@ fun FamilyExpLazyRowItem(familyContributeList: Slice){
 
 /** 가족 경험치 기여도 piechart **/
 @Composable
-fun FamilyExpPieChart(familyContributeList: PieChartData){
+fun FamilyExpPieChart(familyContributeList: MutableState<PieChartData>){
     PieChart(
-        pieChartData = familyContributeList,
+        pieChartData = familyContributeList.value,
     modifier = Modifier
         .width(300.dp)
         .height(300.dp),
@@ -139,7 +175,7 @@ fun FamilyExpPieChart(familyContributeList: PieChartData){
 
 /** 펫 경험치 text and progressbar **/
 @Composable
-fun PetExp() {
+fun PetExp(pet: DomainFamilyPetDTO) {
     Row(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = "경험치",
@@ -148,7 +184,7 @@ fun PetExp() {
 
         Spacer(modifier = Modifier.width(12.dp))
 
-        customProgressBar(progress = 75)
+        customProgressBar(progress = (pet.pet_level * 100 / pet.next_level_exp))
     }
 }
 
@@ -250,9 +286,9 @@ fun customProgressBar(progress: Int) {
 
 /** 펫 정보 (이름, 이미지, 레벨, 설명, 퀘스트) **/
 @Composable
-fun PetDetail(petName: String, painter: AsyncImagePainter, petLevel: String, petDescription: String, petQuest: String) {
+fun PetDetail(pet: DomainFamilyPetDTO) {
     Text(
-        text = petName,
+        text = pet.name,
         style = MaterialTheme.typography.h5.copy(fontWeight = FontWeight.Bold)
     )
 
@@ -260,14 +296,14 @@ fun PetDetail(petName: String, painter: AsyncImagePainter, petLevel: String, pet
 
     Image(
         modifier = Modifier.size(250.dp),
-        painter = painter,
+        painter = rememberAsyncImagePainter(pet.image),
         contentDescription = "펫 이미지"
     )
 
     Spacer(modifier = Modifier.height(4.dp))
 
     Text(
-        text = petLevel,
+        text = "Lv. " + pet.pet_level.toString(),
         style = MaterialTheme.typography.body1.copy(fontWeight = FontWeight.Bold)
 
     )
@@ -275,7 +311,7 @@ fun PetDetail(petName: String, painter: AsyncImagePainter, petLevel: String, pet
     Spacer(modifier = Modifier.height(16.dp))
 
     Text(
-        text = petDescription,
+        text = pet.description.replace("\\n", "\n"),
         style = MaterialTheme.typography.body2,
         textAlign = TextAlign.Center
     )
@@ -283,7 +319,8 @@ fun PetDetail(petName: String, painter: AsyncImagePainter, petLevel: String, pet
     Spacer(modifier = Modifier.height(8.dp))
 
     Text(
-        text = petQuest,
-        style = MaterialTheme.typography.body2
+        text = "질문에 대한 답변을 많이 하고 \n 답변을 길게 작성하면 빠른 성장을 할 수 있어요.",
+        style = MaterialTheme.typography.body2,
+        textAlign = TextAlign.Center
     )
 }

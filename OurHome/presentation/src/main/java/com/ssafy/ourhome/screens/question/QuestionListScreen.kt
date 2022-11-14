@@ -15,7 +15,9 @@ import com.ssafy.ourhome.components.OurHomeSurface
 
 /** 지난 질문 목록 재사용 **/
 @Composable
-fun QuestionListScreen(navController: NavController){
+fun QuestionListScreen(navController: NavController, vm : QuestionViewModel){
+    initQuestionListScreen(vm)
+
     Scaffold(topBar = {
         MainAppBar(title = "지난 질문", onBackClick = {
             navController.popBackStack()
@@ -27,7 +29,7 @@ fun QuestionListScreen(navController: NavController){
                 //QuestionLazyColumn 에 위아래 패딩 8dp 있어서 8dp만
                 Spacer(modifier = Modifier.height(8.dp))
 
-                QuestionLazyColumn(size = 30)
+                QuestionLazyColumn(questionsList = vm.lastAllQuestions)
 
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -35,4 +37,8 @@ fun QuestionListScreen(navController: NavController){
         }
     }
 
+}
+
+fun initQuestionListScreen(vm: QuestionViewModel){
+    vm.getLastAllQuestions()
 }
