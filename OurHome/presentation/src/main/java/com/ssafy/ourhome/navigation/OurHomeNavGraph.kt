@@ -159,8 +159,7 @@ fun OurHomeNavGraph(navController: NavHostController) {
         composable("${OurHomeScreens.SettingScreen.name}") {
             SettingScreen(
                 navController = navController,
-                vm = userPageViewModel
-            )
+                vm = userPageViewModel)
         }
 
         composable(OurHomeScreens.ManageFamilyScreen.name) {

@@ -13,6 +13,7 @@ import com.ssafy.domain.repository.user.UserRepository
 import com.ssafy.domain.repository.user.UserResponse
 import com.ssafy.domain.repository.user.UsersResponse
 import com.ssafy.domain.utils.ResultType
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -53,8 +54,10 @@ class UserRepositoryImpl @Inject constructor(
                 trySend(response)
             }
         awaitClose {
+            Log.d("test5", "getProfile: Cancel")
             snapshotListener.remove()
         }
+
     }
 
     // 이메일 회원 가입

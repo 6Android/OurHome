@@ -15,6 +15,7 @@ import com.ssafy.domain.utils.ResultType
 import com.ssafy.ourhome.utils.Prefs
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import javax.inject.Inject
@@ -60,6 +61,9 @@ class UserPageViewModel @Inject constructor(
         private set
 
     var transferSuccess by mutableStateOf(false)
+        private set
+
+    lateinit var job: Job
         private set
 
     fun getProfile(email: String) = viewModelScope.launch(Dispatchers.IO) {
@@ -168,7 +172,7 @@ class UserPageViewModel @Inject constructor(
     }
 
     // 에디트 텍스트 세팅
-    fun setData(){
+    fun setData() {
         nicknameState.value = user.name
         phoneState.value = user.phone
         birthDayState.value = LocalDate.parse(user.birthday)
@@ -183,6 +187,10 @@ class UserPageViewModel @Inject constructor(
         firebaseAuth.signOut()
         Prefs.email = ""
         Prefs.familyCode = ""
+    }
+
+    fun setJob(job : Job){
+        this.job = job
     }
 
     fun setDelegateSuccess() {

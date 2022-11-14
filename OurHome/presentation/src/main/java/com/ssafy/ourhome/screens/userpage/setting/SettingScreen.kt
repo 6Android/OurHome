@@ -44,6 +44,13 @@ fun SettingScreen(navController: NavController, vm: UserPageViewModel) {
     val scrollState = rememberScrollState()
 
     val context = LocalContext.current
+
+    if(vm.transferSuccess){
+        val intent = Intent(context, MainActivity::class.java)
+        context.startActivity(intent)
+        (context as MainActivity).finish()
+        vm.setTransferSuccess()
+    }
     Scaffold(topBar = {
         MainAppBar(title = "설정", backIconEnable = true, onBackClick = {
             navController.popBackStack()
@@ -70,7 +77,16 @@ fun SettingScreen(navController: NavController, vm: UserPageViewModel) {
                 }
 
                 Spacer(modifier = Modifier.height(42.dp))
-                OurHomeSetting(code = Prefs.familyCode, navController, vm.user.manager, context)
+                OurHomeSetting(
+                    code = Prefs.familyCode,
+                    navAction = { navController.navigate(OurHomeScreens.ManageFamilyScreen.name) },
+                    vm.user.manager,
+                    context
+                ) {
+                    vm.job.cancel()
+                    vm.transferUserData(vm.user)
+
+                }
 
                 Spacer(modifier = Modifier.height(42.dp))
                 Support()
@@ -78,7 +94,7 @@ fun SettingScreen(navController: NavController, vm: UserPageViewModel) {
                 Spacer(modifier = Modifier.height(56.dp))
                 ClickableText("로그아웃") {
                     vm.logout()
-                    val intent = Intent(context,MainActivity::class.java)
+                    val intent = Intent(context, MainActivity::class.java)
                     context.startActivity(intent)
                     (context as MainActivity).finish()
                 }
@@ -86,11 +102,41 @@ fun SettingScreen(navController: NavController, vm: UserPageViewModel) {
 
                 // TEST : 유저 넣기
                 ClickableText("회원탈퇴") {
-                    vm.insertUser(DomainUserDTO(email= "test1@naver.com", name = "테스트1", family_code = "TEST"))
-                    vm.insertUser(DomainUserDTO(email= "test2@naver.com", name = "테스트2",family_code = "TEST"))
-                    vm.insertUser(DomainUserDTO(email= "test3@naver.com", name = "테스트3",family_code = "TEST"))
-                    vm.insertUser(DomainUserDTO(email= "test4@naver.com", name = "테스트4",family_code = "TEST"))
-                    vm.insertUser(DomainUserDTO(email= "test5@naver.com", name = "테스트5",family_code = "TEST"))
+                    vm.insertUser(
+                        DomainUserDTO(
+                            email = "test1@naver.com",
+                            name = "테스트1",
+                            family_code = "TEST"
+                        )
+                    )
+                    vm.insertUser(
+                        DomainUserDTO(
+                            email = "test2@naver.com",
+                            name = "테스트2",
+                            family_code = "TEST"
+                        )
+                    )
+                    vm.insertUser(
+                        DomainUserDTO(
+                            email = "test3@naver.com",
+                            name = "테스트3",
+                            family_code = "TEST"
+                        )
+                    )
+                    vm.insertUser(
+                        DomainUserDTO(
+                            email = "test4@naver.com",
+                            name = "테스트4",
+                            family_code = "TEST"
+                        )
+                    )
+                    vm.insertUser(
+                        DomainUserDTO(
+                            email = "test5@naver.com",
+                            name = "테스트5",
+                            family_code = "TEST"
+                        )
+                    )
                 }
             }
         }
@@ -100,9 +146,10 @@ fun SettingScreen(navController: NavController, vm: UserPageViewModel) {
 @Composable
 private fun OurHomeSetting(
     code: String,
-    navController: NavController,
+    navAction: () -> Unit,
     isManager: Boolean,
-    context: Context
+    context: Context,
+    transfer: () -> Unit
 ) {
     TextHeader(title = "가족 설정")
     Spacer(modifier = Modifier.height(26.dp))
@@ -118,15 +165,16 @@ private fun OurHomeSetting(
         }
         Spacer(modifier = Modifier.height(32.dp))
         TextWithNext(title = "가족 관리") {
-            if(isManager){
-                navController.navigate(OurHomeScreens.ManageFamilyScreen.name)
-            }else{
+            if (isManager) {
+                navAction()
+
+            } else {
                 Toast.makeText(context, "가족장 권한이 필요합니다.", Toast.LENGTH_SHORT).show()
             }
         }
         Spacer(modifier = Modifier.height(32.dp))
         TextWithNext(title = "가족 끊기") {
-
+            transfer()
         }
     }
 }
