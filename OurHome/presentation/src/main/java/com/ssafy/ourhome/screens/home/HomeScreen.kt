@@ -1,5 +1,6 @@
 package com.ssafy.ourhome.screens.home
 
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -13,6 +14,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -41,10 +43,7 @@ import com.ssafy.ourhome.R
 import com.ssafy.ourhome.components.OurHomeSurface
 import com.ssafy.ourhome.components.RoundedButton
 import com.ssafy.ourhome.navigation.OurHomeScreens
-import com.ssafy.ourhome.utils.Prefs
-import com.ssafy.ourhome.utils.State
-import com.ssafy.ourhome.utils.checkAndRequestLocationPermissions
-import com.ssafy.ourhome.utils.permissions
+import com.ssafy.ourhome.utils.*
 
 /** 맵 화면 이동 **/
 fun moveMap(navController: NavController, vm: HomeViewModel) {
@@ -100,8 +99,10 @@ fun HomeScreen(navController: NavController, vm: HomeViewModel) {
         }
 
     }
+    LaunchedEffect(key1 = "") {
+        vm.getFamilyUsers()
+    }
 
-    vm.getFamilyUsers()
     when (vm.familyUsersProcessState.value) {
         State.SUCCESS -> {
             // 스케줄 추가 상태 초기화
@@ -211,7 +212,7 @@ fun HomeScreen(navController: NavController, vm: HomeViewModel) {
                 if (visibleBottomSheetState.value) {
                     BottomSheet(
                         list = vm.scheduleMap.getOrDefault(
-                            "${selection.value!!.date.year}-${selection.value!!.date.monthValue}-${selection.value!!.date.dayOfMonth}",
+                            "${selection.value!!.date.year}-${selection.value!!.date.monthValue.toFillZeroString()}-${selection.value!!.date.dayOfMonth.toFillZeroString()}",
                             emptyList()
                         ),
                         onAddScheduleClick = {

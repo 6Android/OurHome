@@ -40,6 +40,7 @@ import com.ssafy.ourhome.ui.theme.MainColor
 import com.ssafy.ourhome.ui.theme.nanum
 import com.ssafy.ourhome.utils.displayText
 import com.ssafy.ourhome.utils.rememberFirstVisibleMonthAfterScroll
+import com.ssafy.ourhome.utils.toFillZeroString
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.YearMonth
@@ -169,11 +170,6 @@ fun Calendar(
     val coroutineScope = rememberCoroutineScope()
     val visibleMonth = rememberFirstVisibleMonthAfterScroll(state = state, onChange = onMonthChange)
 
-//    visibleMonth.let {
-//        // 같은 날짜로 묶기
-//        map.putAll(getSchedules(it).groupBy { schedule -> schedule.date })
-//    }
-
     CalendarTitle(
         modifier = Modifier.padding(vertical = 10.dp, horizontal = 8.dp),
         currentMonth = visibleMonth,
@@ -195,7 +191,7 @@ fun Calendar(
             Day(
                 day = day,
                 isSelected = selection.value == day,
-                hasSchedule = map.containsKey("${day.date.year}-${day.date.monthValue}-${day.date.dayOfMonth}"),
+                hasSchedule = map.containsKey("${day.date.year}-${day.date.monthValue.toFillZeroString()}-${day.date.dayOfMonth.toFillZeroString()}"),
             ) { clickedDay ->
                 selection.value = clickedDay
                 visibleBottomSheetState.value = true

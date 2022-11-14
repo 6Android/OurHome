@@ -23,6 +23,7 @@ import com.ssafy.ourhome.components.MainAppBar
 import com.ssafy.ourhome.components.OurHomeSurface
 import com.ssafy.ourhome.navigation.OurHomeScreens
 import com.ssafy.ourhome.screens.home.HomeViewModel
+import com.ssafy.ourhome.utils.Prefs.email
 import com.ssafy.ourhome.utils.State
 import java.time.LocalDate
 
@@ -117,10 +118,12 @@ fun AddScheduleScreen(navController: NavController, vm: HomeViewModel) {
                         PersonList(
                             personList = vm.addScheduleParticipantsState
                                 .filter { it.checked }
-                                .map { it.toDomainUserDTO() })
-                        {
-                            navController.navigate(OurHomeScreens.AddMemberScreen.name)
-                        }
+                                .map { it.toDomainUserDTO() },
+                            onAddClick = { navController.navigate(OurHomeScreens.AddMemberScreen.name) },
+                            onDeleteClick = { email ->
+                                vm.deleteParticipant(email)
+                            }
+                        )
                     }
                 }
 

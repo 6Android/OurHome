@@ -170,4 +170,15 @@ class HomeViewModel @Inject constructor(
             }
         )
     }
+
+    fun deleteParticipant(email: String) {
+        var idx = 0
+        addScheduleParticipantsState.forEachIndexed { index, participantDTO ->
+            if (participantDTO.email == email) {
+                idx = index
+                return@forEachIndexed
+            }
+        }
+        addScheduleParticipantsState[idx] = addScheduleParticipantsState[idx].copy(checked = false)
+    }
 }

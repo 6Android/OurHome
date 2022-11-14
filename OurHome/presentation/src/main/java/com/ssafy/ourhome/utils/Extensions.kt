@@ -60,3 +60,5 @@ fun Modifier.addFocusCleaner(focusManager: FocusManager, doOnClear: () -> Unit =
         })
     }
 }
+
+fun Int.toFillZeroString() = "%02d".format(this)

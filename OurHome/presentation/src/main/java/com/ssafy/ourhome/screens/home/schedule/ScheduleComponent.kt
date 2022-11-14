@@ -23,6 +23,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.ssafy.domain.model.user.DomainUserDTO
 import com.ssafy.ourhome.components.TextInput
 import com.ssafy.ourhome.utils.Person
+import com.ssafy.ourhome.utils.personList
 import java.time.LocalDate
 
 
@@ -82,7 +83,7 @@ fun WriteContent(contentState: MutableState<String>, isEditable: Boolean = true)
 
 /** 함께하는 가족들 리스트 */
 @Composable
-fun PersonList(personList: List<DomainUserDTO>, isEditable: Boolean = true, onAddClick: () -> Unit) {
+fun PersonList(personList: List<DomainUserDTO>, isEditable: Boolean = true, onAddClick: () -> Unit, onDeleteClick: (String) -> Unit = {}) {
     Row {
         LazyRow(
             horizontalArrangement = Arrangement.spacedBy(16.dp)
@@ -93,7 +94,7 @@ fun PersonList(personList: List<DomainUserDTO>, isEditable: Boolean = true, onAd
             items(items = personList, itemContent = { item ->
 
                 /** 구성원 리스트 아이템 */
-                PersonListItem(item, isEditable)
+                PersonListItem(item, isEditable, onDeleteClick)
             })
             if (isEditable) {
                 item {
@@ -123,7 +124,7 @@ fun PersonList(personList: List<DomainUserDTO>, isEditable: Boolean = true, onAd
 
 /** 함께하는 가족들 리스트 아이템 */
 @Composable
-fun PersonListItem(item: DomainUserDTO, isEditable: Boolean = true) {
+fun PersonListItem(item: DomainUserDTO, isEditable: Boolean = true, onDeleteClick: (String) -> Unit = {}) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
         Box() {
@@ -146,7 +147,8 @@ fun PersonListItem(item: DomainUserDTO, isEditable: Boolean = true) {
                         .clip(CircleShape)
                         .border(width = 1.dp, color = Color.Black, shape = CircleShape)
                         .clickable {
-                            // todo: 가족 구성원 추가 화면으로 이동
+                            // todo: 구성원 삭제
+                            onDeleteClick(item.email)
                         }
                         .background(Color.White)
                         .padding(2.dp)

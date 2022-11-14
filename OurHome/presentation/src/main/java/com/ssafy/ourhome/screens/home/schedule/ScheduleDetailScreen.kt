@@ -98,20 +98,24 @@ fun ScheduleDetailScreen(navController: NavHostController, vm: HomeViewModel) {
                                 Spacer(modifier = Modifier.height(16.dp))
                             }
 
-                            /** 함께하는 가족들 헤더 */
-                            Text(
-                                modifier = Modifier.offset(x = 8.dp),
-                                text = "함께하는 가족들",
-                                style = MaterialTheme.typography.subtitle2
-                            )
+                            if (vm.scheduleDetailState.value.participants.isNotEmpty()) {
+                                /** 함께하는 가족들 헤더 */
+                                Text(
+                                    modifier = Modifier.offset(x = 8.dp),
+                                    text = "함께하는 가족들",
+                                    style = MaterialTheme.typography.subtitle2
+                                )
+                            }
                         }
 
                         Spacer(modifier = Modifier.height(8.dp))
 
                         /** 함께하는 가족들 리스트 */
-                        PersonList(personList = vm.scheduleDetailPeople, isEditable = false) {
-                            navController.navigate(OurHomeScreens.AddMemberScreen.name)
-                        }
+                        PersonList(
+                            personList = vm.scheduleDetailPeople,
+                            isEditable = false,
+                            onAddClick = { navController.navigate(OurHomeScreens.AddMemberScreen.name) }
+                        )
                     }
                 }
             }
