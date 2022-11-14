@@ -23,5 +23,9 @@ const val ALBUM = "album"
 const val INIT_DATE = "init_date"
 
 const val SCHEDULE = "schedule"
+const val DATE = "date"
+const val YEAR = "year"
+const val MONTH = "month"
+const val DAY = "day"
 
 const val CHAT = "chat"

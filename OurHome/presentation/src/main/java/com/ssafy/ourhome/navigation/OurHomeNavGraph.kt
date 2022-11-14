@@ -179,7 +179,7 @@ fun OurHomeNavGraph(navController: NavHostController) {
         }
 
         composable(OurHomeScreens.ScheduleDetailScreen.name) {
-            ScheduleDetailScreen(navController = navController)
+            ScheduleDetailScreen(navController = navController, vm = homeViewModel)
         }
 
         composable(OurHomeScreens.MapScreen.name) {

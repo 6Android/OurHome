@@ -32,14 +32,13 @@ import androidx.compose.ui.unit.sp
 import com.kizitonwose.calendar.compose.HorizontalCalendar
 import com.kizitonwose.calendar.compose.rememberCalendarState
 import com.kizitonwose.calendar.core.*
+import com.ssafy.domain.model.schedule.DomainScheduleDTO
 import com.ssafy.ourhome.R
 import com.ssafy.ourhome.ui.theme.Gray
 import com.ssafy.ourhome.ui.theme.Green
 import com.ssafy.ourhome.ui.theme.MainColor
 import com.ssafy.ourhome.ui.theme.nanum
-import com.ssafy.ourhome.utils.Schedule
 import com.ssafy.ourhome.utils.displayText
-import com.ssafy.ourhome.utils.getSchedules
 import com.ssafy.ourhome.utils.rememberFirstVisibleMonthAfterScroll
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
@@ -51,8 +50,8 @@ import java.util.*
 @Composable
 fun TodayScheduleList(
     modifier: Modifier = Modifier,
-    list: List<Schedule>,
-    onScheduleClick: (Schedule) -> Unit,
+    list: List<DomainScheduleDTO>,
+    onScheduleClick: (DomainScheduleDTO) -> Unit,
 ) {
     LazyColumn(modifier = modifier) {
         items(list) { item ->
@@ -66,8 +65,8 @@ fun TodayScheduleList(
 @Composable
 fun TodayScheduleListItem(
     modifier: Modifier = Modifier.fillMaxWidth(),
-    schedule: Schedule,
-    onScheduleClick: (Schedule) -> Unit
+    schedule: DomainScheduleDTO,
+    onScheduleClick: (DomainScheduleDTO) -> Unit
 ) {
     Card(
         modifier = modifier
@@ -119,7 +118,8 @@ fun CalendarCard(
     modifier: Modifier = Modifier,
     visibleBottomSheetState: MutableState<Boolean>,
     selection: MutableState<CalendarDay?>,
-    map: MutableMap<String, List<Schedule>>
+    map: MutableMap<String, List<DomainScheduleDTO>>,
+    onMonthChange: (String) -> Unit
 ) {
     Card(
         modifier = modifier
@@ -139,7 +139,8 @@ fun CalendarCard(
             Calendar(
                 visibleBottomSheetState = visibleBottomSheetState,
                 selection = selection,
-                map = map
+                map = map,
+                onMonthChange = onMonthChange
             )
         }
     }
@@ -151,7 +152,8 @@ fun CalendarCard(
 fun Calendar(
     visibleBottomSheetState: MutableState<Boolean>,
     selection: MutableState<CalendarDay?>,
-    map: MutableMap<String, List<Schedule>>
+    map: MutableMap<String, List<DomainScheduleDTO>>,
+    onMonthChange: (String) -> Unit
 ) {
     val currentMonth = remember { YearMonth.now() }
     val startMonth = remember { currentMonth.minusMonths(500) } // Adjust as needed
@@ -165,16 +167,12 @@ fun Calendar(
         firstDayOfWeek = daysOfWeek.first()
     )
     val coroutineScope = rememberCoroutineScope()
-    val visibleMonth = rememberFirstVisibleMonthAfterScroll(state)
+    val visibleMonth = rememberFirstVisibleMonthAfterScroll(state = state, onChange = onMonthChange)
 
-    // 달력 스크롤 시 이전에 선택한 날짜 초기화
-//    LaunchedEffect(visibleMonth) {
-//        selection = null
+//    visibleMonth.let {
+//        // 같은 날짜로 묶기
+//        map.putAll(getSchedules(it).groupBy { schedule -> schedule.date })
 //    }
-
-    visibleMonth.let {
-        map.putAll(getSchedules(it).groupBy { schedule -> schedule.date })
-    }
 
     CalendarTitle(
         modifier = Modifier.padding(vertical = 10.dp, horizontal = 8.dp),
