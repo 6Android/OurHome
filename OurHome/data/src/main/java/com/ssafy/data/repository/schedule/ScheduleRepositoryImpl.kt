@@ -25,7 +25,12 @@ class ScheduleRepositoryImpl @Inject constructor(
     ): Flow<ScheduleListResponse> = callbackFlow {
         scheduleDataSource.getFamilySchedules(familyCode, year, month)
             .addOnSuccessListener {
-                val schedules = it.toObjects(DomainScheduleDTO::class.java)
+                val schedules =
+                    it.documents.map { document ->
+                        document.toObject(DomainScheduleDTO::class.java)?.apply {
+                            uid = document.id
+                        }!!
+                    }
                 trySend(ResultType.Success(schedules))
             }
             .addOnFailureListener {

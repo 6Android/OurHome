@@ -5,6 +5,7 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class DomainScheduleDTO(
+    var uid: String = "",
     var date: String = "",
     var year: Int = 0,
     var month: Int = 0,

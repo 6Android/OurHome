@@ -8,7 +8,6 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navArgument
-import com.google.android.gms.maps.MapView
 import com.ssafy.domain.model.user.DomainUserDTO
 import com.ssafy.ourhome.screens.NextScreen
 import com.ssafy.ourhome.screens.album.AlbumDetailScreen
@@ -44,11 +43,11 @@ import com.ssafy.ourhome.screens.userpage.setting.SettingViewModel
 @Composable
 fun OurHomeNavGraph(navController: NavHostController) {
     val loginViewModel: LoginViewModel = hiltViewModel()
-    val mapViewModel : MapViewModel = hiltViewModel()
-    val userPageViewModel : UserPageViewModel = hiltViewModel()
-    val homeViewModel : HomeViewModel = hiltViewModel()
-    val settingViewModel : SettingViewModel = hiltViewModel()
-    val questionViewModel : QuestionViewModel = hiltViewModel()
+    val mapViewModel: MapViewModel = hiltViewModel()
+    val userPageViewModel: UserPageViewModel = hiltViewModel()
+    val homeViewModel: HomeViewModel = hiltViewModel()
+    val settingViewModel: SettingViewModel = hiltViewModel()
+    val questionViewModel: QuestionViewModel = hiltViewModel()
 
     NavHost(
         navController = navController,
@@ -64,7 +63,7 @@ fun OurHomeNavGraph(navController: NavHostController) {
             AlbumScreen(navController = navController)
         }
         composable(BottomNavItem.MyPage.screenRoute) {
-            MyPageScreen(navController = navController,vm = userPageViewModel)
+            MyPageScreen(navController = navController, vm = userPageViewModel)
         }
 
         composable(OurHomeScreens.NextScreen.name) {
@@ -140,7 +139,11 @@ fun OurHomeNavGraph(navController: NavHostController) {
             })
         ) { backStackEntry ->
             backStackEntry.arguments?.getString("email").let {
-                UserPageScreen(navController = navController, email = it.toString(),vm = userPageViewModel)
+                UserPageScreen(
+                    navController = navController,
+                    email = it.toString(),
+                    vm = userPageViewModel
+                )
             }
         }
 
@@ -149,14 +152,19 @@ fun OurHomeNavGraph(navController: NavHostController) {
             var userDTO =
                 navController.previousBackStackEntry?.arguments?.getParcelable<DomainUserDTO>("userDTO")
             Log.d("UserPageScreen_", "navigation: $userDTO ")
-            EditProfileScreen(navController = navController, userDTO = userDTO!!,vm = userPageViewModel)
+            EditProfileScreen(
+                navController = navController,
+                userDTO = userDTO!!,
+                vm = userPageViewModel
+            )
         }
 
-        composable("${OurHomeScreens.SettingScreen.name}/{permit}",
-        arguments = listOf(navArgument("permit"){
-            type = NavType.BoolType
-        })
-        ) {backStackEntry ->
+        composable(
+            "${OurHomeScreens.SettingScreen.name}/{permit}",
+            arguments = listOf(navArgument("permit") {
+                type = NavType.BoolType
+            })
+        ) { backStackEntry ->
             backStackEntry.arguments?.getBoolean("permit").let {
                 SettingScreen(navController = navController, permit = it!!, vm = settingViewModel)
             }
@@ -179,11 +187,11 @@ fun OurHomeNavGraph(navController: NavHostController) {
         }
 
         composable(OurHomeScreens.ScheduleDetailScreen.name) {
-            ScheduleDetailScreen(navController = navController)
+            ScheduleDetailScreen(navController = navController, vm = homeViewModel)
         }
 
-        composable(OurHomeScreens.MapScreen.name){
-            MapScreen(navController = navController,vm = mapViewModel )
+        composable(OurHomeScreens.MapScreen.name) {
+            MapScreen(navController = navController, vm = mapViewModel)
         }
     }
 }

@@ -12,6 +12,7 @@ import com.ssafy.domain.usecase.user.EditLocationPermissionUseCase
 import com.ssafy.domain.usecase.user.GetFamilyUsersUseCase
 import com.ssafy.domain.utils.ResultType
 import com.ssafy.ourhome.utils.Prefs
+import com.ssafy.ourhome.utils.Schedule
 import com.ssafy.ourhome.utils.State
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -29,6 +30,9 @@ class HomeViewModel @Inject constructor(
     val familyUsersProcessState = mutableStateOf(State.DEFAULT)
 
     val scheduleMap = mutableStateMapOf<String, List<DomainScheduleDTO>>()
+
+    val scheduleDetailState = mutableStateOf(DomainScheduleDTO())
+    var scheduleDetailPeople = listOf<DomainUserDTO>()
 
     fun editLocationPermission(permission: Boolean) = viewModelScope.launch(Dispatchers.IO) {
         editLocationPermissionUseCase.execute(Prefs.familyCode, Prefs.email, permission)
@@ -84,4 +88,13 @@ class HomeViewModel @Inject constructor(
 
             }
         }
+
+    fun setScheduleDetail(schedule: DomainScheduleDTO) {
+        scheduleDetailState.value = schedule
+        scheduleDetailPeople = familyUsersState.value.filter { user ->
+            schedule.participants.any { email ->
+                email == user.email
+            }
+        }
+    }
 }
