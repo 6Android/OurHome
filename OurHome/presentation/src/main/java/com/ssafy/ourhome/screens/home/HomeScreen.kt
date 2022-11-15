@@ -314,6 +314,7 @@ fun HomeScreen(navController: NavController, vm: HomeViewModel) {
                         familyCode = Prefs.familyCode,
                         onShareClick = {
                             // todo: 카카오톡을 공유
+                            shareFamilyCode(context, Prefs.familyCode)
                         },
                         onDismissRequest = { visibleInviteDialogState.value = false }
                     )
