@@ -142,7 +142,6 @@ class QuestionViewModel @Inject constructor(
                         }
                     }
                     familyAnswers = familyAnswerListTmp
-                    Log.d("ddd", "getQuestionAnswers: $familyAnswers")
 
                 }
                 is ResultType.Error -> {

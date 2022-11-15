@@ -99,6 +99,8 @@ fun initQuestionDetailViewModelCallback(vm: QuestionViewModel, context: Context)
 }
 
 fun initQuestionDetailScreen(vm : QuestionViewModel){
+    vm.myAnswer.value = ""
+    vm.myAnswerPoint = 0
     vm.getFamilyUsers()
     vm.getQuestionAnswers()
     vm.getDetailQuestion()

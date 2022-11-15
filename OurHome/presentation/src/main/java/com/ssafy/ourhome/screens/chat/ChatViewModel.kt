@@ -98,11 +98,9 @@ class ChatViewModel @Inject constructor(
                     for(user in familyUserList){
                         familyUsers.value[user.email] = user
                     }
-                    Log.d("ddd", "getFamilyUsers: 11")
                     getFamilyProcessState.value = State.SUCCESS
                 }
                 is ResultType.Error -> {
-                    Log.d("ddd", "getFamilyUsers: ${it.exception}")
                 }
                 else -> {
 
