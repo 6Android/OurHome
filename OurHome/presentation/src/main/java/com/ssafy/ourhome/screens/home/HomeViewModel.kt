@@ -18,6 +18,7 @@ import com.ssafy.domain.utils.ResultType
 import com.ssafy.ourhome.model.schedule.ParticipantDTO
 import com.ssafy.ourhome.utils.Prefs
 import com.ssafy.ourhome.utils.State
+import com.ssafy.ourhome.utils.TodayQuestionState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -50,7 +51,7 @@ class HomeViewModel @Inject constructor(
     val addScheduleDateState = mutableStateOf(LocalDate.now())
     val addScheduleParticipantsState = mutableStateListOf<ParticipantDTO>()
 
-    val checkAnswerTodayQuestionProcessState = mutableStateOf(State.DEFAULT)
+    val checkAnswerTodayQuestionProcessState = mutableStateOf(TodayQuestionState.DEFAULT)
 
 
     fun editLocationPermission(permission: Boolean) = viewModelScope.launch(Dispatchers.IO) {
@@ -193,13 +194,13 @@ class HomeViewModel @Inject constructor(
             .collect { response ->
                 when (response) {
                     is ResultType.Success -> {
-                        checkAnswerTodayQuestionProcessState.value = State.SUCCESS
+                        checkAnswerTodayQuestionProcessState.value = TodayQuestionState.SUCCESS
                     }
                     is ResultType.Fail -> {
-                        checkAnswerTodayQuestionProcessState.value = State.FAIL
+                        checkAnswerTodayQuestionProcessState.value = TodayQuestionState.FAIL
                     }
                     else -> {
-                        checkAnswerTodayQuestionProcessState.value = State.ERROR
+                        checkAnswerTodayQuestionProcessState.value = TodayQuestionState.ERROR
                     }
                 }
             }

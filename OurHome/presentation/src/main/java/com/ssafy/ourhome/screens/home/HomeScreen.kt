@@ -105,7 +105,7 @@ fun HomeScreen(navController: NavController, vm: HomeViewModel) {
     LaunchedEffect(key1 = "") {
         vm.getFamilyUsers()
 
-        if (vm.checkAnswerTodayQuestionProcessState.value != State.LOADING) vm.checkAnswerTodayQuestion()
+        if (vm.checkAnswerTodayQuestionProcessState.value != TodayQuestionState.COMPLETED) vm.checkAnswerTodayQuestion()
 
     }
 
@@ -123,17 +123,17 @@ fun HomeScreen(navController: NavController, vm: HomeViewModel) {
 
     when (vm.checkAnswerTodayQuestionProcessState.value) {
         // 오늘의 질문에 이미 대답한 경우
-        State.SUCCESS -> {
-            vm.checkAnswerTodayQuestionProcessState.value = State.LOADING
+        TodayQuestionState.SUCCESS -> {
+            vm.checkAnswerTodayQuestionProcessState.value = TodayQuestionState.COMPLETED
         }
         // 오늘의 질문에 대답 안한 경우
-        State.FAIL -> {
+        TodayQuestionState.FAIL -> {
             visibleMoveToQuestionDialogState.value = true
-            vm.checkAnswerTodayQuestionProcessState.value = State.LOADING
+            vm.checkAnswerTodayQuestionProcessState.value = TodayQuestionState.COMPLETED
         }
         // 에러
-        State.ERROR -> {
-            vm.checkAnswerTodayQuestionProcessState.value = State.LOADING
+        TodayQuestionState.ERROR -> {
+            vm.checkAnswerTodayQuestionProcessState.value = TodayQuestionState.COMPLETED
         }
     }
 
