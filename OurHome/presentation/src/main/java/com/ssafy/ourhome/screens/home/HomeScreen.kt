@@ -1,6 +1,5 @@
 package com.ssafy.ourhome.screens.home
 
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -45,7 +44,6 @@ import com.ssafy.ourhome.components.RoundedButton
 import com.ssafy.ourhome.navigation.BottomNavItem
 import com.ssafy.ourhome.navigation.OurHomeScreens
 import com.ssafy.ourhome.utils.*
-import com.ssafy.ourhome.utils.Prefs.email
 
 /** 맵 화면 이동 **/
 fun moveMap(navController: NavController, vm: HomeViewModel) {
@@ -144,8 +142,8 @@ fun HomeScreen(navController: NavController, vm: HomeViewModel) {
                     // 내 이미지 클릭했을 경우 바텀 네비 마이페이지로 이동
                     if (it == Prefs.email) {
                         navController.navigate(BottomNavItem.MyPage.screenRoute)
-                    }else{
-                        navController.navigate(OurHomeScreens.UserPageScreen.name+"/$it")
+                    } else {
+                        navController.navigate(OurHomeScreens.UserPageScreen.name + "/$it")
                     }
                 }
                 Spacer(modifier = Modifier.height(24.dp))
@@ -235,6 +233,7 @@ fun HomeScreen(navController: NavController, vm: HomeViewModel) {
                         familyCode = Prefs.familyCode,
                         onShareClick = {
                             // todo: 카카오톡을 공유
+                            shareFamilyCode(context, Prefs.familyCode)
                         },
                         onDismissRequest = { visibleInviteDialogState.value = false }
                     )
