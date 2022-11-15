@@ -1,5 +1,7 @@
 package com.ssafy.ourhome.screens.home.map
 
+import android.graphics.BitmapFactory
+import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -26,9 +28,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.model.CameraPosition
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.LatLngBounds
+import com.google.android.gms.maps.model.*
 import com.google.maps.android.compose.*
 import com.holix.android.bottomsheetdialog.compose.BottomSheetDialog
 import com.holix.android.bottomsheetdialog.compose.BottomSheetDialogProperties
@@ -43,6 +43,7 @@ fun MapScreen(
 ) {
 
     vm.getFamilyUsers()
+    Log.d("test6", "MapScreen: ${vm.users}")
 
     val width = remember {
         mutableStateOf(0)
@@ -61,7 +62,7 @@ fun MapScreen(
     }
 
     val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(LatLng(72.715133, 126.734086), 10f)
+        position = CameraPosition.fromLatLngZoom(LatLng(128.3445734, 36.119485), 10f)
     }
 
     var mapProperties by remember {
@@ -93,7 +94,9 @@ fun MapScreen(
                 Marker(
                     state = MarkerState(position = LatLng(i.latitude, i.longitude)),
                     title = i.name,
-                    snippet = positionUpdateFormatter(i.location_updated)
+                    snippet = positionUpdateFormatter(i.location_updated),
+                    icon = if (i.location_permit) BitmapDescriptorFactory.fromResource(R.drawable.ic_enable_pin)
+                    else BitmapDescriptorFactory.fromResource(R.drawable.ic_disabled_pin)
                 )
             }
 
@@ -211,7 +214,7 @@ private fun UserListView(list: List<DomainUserDTO>, onItemClick: (LatLng) -> (Un
                     modifier = Modifier
                         .weight(5f)
                         .padding(horizontal = 32.dp),
-                    style = MaterialTheme.typography.h6.copy(fontWeight = FontWeight.Bold)
+                    style = MaterialTheme.typography.h6.copy(fontWeight = FontWeight.Bold, color = if(user.location_permit) Color.Black else Color.LightGray)
                 )
                 Column(
                     modifier = Modifier.weight(3f),
