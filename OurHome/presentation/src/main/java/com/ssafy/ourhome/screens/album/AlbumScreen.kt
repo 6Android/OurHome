@@ -75,6 +75,12 @@ fun AlbumLazyVerticalGrid(photos: List<String>, navController: NavController){ /
 
     val tmpList = listOf<List<String>>(photos, photos, photos, photos)
 
+//    LazyVerticalGrid(columns = GridCells.Fixed(3)){
+//        items(span = ) {
+//
+//        }
+//    }
+    
     LazyVerticalGrid(modifier = Modifier
         .fillMaxSize()
         .padding(horizontal = 8.dp), columns = GridCells.Fixed(3)){

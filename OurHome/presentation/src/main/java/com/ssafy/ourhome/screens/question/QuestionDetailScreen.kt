@@ -11,12 +11,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -112,7 +107,7 @@ fun initQuestionDetailScreen(vm : QuestionViewModel){
 /** 가족 답변 카드 **/
 @Composable
 fun FamilyAnswer(vm: QuestionViewModel){
-
+    Log.d("ddd", "FamilyAnswer: ${vm.familyAnswers}")
     LazyColumn(
         modifier = Modifier.height(600.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
