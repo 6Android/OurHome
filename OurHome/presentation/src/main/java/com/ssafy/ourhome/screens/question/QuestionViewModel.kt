@@ -211,6 +211,31 @@ class QuestionViewModel @Inject constructor(
         }
     }
 
+    fun getFamilyUsersInPetDetail() = viewModelScope.launch(Dispatchers.IO) {
+        getFamilyUsersUseCase.execute(Prefs.familyCode).collect{
+            when(it) {
+                is ResultType.Loading -> {}
+                is ResultType.Success -> {
+                    val familyUserList = it.data
+
+                    for(user in familyUserList){
+                        familyUsers.value[user.email] = user
+                        if(user.email == Prefs.email){
+                            myProfile = user
+                        }
+                    }
+                    familyPetProcessState = State.SUCCESS
+                }
+                is ResultType.Error -> {
+                    familyPetProcessState = State.ERROR
+                }
+                else -> {
+
+                }
+            }
+        }
+    }
+
     fun getFamilyUsers() = viewModelScope.launch(Dispatchers.IO) {
         getFamilyUsersUseCase.execute(Prefs.familyCode).collect{
             when(it) {
@@ -224,7 +249,7 @@ class QuestionViewModel @Inject constructor(
                             myProfile = user
                         }
                     }
-
+                    familyPetProcessState = State.SUCCESS
                     familyGetState = State.SUCCESS
                 }
                 is ResultType.Error -> {
