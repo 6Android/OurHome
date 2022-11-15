@@ -128,9 +128,9 @@ fun FamilyAnswerItem(vm: QuestionViewModel, familyAnswers: DomainQuestionAnswerD
     var painter = rememberAsyncImagePainter(R.drawable.img_default_user)
     var name = "가족 정보 없음"
 
-    if(vm.familyUsers.value.contains(familyAnswers.email)){
-        painter = rememberAsyncImagePainter(vm.familyUsers.value.get(familyAnswers.email)!!.image)
-        name = vm.familyUsers.value.get(familyAnswers.email)!!.name
+    if(vm.familyUsers.contains(familyAnswers.email)){
+        painter = rememberAsyncImagePainter(vm.familyUsers[familyAnswers.email]!!.image)
+        name = vm.familyUsers[familyAnswers.email]!!.name
     }
 
     GrayBorderBox {

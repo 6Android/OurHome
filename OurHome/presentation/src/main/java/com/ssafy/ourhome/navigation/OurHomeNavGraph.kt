@@ -11,6 +11,7 @@ import com.ssafy.ourhome.screens.NextScreen
 import com.ssafy.ourhome.screens.SplashScreen
 import com.ssafy.ourhome.screens.album.AlbumDetailScreen
 import com.ssafy.ourhome.screens.album.AlbumScreen
+import com.ssafy.ourhome.screens.album.AlbumViewModel
 import com.ssafy.ourhome.screens.chat.ChatScreen
 import com.ssafy.ourhome.screens.chat.ChatViewModel
 import com.ssafy.ourhome.screens.home.HomeScreen
@@ -49,6 +50,7 @@ fun OurHomeNavGraph(navController: NavHostController) {
     val homeViewModel: HomeViewModel = hiltViewModel()
     val questionViewModel: QuestionViewModel = hiltViewModel()
     val chatViewModel: ChatViewModel = hiltViewModel()
+    val albumViewModel: AlbumViewModel = hiltViewModel()
 
     NavHost(
         navController = navController,
@@ -65,7 +67,7 @@ fun OurHomeNavGraph(navController: NavHostController) {
             QuestionScreen(navController = navController, vm = questionViewModel)
         }
         composable(BottomNavItem.Album.screenRoute) {
-            AlbumScreen(navController = navController)
+            AlbumScreen(navController = navController, vm = albumViewModel)
         }
         composable(BottomNavItem.MyPage.screenRoute) {
             MyPageScreen(navController = navController, vm = userPageViewModel)
@@ -91,7 +93,7 @@ fun OurHomeNavGraph(navController: NavHostController) {
             QuestionListScreen(navController = navController, vm = questionViewModel)
         }
 
-        composable(OurHomeScreens.QuestionDetailScreen.name){
+        composable(OurHomeScreens.QuestionDetailScreen.name) {
             QuestionDetailScreen(navController = navController, vm = questionViewModel)
         }
 
@@ -104,7 +106,7 @@ fun OurHomeNavGraph(navController: NavHostController) {
         }
 
         composable(OurHomeScreens.AlbumScreen.name) {
-            AlbumScreen(navController = navController)
+            AlbumScreen(navController = navController, vm = albumViewModel)
         }
 
         composable(

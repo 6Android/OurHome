@@ -45,6 +45,7 @@ import com.ssafy.ourhome.navigation.BottomNavItem
 import com.ssafy.ourhome.navigation.OurHomeScreens
 import com.ssafy.ourhome.startLoading
 import com.ssafy.ourhome.stopLoading
+import com.ssafy.ourhome.screens.question.navigateChatScreen
 import com.ssafy.ourhome.utils.*
 
 /** 맵 화면 이동 **/
@@ -161,7 +162,7 @@ fun HomeScreen(navController: NavController, vm: HomeViewModel) {
                 /** 홈 툴바 */
                 HomeToolBar {
                     // todo: 채팅 아이콘 클릭
-
+                    navigateChatScreen(navController)
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))

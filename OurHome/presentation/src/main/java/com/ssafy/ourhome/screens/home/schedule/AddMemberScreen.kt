@@ -95,7 +95,8 @@ fun FamilyListItem(participant: ParticipantDTO, onItemClick: (ParticipantDTO) ->
                     .size(64.dp)
                     .clip(CircleShape),
                 contentScale = ContentScale.Crop,
-                painter = rememberAsyncImagePainter(participant.image),
+                painter = if (participant.image == "default") painterResource(R.drawable.img_default_user)
+                else rememberAsyncImagePainter(participant.image),
                 contentDescription = "Profile Image"
             )
             Spacer(modifier = Modifier.width(16.dp))
