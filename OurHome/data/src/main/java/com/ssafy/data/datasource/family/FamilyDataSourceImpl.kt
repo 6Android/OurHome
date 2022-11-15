@@ -28,6 +28,14 @@ class FamilyDataSourceImpl @Inject constructor(
     override fun getFamilyPetDoc(familyCode: String) =
         getFamilyDoc(familyCode).collection(PET).document(OUR_PET)
 
+    // family/album Doc (family Collection -> family_code Doc ->  album Collection -> init_date Doc)
+    override fun getFamilyAlbumDoc(familyCode: String) =
+        getFamilyDoc(familyCode).collection(ALBUM).document(INIT_DATE)
+
+    // family/chat Doc (family Collection -> family_code Doc ->  chat Collection -> init_date Doc)
+    override fun getFamilyChatDoc(familyCode: String) =
+        getFamilyDoc(familyCode).collection(CHAT).document(INIT_DATE)
+
     // family 이미 있는지 검사
     override fun checkFamily(familyCode: String): Task<DocumentSnapshot> =
         fireStore.collection(FAMILY).document(familyCode).get()

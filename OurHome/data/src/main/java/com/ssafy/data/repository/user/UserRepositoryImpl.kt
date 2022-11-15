@@ -8,8 +8,7 @@ import com.ssafy.data.datasource.pet.PetDataSource
 import com.ssafy.data.datasource.question.QuestionDataSource
 import com.ssafy.data.datasource.user.UserDataSource
 import com.ssafy.data.model.question.DataQuestionDTO
-import com.ssafy.data.utils.EMAIL
-import com.ssafy.data.utils.FAMILY_CODE
+import com.ssafy.data.utils.*
 import com.ssafy.domain.model.family.DomainFamilyDTO
 import com.ssafy.domain.model.pet.DomainFamilyPetDTO
 import com.ssafy.domain.model.user.DomainUserDTO
@@ -20,6 +19,7 @@ import com.ssafy.domain.utils.ResultType
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import java.time.LocalDateTime
 import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
@@ -202,6 +202,31 @@ class UserRepositoryImpl @Inject constructor(
             val familyPetDocRef =
                 familyDataSource.getFamilyPetDoc(familyCode = familyCode)
 
+            // family/album
+            // init_date 초기화
+            val familyAlbumDocRef =
+                familyDataSource.getFamilyAlbumDoc(familyCode = familyCode)
+
+            // family/chat
+            // init_date 초기화
+            val familyChatDocRef =
+                familyDataSource.getFamilyChatDoc(familyCode = familyCode)
+
+            // init_date 담기위한 현재 시간
+            val date = LocalDateTime.now()
+            var dateString = date.toString().split("T")[0] + "T"
+
+            dateString += date.hour.toFillZeroString() + "-"
+            dateString += date.minute.toFillZeroString() + "-"
+            dateString += date.second.toFillZeroString()
+
+            val dateMap: Map<String, Any> = mapOf(
+                DATE to dateString,
+                YEAR to date.year,
+                MONTH to date.monthValue,
+                DAY to date.dayOfMonth
+            )
+
             fireStore.runTransaction { transaction ->
                 val userSnapshot = transaction.get(userDocRef)
                 var user = userSnapshot.toObject(DomainUserDTO::class.java)!!
@@ -230,6 +255,13 @@ class UserRepositoryImpl @Inject constructor(
 
                 // family/pet 안에 doc 새로 추가
                 transaction.set(familyPetDocRef, petInfo)
+
+                // family/album 안에 init_date doc 새로 추가
+                transaction.set(familyAlbumDocRef, dateMap)
+
+                // family/char 안에 init_date doc 새로 추가
+                transaction.set(familyChatDocRef, dateMap)
+
 
                 null
             }.addOnSuccessListener {
