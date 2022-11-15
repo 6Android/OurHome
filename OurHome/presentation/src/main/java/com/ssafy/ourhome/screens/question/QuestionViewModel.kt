@@ -2,6 +2,7 @@ package com.ssafy.ourhome.screens.question
 
 import android.util.Log
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
@@ -67,7 +68,8 @@ class QuestionViewModel @Inject constructor(
     var lastAllQuestions by mutableStateOf(listOf<DomainQuestionDTO>())
         private set
 
-    var familyUsers = mutableStateOf<MutableMap<String, DomainUserDTO>>(mutableMapOf())
+//    var familyUsers = mutableStateOf<MutableMap<String, DomainUserDTO>>(mutableMapOf())
+    val familyUsers = mutableStateMapOf<String, DomainUserDTO>()
 
     var familyPetProcessState by mutableStateOf(State.DEFAULT)
 
@@ -219,7 +221,7 @@ class QuestionViewModel @Inject constructor(
                     val familyUserList = it.data
 
                     for(user in familyUserList){
-                        familyUsers.value[user.email] = user
+                        familyUsers[user.email] = user
                         if(user.email == Prefs.email){
                             myProfile = user
                         }
@@ -317,12 +319,7 @@ class QuestionViewModel @Inject constructor(
         }
     }
 
-    fun checkCompleteAnswer() : Boolean{
-        if(familyAnswers.size + 1 == familyUsers.value.size){
-            return true
-        }
-        return false
-    }
+    fun checkCompleteAnswer() = familyAnswers.size + 1 == familyUsers.size
 
     fun completeTodayAnswer(today: LocalDate, date: String) = viewModelScope.launch(Dispatchers.IO) {
         val questionMap = mapOf<String, Any>(

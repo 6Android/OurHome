@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -70,9 +71,7 @@ fun PetDetailScreen(navController: NavController, vm: QuestionViewModel) {
                 Spacer(modifier = Modifier.height(16.dp))
 
                 CenterHorizontalColumn{
-
                     PetDetail(vm.pet)
-
                 }
 
                 Spacer(modifier = Modifier.height(32.dp))
@@ -81,10 +80,8 @@ fun PetDetailScreen(navController: NavController, vm: QuestionViewModel) {
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                CenterHorizontalColumn {
-
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     FamilyExpPieChart(familyContributeList)
-
                 }
                 
                 Spacer(modifier = Modifier.height(36.dp))
@@ -112,15 +109,14 @@ fun initPetDetailViewModelCallback(vm: QuestionViewModel, context: Context, fami
         }
         State.SUCCESS -> {
             var totalContributePoint = 0L
-            for(key in vm.familyUsers.value.keys){
-                totalContributePoint += vm.familyUsers.value.get(key)!!.contribute_point
+            for(key in vm.familyUsers.keys){
+                totalContributePoint += vm.familyUsers[key]!!.contribute_point
             }
 
             val dataList = mutableListOf<Slice>()
-            var i = 0
-            for(key in vm.familyUsers.value.keys){
-                dataList.add(Slice(1F * vm.familyUsers.value.get(key)!!.contribute_point / totalContributePoint, PieChartColors[i], vm.familyUsers.value.get(key)!!.name))
-                i++
+
+            for((i, key) in vm.familyUsers.keys.withIndex()){
+                dataList.add(Slice(1F * vm.familyUsers[key]!!.contribute_point / totalContributePoint, PieChartColors[i], vm.familyUsers[key]!!.name))
             }
             familyContributeList.value = PieChartData(dataList)
         }
@@ -174,10 +170,10 @@ fun FamilyExpPieChart(familyContributeList: MutableState<PieChartData>){
 /** 펫 경험치 text and progressbar **/
 @Composable
 fun PetExp(pet: DomainFamilyPetDTO) {
-    Row(modifier = Modifier.fillMaxWidth()) {
+    Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp), verticalAlignment = Alignment.CenterVertically) {
         Text(
             text = "경험치",
-            style = MaterialTheme.typography.h4.copy(fontWeight = FontWeight.ExtraBold)
+            style = MaterialTheme.typography.subtitle2
         )
 
         Spacer(modifier = Modifier.width(12.dp))
@@ -287,10 +283,10 @@ fun customProgressBar(progress: Int) {
 fun PetDetail(pet: DomainFamilyPetDTO) {
     Text(
         text = pet.name,
-        style = MaterialTheme.typography.h5.copy(fontWeight = FontWeight.Bold)
+        style = MaterialTheme.typography.subtitle1
     )
 
-    Spacer(modifier = Modifier.height(4.dp))
+    Spacer(modifier = Modifier.height(12.dp))
 
     Image(
         modifier = Modifier.size(250.dp),
@@ -298,7 +294,7 @@ fun PetDetail(pet: DomainFamilyPetDTO) {
         contentDescription = "펫 이미지"
     )
 
-    Spacer(modifier = Modifier.height(4.dp))
+    Spacer(modifier = Modifier.height(8.dp))
 
     Text(
         text = "Lv. " + pet.pet_level.toString(),
