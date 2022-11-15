@@ -126,4 +126,35 @@ class QuestionRepositoryImpl @Inject constructor(
         }
         awaitClose {  }
     }
+
+    // 오늘의 질문에 답 했는지 안했는지 체크
+    override fun checkAnswerTodayQuestion(
+        familyCode: String,
+        email: String
+    ) =
+        callbackFlow {
+        questionDataSource.getTodayQuestion(familyCode).get().addOnCompleteListener { it1 ->
+            if (it1.isSuccessful){
+                val todayQuestionId = it1.result.documents[0].id
+
+                questionDataSource.getQuestionAnswers(familyCode = familyCode, questionSeq = todayQuestionId.toInt()).addOnCompleteListener { it2 ->
+                    if (it2.isSuccessful){
+                        val list = it2.result.documents.map { it.id }
+
+                        if (list.any { it == email }){
+                            trySend(ResultType.Success(Unit))
+                        }else{
+                            trySend(ResultType.Fail)
+                        }
+
+                    }else{
+                        trySend(ResultType.Error(it2.exception))
+                    }
+                }
+            }else{
+                trySend(ResultType.Error(it1.exception))
+            }
+        }
+        awaitClose { }
+    }
 }

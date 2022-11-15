@@ -29,6 +29,13 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequest
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
+import com.ssafy.data.utils.FAMILY
+import com.ssafy.data.utils.QUESTION
+import com.ssafy.data.utils.QUESTION_ANSWER
+import com.ssafy.data.utils.QUESTION_SEQ
 import com.ssafy.ourhome.navigation.BottomNavItem
 import com.ssafy.ourhome.navigation.BottomNavigation
 import com.ssafy.ourhome.navigation.OurHomeNavGraph
@@ -36,6 +43,7 @@ import com.ssafy.ourhome.navigation.OurHomeScreens
 import com.ssafy.ourhome.ui.theme.MainColor
 import com.ssafy.ourhome.ui.theme.OurHomeTheme
 import com.ssafy.ourhome.utils.LOCATION
+import com.ssafy.ourhome.utils.Prefs.familyCode
 import com.ssafy.ourhome.utils.findActivity
 import com.ssafy.ourhome.work.MapWorkManager
 import dagger.hilt.android.AndroidEntryPoint
@@ -78,6 +86,23 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         workManager = WorkManager.getInstance(applicationContext)
+        val fireStore = FirebaseFirestore.getInstance()
+        fireStore.collection(FAMILY).document(familyCode).collection(QUESTION).orderBy(QUESTION_SEQ).limitToLast(1).get().addOnCompleteListener {
+            if (it.isSuccessful){
+                val todayQuestionId = it.result.documents[0].id
+                Log.d("TAG", "checkAnswerTodayQuestion: $todayQuestionId")
+                val re = fireStore.collection(FAMILY).document(familyCode).collection(QUESTION).document(todayQuestionId).collection(
+                    QUESTION_ANSWER
+                ).get().addOnCompleteListener {
+                    Log.d("TAG", "onCreate documents: ${it.result.documents}")
+                }
+
+
+
+            }else{
+
+            }
+        }
 
 //        stopWorkManager()
 //        startWorkManager()

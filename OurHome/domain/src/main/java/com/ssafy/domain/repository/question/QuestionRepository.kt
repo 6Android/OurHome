@@ -27,4 +27,7 @@ interface QuestionRepository {
     fun answerQuestion(familyCode: String, questionSeq: Int, answer: DomainQuestionAnswerDTO): Flow<ResultType<Unit>>
 
     fun completeTodayQuestion(familyCode: String, questionSeq: Int, questionsMap: Map<String, Any>): Flow<ResultType<Unit>>
+
+    // 오늘의 질문에 답 했는지 안했는지 체크
+    fun checkAnswerTodayQuestion(familyCode: String, email: String): Flow<ResultType<Unit>>
 }
