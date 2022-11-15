@@ -9,16 +9,15 @@ import android.location.LocationManager
 import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.ssafy.domain.usecase.user.SendLatLngUseCase
-import com.ssafy.ourhome.utils.Prefs
+import com.ssafy.ourhome.utils.Prefs.email
+import com.ssafy.ourhome.utils.Prefs.familyCode
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.coroutineScope
-import kotlin.random.Random
 
 @HiltWorker
 class MapWorkManager @AssistedInject constructor(
@@ -36,29 +35,34 @@ class MapWorkManager @AssistedInject constructor(
 
         val location = getLatLng(appContext)
 
-//        sendLatLngUseCase.execute(
-//            "EX7342",
-//            "a@naver.com",
-//            location.latitude,
-//            location.longitude
-//        ).collect {
-//            Log.d("test5", "doWork: $it")
-//        }
-
         sendLatLngUseCase.execute(
-            Prefs.familyCode,
-            Prefs.email,
-            Random.nextDouble(100.0),
-            Random.nextDouble(100.0),
+            familyCode,
+            email,
+            location.latitude,
+            location.longitude,
             System.currentTimeMillis()
         ).collect {
             Log.d("test5", "doWork: $it")
         }
+
+//        FirebaseFirestore.getInstance().collection(FAMILY).document(familyCode).collection(USER).document(email)
+//            .update("latitude",  Random.nextDouble(100.0), "longitude",  Random.nextDouble(100.0), "location_updated", System.currentTimeMillis())
+
+//        sendLatLngUseCase.execute(
+//            Prefs.familyCode,
+//            Prefs.email,
+//            Random.nextDouble(100.0),
+//            Random.nextDouble(100.0),
+//            System.currentTimeMillis()
+//        ).collect {
+//            Log.d("test5", "doWork: $it")
+//        }
         Log.d("test5", "doWork: End")
         Result.success()
     }
 
     private fun getLatLng(appContext: Context): Location {
+        Log.d("test5", "getLatLng: 들어왓서요")
         val locationManager = appContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager?
 
         val REQUIRED_PERMISSIONS = arrayOf(
@@ -89,7 +93,6 @@ class MapWorkManager @AssistedInject constructor(
                     REQUIRED_PERMISSIONS[0]
                 )
             ) {
-//                Toast.makeText(this, "앱을 실행하려면 위치 접근 권한이 필요합니다.", Toast.LENGTH_SHORT).show()
                 ActivityCompat.requestPermissions(
                     appContext,
                     REQUIRED_PERMISSIONS,

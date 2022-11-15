@@ -1,5 +1,6 @@
 package com.ssafy.ourhome.screens.home.map
 
+import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -43,6 +44,7 @@ fun MapScreen(
 ) {
 
     vm.getFamilyUsers()
+    Log.d("test6", "MapScreen: ${vm.users}")
 
     val width = remember {
         mutableStateOf(0)
@@ -61,7 +63,7 @@ fun MapScreen(
     }
 
     val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(LatLng(72.715133, 126.734086), 10f)
+        position = CameraPosition.fromLatLngZoom(LatLng(128.3445734, 36.119485), 10f)
     }
 
     var mapProperties by remember {
