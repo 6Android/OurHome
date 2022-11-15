@@ -138,12 +138,11 @@ class UserPageViewModel @Inject constructor(
 
     fun editManager(otherEmail: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            editProcessState = State.LOADING
             editManagerUseCase.execute(Prefs.familyCode, Prefs.email, otherEmail).collect {
                 when (it) {
                     is ResultType.Success -> {
                         Log.d("SettingViewModel", "yes: ")
-                        editProcessState = State.SUCCESS
+                        delegateSuccess = true
                     }
                     else -> {
                         Log.d("SettingViewModel", "no: ")
