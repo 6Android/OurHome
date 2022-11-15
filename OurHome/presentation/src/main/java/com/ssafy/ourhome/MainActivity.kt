@@ -6,9 +6,12 @@ import android.util.Log
 import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
@@ -17,18 +20,25 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequest
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import com.airbnb.lottie.compose.*
+import com.ssafy.ourhome.MainActivity.Companion.loadingState
 import com.ssafy.ourhome.navigation.BottomNavItem
 import com.ssafy.ourhome.navigation.BottomNavigation
 import com.ssafy.ourhome.navigation.OurHomeNavGraph
@@ -45,6 +55,10 @@ import java.util.concurrent.TimeUnit
 class MainActivity : ComponentActivity() {
 
     companion object {
+        var loadingState = mutableStateOf(
+            false
+        )
+
         private val locationWorkRequest: PeriodicWorkRequest =
             PeriodicWorkRequestBuilder<MapWorkManager>(15, TimeUnit.MINUTES)
                 .build()
@@ -102,6 +116,11 @@ fun MyApp() {
 
         // Subscribe to navBackStackEntry, required to get current route
         val navBackStackEntry by navController.currentBackStackEntryAsState()
+
+        /** 로딩 다이얼로그 */
+        if (loadingState.value) {
+            LoadingDialog()
+        }
 
         // Control TopBar and BottomBar
         when (navBackStackEntry?.destination?.route) {
@@ -168,6 +187,35 @@ fun StatusBarColorUpdateEffect(color: Color, isLight: Boolean = true) {
                 statusBarColor = defaultStatusBarColor.toArgb()
                 if (isLight) decorView.systemUiVisibility = 0
             }
+        }
+    }
+}
+
+/** 로딩 다이얼로그 */
+@Composable
+private fun LoadingDialog() {
+    Dialog(
+        onDismissRequest = { loadingState.value = false },
+        DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false)
+    ) {
+        Box(
+            contentAlignment = Center,
+            modifier = Modifier
+                .size(200.dp)
+                .background(White, shape = CircleShape)
+        ) {
+            val context = LocalContext.current
+            val composition by rememberLottieComposition(LottieCompositionSpec.Asset("loading.json"))
+            val logoAnimationState =
+                animateLottieCompositionAsState(
+                    composition = composition,
+                    iterations = LottieConstants.IterateForever
+                )
+            LottieAnimation(
+                modifier = Modifier.align(Center),
+                composition = composition,
+                progress = { logoAnimationState.progress }
+            )
         }
     }
 }
