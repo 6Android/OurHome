@@ -61,9 +61,13 @@ fun BottomNavigation(navController: NavController, bottomBarState: MutableState<
                         alwaysShowLabel = false,
                         onClick = {
                             navController.navigate(item.screenRoute) {
-                                navController.graph.startDestinationRoute?.let {
-                                    popUpTo(it) { saveState = true }
-                                }
+//                                navController.graph.startDestinationRoute?.let {
+//                                    popUpTo(it) { saveState = true }
+//                                }
+                                navController.popBackStack(
+                                    route = BottomNavItem.Home.screenRoute,
+                                    inclusive = false
+                                )
                                 launchSingleTop = true
                                 restoreState = true
                             }
