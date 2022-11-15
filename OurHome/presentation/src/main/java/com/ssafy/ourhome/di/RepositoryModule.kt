@@ -1,7 +1,6 @@
 package com.ssafy.ourhome.di
 
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.storage.FirebaseStorage
 import com.ssafy.data.datasource.family.FamilyDataSource
 import com.ssafy.data.datasource.pet.PetDataSource
 import com.ssafy.data.datasource.question.QuestionDataSource
@@ -31,9 +30,11 @@ object RepositoryModule {
     fun provideUserRepository(
         fireStore: FirebaseFirestore,
         userDataSource: UserDataSource,
-        familyDataSource: FamilyDataSource
+        familyDataSource: FamilyDataSource,
+        questionDataSource: QuestionDataSource,
+        petDataSource: PetDataSource
     ): UserRepository {
-        return UserRepositoryImpl(fireStore,userDataSource, familyDataSource)
+        return UserRepositoryImpl(fireStore,userDataSource, familyDataSource, questionDataSource, petDataSource)
     }
 
     // ScheduleRepository DI

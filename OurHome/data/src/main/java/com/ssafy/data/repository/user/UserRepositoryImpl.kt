@@ -3,28 +3,31 @@ package com.ssafy.data.repository.user
 import android.net.Uri
 import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.storage.FirebaseStorage
 import com.ssafy.data.datasource.family.FamilyDataSource
+import com.ssafy.data.datasource.pet.PetDataSource
+import com.ssafy.data.datasource.question.QuestionDataSource
 import com.ssafy.data.datasource.user.UserDataSource
-import com.ssafy.data.utils.EMAIL
-import com.ssafy.data.utils.FAMILY_CODE
+import com.ssafy.data.model.question.DataQuestionDTO
+import com.ssafy.data.utils.*
 import com.ssafy.domain.model.family.DomainFamilyDTO
-import com.ssafy.domain.model.question.DomainQuestionDTO
+import com.ssafy.domain.model.pet.DomainFamilyPetDTO
 import com.ssafy.domain.model.user.DomainUserDTO
 import com.ssafy.domain.repository.user.UserRepository
 import com.ssafy.domain.repository.user.UserResponse
 import com.ssafy.domain.repository.user.UsersResponse
 import com.ssafy.domain.utils.ResultType
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import java.time.LocalDateTime
 import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
     private val fireStore: FirebaseFirestore,
     private val userDataSource: UserDataSource,
-    private val familyDataSource: FamilyDataSource
+    private val familyDataSource: FamilyDataSource,
+    private val questionDataSource: QuestionDataSource,
+    private val petDataSource: PetDataSource
 ) : UserRepository {
 
     override fun getFamilyUsers(familyCode: String): Flow<UsersResponse> = callbackFlow {
@@ -180,6 +183,12 @@ class UserRepositoryImpl @Inject constructor(
             // user Doc
             val userDocRef = userDataSource.getUserDoc(userEmail)
 
+            // question_info Doc
+            val questionInfoDocRef = questionDataSource.getQuestionInfoDoc("1")
+
+            // pet_info Doc
+            val petInfoDocRef = petDataSource.getPetInfoDoc("1")
+
             // family/user Doc
             val familyUserDocRef =
                 familyDataSource.getFamilyUserDoc(familyCode = familyCode, email = userEmail)
@@ -189,9 +198,44 @@ class UserRepositoryImpl @Inject constructor(
             val familyQuestionDocRef =
                 familyDataSource.getFamilyQuestionDoc(familyCode = familyCode, seq = "1")
 
+            // family/pet Doc
+            val familyPetDocRef =
+                familyDataSource.getFamilyPetDoc(familyCode = familyCode)
+
+            // family/album
+            // init_date 초기화
+            val familyAlbumDocRef =
+                familyDataSource.getFamilyAlbumDoc(familyCode = familyCode)
+
+            // family/chat
+            // init_date 초기화
+            val familyChatDocRef =
+                familyDataSource.getFamilyChatDoc(familyCode = familyCode)
+
+            // init_date 담기위한 현재 시간
+            val date = LocalDateTime.now()
+            var dateString = date.toString().split("T")[0] + "T"
+
+            dateString += date.hour.toFillZeroString() + "-"
+            dateString += date.minute.toFillZeroString() + "-"
+            dateString += date.second.toFillZeroString()
+
+            val dateMap: Map<String, Any> = mapOf(
+                DATE to dateString,
+                YEAR to date.year,
+                MONTH to date.monthValue,
+                DAY to date.dayOfMonth
+            )
+
             fireStore.runTransaction { transaction ->
                 val userSnapshot = transaction.get(userDocRef)
                 var user = userSnapshot.toObject(DomainUserDTO::class.java)!!
+
+                val questionInfoSnapshot = transaction.get(questionInfoDocRef)
+                val questionInfo = questionInfoSnapshot.toObject(DataQuestionDTO::class.java)!!
+
+                val petInfoSnapshot = transaction.get(petInfoDocRef)
+                val petInfo = petInfoSnapshot.toObject(DomainFamilyPetDTO::class.java)!!
 
                 // family doc 새로 추가
                 transaction.set(familyDocRef, familyDTO)
@@ -207,16 +251,23 @@ class UserRepositoryImpl @Inject constructor(
                 transaction.set(familyUserDocRef, user)
 
                 // family/question 안에 doc 새로 추가
-                val questionMap = mapOf<String, Any>(
-                    "question_seq" to 1,
-                    "email_map" to mapOf<String, DomainQuestionDTO>()
-                )
-                transaction.set(familyQuestionDocRef, questionMap)
+                transaction.set(familyQuestionDocRef, questionInfo)
+
+                // family/pet 안에 doc 새로 추가
+                transaction.set(familyPetDocRef, petInfo)
+
+                // family/album 안에 init_date doc 새로 추가
+                transaction.set(familyAlbumDocRef, dateMap)
+
+                // family/char 안에 init_date doc 새로 추가
+                transaction.set(familyChatDocRef, dateMap)
+
 
                 null
             }.addOnSuccessListener {
                 trySend(ResultType.Success(Unit))
             }.addOnFailureListener {
+                Log.d("TAG", "insetFamily: $it")
                 trySend(ResultType.Error(Exception()))
             }
 
@@ -282,18 +333,21 @@ class UserRepositoryImpl @Inject constructor(
     override fun editUserProfile(imageUri: Uri, user: DomainUserDTO): Flow<ResultType<Unit>> =
         callbackFlow {
 
-            if(imageUri.toString() != user.image){
+            if (imageUri.toString() != user.image) {
                 userDataSource.editProfileImage(user.email, imageUri).addOnSuccessListener {
                     it.metadata?.reference?.downloadUrl?.addOnSuccessListener { uri ->
                         Log.d("test5", "editUserProfile: $uri")
-                        userDataSource.editUserInfo(user.family_code, user.copy(image = uri.toString()))
+                        userDataSource.editUserInfo(
+                            user.family_code,
+                            user.copy(image = uri.toString())
+                        )
                             .addOnCompleteListener {
                                 Log.d("test5", "successWithImage")
                                 trySend(ResultType.Success(Unit))
                             }
                     }
                 }
-            }else{
+            } else {
                 userDataSource.editUserInfo(user.family_code, user)
                     .addOnCompleteListener {
                         Log.d("test5", "successWithOutImage")

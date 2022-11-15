@@ -15,6 +15,15 @@ interface FamilyDataSource {
     // family/question Doc (family Collection -> family_code Doc ->  question Collection -> seq Doc)
     fun getFamilyQuestionDoc(familyCode: String, seq: String): DocumentReference
 
+    // family/pet Doc (family Collection -> family_code Doc ->  pet Collection -> out_pet Doc)
+    fun getFamilyPetDoc(familyCode: String): DocumentReference
+
+    // family/album Doc (family Collection -> family_code Doc ->  album Collection -> init_date Doc)
+    fun getFamilyAlbumDoc(familyCode: String): DocumentReference
+
+    // family/chat Doc (family Collection -> family_code Doc ->  chat Collection -> init_date Doc)
+    fun getFamilyChatDoc(familyCode: String): DocumentReference
+
     // family 이미 있는지 검사
     fun checkFamily(email: String): Task<DocumentSnapshot>
 }

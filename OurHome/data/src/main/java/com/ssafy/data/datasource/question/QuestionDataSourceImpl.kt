@@ -57,4 +57,7 @@ class QuestionDataSourceImpl @Inject constructor(
     ): Task<Void> =
         firestore.collection(FAMILY).document(familyCode).collection(QUESTION).document(questionSeq.toString()).set(questionsMap, SetOptions.merge())
 
+    // question_info doc 반환 (question Collection -> seq Doc)
+    override fun getQuestionInfoDoc(seq: String) =
+        firestore.collection(QUESTION_INFO).document(seq)
 }
