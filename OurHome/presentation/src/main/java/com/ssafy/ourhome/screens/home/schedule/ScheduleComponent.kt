@@ -17,13 +17,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.ssafy.domain.model.user.DomainUserDTO
+import com.ssafy.ourhome.R
 import com.ssafy.ourhome.components.TextInput
-import com.ssafy.ourhome.utils.Person
-import com.ssafy.ourhome.utils.personList
 import java.time.LocalDate
 
 
@@ -135,7 +135,8 @@ fun PersonListItem(item: DomainUserDTO, isEditable: Boolean = true, onDeleteClic
                     .size(64.dp)
                     .clip(CircleShape),
                 contentScale = ContentScale.Crop,
-                painter = rememberAsyncImagePainter(item.image),
+                painter = if (item.image == "default") painterResource(R.drawable.img_default_user)
+                else rememberAsyncImagePainter(item.image),
                 contentDescription = "Profile Image"
             )
 
