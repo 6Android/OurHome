@@ -32,3 +32,4 @@ const val DAY = "day"
 const val CHAT = "chat"
 
 const val PROFILE_IMAGE = "profile_image"
+const val ALBUM_IMAGE = "album_image"

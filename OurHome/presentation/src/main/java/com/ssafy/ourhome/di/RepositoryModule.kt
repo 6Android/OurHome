@@ -1,17 +1,20 @@
 package com.ssafy.ourhome.di
 
 import com.google.firebase.firestore.FirebaseFirestore
+import com.ssafy.data.datasource.album.AlbumDataSource
 import com.ssafy.data.datasource.chat.ChatDataSource
 import com.ssafy.data.datasource.family.FamilyDataSource
 import com.ssafy.data.datasource.pet.PetDataSource
 import com.ssafy.data.datasource.question.QuestionDataSource
 import com.ssafy.data.datasource.schedule.ScheduleDataSource
 import com.ssafy.data.datasource.user.UserDataSource
+import com.ssafy.data.repository.album.AlbumRepositoryImpl
 import com.ssafy.data.repository.chat.ChatRepositoryImpl
 import com.ssafy.data.repository.pet.PetRepositoryImpl
 import com.ssafy.data.repository.question.QuestionRepositoryImpl
 import com.ssafy.data.repository.schedule.ScheduleRepositoryImpl
 import com.ssafy.data.repository.user.UserRepositoryImpl
+import com.ssafy.domain.repository.album.AlbumRepository
 import com.ssafy.domain.repository.chat.ChatRepository
 import com.ssafy.domain.repository.pet.PetRepository
 import com.ssafy.domain.repository.question.QuestionRepository
@@ -37,7 +40,13 @@ object RepositoryModule {
         questionDataSource: QuestionDataSource,
         petDataSource: PetDataSource
     ): UserRepository {
-        return UserRepositoryImpl(fireStore,userDataSource, familyDataSource, questionDataSource, petDataSource)
+        return UserRepositoryImpl(
+            fireStore,
+            userDataSource,
+            familyDataSource,
+            questionDataSource,
+            petDataSource
+        )
     }
 
     // ScheduleRepository DI
@@ -75,5 +84,15 @@ object RepositoryModule {
         chatDataSource: ChatDataSource
     ): ChatRepository {
         return ChatRepositoryImpl(chatDataSource)
+    }
+
+    // Album DI
+    @Provides
+    @Singleton
+    fun provideAlbumRepository(
+        fireStore: FirebaseFirestore,
+        albumDataSource: AlbumDataSource
+    ): AlbumRepository {
+        return AlbumRepositoryImpl(albumDataSource)
     }
 }
