@@ -246,7 +246,7 @@ class QuestionViewModel @Inject constructor(
                     val familyUserList = it.data
 
                     for(user in familyUserList){
-                        familyUsers.value[user.email] = user
+                        familyUsers[user.email] = user
                         if(user.email == Prefs.email){
                             myProfile = user
                         }
