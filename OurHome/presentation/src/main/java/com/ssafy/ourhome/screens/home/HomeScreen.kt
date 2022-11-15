@@ -43,6 +43,8 @@ import com.ssafy.ourhome.components.OurHomeSurface
 import com.ssafy.ourhome.components.RoundedButton
 import com.ssafy.ourhome.navigation.BottomNavItem
 import com.ssafy.ourhome.navigation.OurHomeScreens
+import com.ssafy.ourhome.startLoading
+import com.ssafy.ourhome.stopLoading
 import com.ssafy.ourhome.utils.*
 
 /** 맵 화면 이동 **/
@@ -105,7 +107,7 @@ fun HomeScreen(navController: NavController, vm: HomeViewModel) {
     LaunchedEffect(key1 = "") {
         vm.getFamilyUsers()
 
-        if (vm.checkAnswerTodayQuestionProcessState.value != TodayQuestionState.COMPLETED) vm.checkAnswerTodayQuestion()
+        if (vm.checkAnswerTodayQuestionProcessState.value != State.COMPLETED) vm.checkAnswerTodayQuestion()
 
     }
 
@@ -123,17 +125,23 @@ fun HomeScreen(navController: NavController, vm: HomeViewModel) {
 
     when (vm.checkAnswerTodayQuestionProcessState.value) {
         // 오늘의 질문에 이미 대답한 경우
-        TodayQuestionState.SUCCESS -> {
-            vm.checkAnswerTodayQuestionProcessState.value = TodayQuestionState.COMPLETED
+        State.SUCCESS -> {
+            vm.checkAnswerTodayQuestionProcessState.value = State.COMPLETED
         }
         // 오늘의 질문에 대답 안한 경우
-        TodayQuestionState.FAIL -> {
+        State.FAIL -> {
             visibleMoveToQuestionDialogState.value = true
-            vm.checkAnswerTodayQuestionProcessState.value = TodayQuestionState.COMPLETED
+            vm.checkAnswerTodayQuestionProcessState.value = State.COMPLETED
         }
         // 에러
-        TodayQuestionState.ERROR -> {
-            vm.checkAnswerTodayQuestionProcessState.value = TodayQuestionState.COMPLETED
+        State.ERROR -> {
+            vm.checkAnswerTodayQuestionProcessState.value = State.COMPLETED
+        }
+        State.LOADING -> {
+            startLoading()
+        }
+        State.COMPLETED -> {
+            stopLoading()
         }
     }
 

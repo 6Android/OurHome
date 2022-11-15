@@ -18,7 +18,6 @@ import com.ssafy.domain.utils.ResultType
 import com.ssafy.ourhome.model.schedule.ParticipantDTO
 import com.ssafy.ourhome.utils.Prefs
 import com.ssafy.ourhome.utils.State
-import com.ssafy.ourhome.utils.TodayQuestionState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -51,7 +50,7 @@ class HomeViewModel @Inject constructor(
     val addScheduleDateState = mutableStateOf(LocalDate.now())
     val addScheduleParticipantsState = mutableStateListOf<ParticipantDTO>()
 
-    val checkAnswerTodayQuestionProcessState = mutableStateOf(TodayQuestionState.DEFAULT)
+    val checkAnswerTodayQuestionProcessState = mutableStateOf(State.DEFAULT)
 
 
     fun editLocationPermission(permission: Boolean) = viewModelScope.launch(Dispatchers.IO) {
@@ -189,18 +188,19 @@ class HomeViewModel @Inject constructor(
 
     // 오늘의 질문 대답했는지 체크
     fun checkAnswerTodayQuestion() = viewModelScope.launch(Dispatchers.IO) {
+        checkAnswerTodayQuestionProcessState.value = State.LOADING
 
         checkAnswerTodayQuestionUseCase.execute(Prefs.familyCode, Prefs.email)
             .collect { response ->
                 when (response) {
                     is ResultType.Success -> {
-                        checkAnswerTodayQuestionProcessState.value = TodayQuestionState.SUCCESS
+                        checkAnswerTodayQuestionProcessState.value = State.SUCCESS
                     }
                     is ResultType.Fail -> {
-                        checkAnswerTodayQuestionProcessState.value = TodayQuestionState.FAIL
+                        checkAnswerTodayQuestionProcessState.value = State.FAIL
                     }
                     else -> {
-                        checkAnswerTodayQuestionProcessState.value = TodayQuestionState.ERROR
+                        checkAnswerTodayQuestionProcessState.value = State.ERROR
                     }
                 }
             }

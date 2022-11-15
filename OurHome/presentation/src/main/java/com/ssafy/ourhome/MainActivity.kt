@@ -220,6 +220,14 @@ private fun LoadingDialog() {
     }
 }
 
+fun startLoading() {
+    loadingState.value = true
+}
+
+fun stopLoading() {
+    loadingState.value = false
+}
+
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {

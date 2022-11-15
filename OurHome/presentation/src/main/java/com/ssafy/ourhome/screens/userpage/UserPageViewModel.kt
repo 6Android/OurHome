@@ -3,7 +3,6 @@ package com.ssafy.ourhome.screens.userpage
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
@@ -13,6 +12,7 @@ import com.ssafy.domain.model.user.DomainUserDTO
 import com.ssafy.domain.usecase.user.*
 import com.ssafy.domain.utils.ResultType
 import com.ssafy.ourhome.utils.Prefs
+import com.ssafy.ourhome.utils.State
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -54,7 +54,7 @@ class UserPageViewModel @Inject constructor(
     var getProfileFail by mutableStateOf(false) // true = 실패
         private set
 
-    var editSuccess by mutableStateOf(false)
+    var editProcessState by mutableStateOf(State.DEFAULT)
         private set
 
     var errorState by mutableStateOf(false)
@@ -83,6 +83,7 @@ class UserPageViewModel @Inject constructor(
     }
 
     fun editProfile() = viewModelScope.launch(Dispatchers.IO) {
+        editProcessState = State.LOADING
 
         val tmp = user.copy()
         tmp.name = nicknameState.value
@@ -96,7 +97,7 @@ class UserPageViewModel @Inject constructor(
 
         editUserProfileUseCase.execute(imageUri.value.toUri(), tmp).collect {
             if (it is ResultType.Success) {
-                editSuccess = true
+                editProcessState = State.SUCCESS
             }
         }
     }
@@ -137,11 +138,12 @@ class UserPageViewModel @Inject constructor(
 
     fun editManager(otherEmail: String) {
         viewModelScope.launch(Dispatchers.IO) {
+            editProcessState = State.LOADING
             editManagerUseCase.execute(Prefs.familyCode, Prefs.email, otherEmail).collect {
                 when (it) {
                     is ResultType.Success -> {
                         Log.d("SettingViewModel", "yes: ")
-                        editSuccess = true
+                        editProcessState = State.SUCCESS
                     }
                     else -> {
                         Log.d("SettingViewModel", "no: ")
@@ -206,10 +208,15 @@ class UserPageViewModel @Inject constructor(
     }
 
     fun setEditSuccess() {
-        editSuccess = false
+        editProcessState = State.SUCCESS
     }
 
     fun setGetProfileFail() {
-        editSuccess = false
+        editProcessState = State.FAIL
+    }
+
+    fun seteditProcessStateDefault(){
+        editProcessState = State.DEFAULT
+
     }
 }

@@ -31,13 +31,15 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.core.net.toUri
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.squaredem.composecalendar.ComposeCalendar
 import com.ssafy.ourhome.R
 import com.ssafy.ourhome.components.MainAppBar
 import com.ssafy.ourhome.components.OurHomeSurface
+import com.ssafy.ourhome.startLoading
+import com.ssafy.ourhome.stopLoading
+import com.ssafy.ourhome.utils.State
 import com.ssafy.ourhome.utils.optimizeBitmap
 import java.io.File
 import java.time.LocalDate
@@ -61,7 +63,7 @@ fun EditProfileScreen(
     val imagePicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
         onResult = { uri ->
-            if(uri != null) {
+            if (uri != null) {
                 Log.d("test5", "EditProfileScreen: $uri")
                 var file = Uri.fromFile(optimizeBitmap(context, uri)?.let { File(it) })
                 Log.d("test5", "EditProfileScreen: ${file}")
@@ -71,11 +73,19 @@ fun EditProfileScreen(
             }
         }
     )
-    // 에디트 성공
-    if (vm.editSuccess) {
-        Toast.makeText(LocalContext.current, "정보 수정에 성공하였습니다.", Toast.LENGTH_SHORT).show()
-        vm.setEditSuccess()
-        navController.popBackStack()
+
+    when (vm.editProcessState) {
+        // 에디트 성공
+        State.SUCCESS -> {
+            stopLoading()
+
+            Toast.makeText(LocalContext.current, "정보 수정에 성공하였습니다.", Toast.LENGTH_SHORT).show()
+            navController.popBackStack()
+            vm.seteditProcessStateDefault()
+        }
+        State.LOADING -> {
+            startLoading()
+        }
     }
 
     if (showDialog.value) {
