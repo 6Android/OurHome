@@ -1,5 +1,10 @@
 package com.ssafy.ourhome.screens.album
 
+import android.net.Uri
+import android.util.Log
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -7,15 +12,16 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Divider
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -28,20 +34,61 @@ import com.ssafy.ourhome.components.MainAppBar
 import com.ssafy.ourhome.components.OurHomeSurface
 import com.ssafy.ourhome.navigation.OurHomeScreens
 import com.ssafy.ourhome.screens.question.navigateChatScreen
+import com.ssafy.ourhome.ui.theme.MainColor
 import com.ssafy.ourhome.utils.CHATTING_ICON_BLACK
+import com.ssafy.ourhome.utils.optimizeBitmap
 import okhttp3.internal.checkOffsetAndCount
+import java.io.File
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
 @Composable
-fun AlbumScreen(navController : NavController){
+fun AlbumScreen(navController: NavController, vm : AlbumViewModel) {
     val systemUiController: SystemUiController = rememberSystemUiController()
     systemUiController.isStatusBarVisible = true // Status bar 안보이기
 
+
+    val context = LocalContext.current
+
+    val imagePicker = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent(),
+        onResult = { uri ->
+            if(uri != null) {
+                Log.d("test5", "EditProfileScreen: $uri")
+                var file = Uri.fromFile(optimizeBitmap(context, uri)?.let { File(it) })
+                Log.d("test5", "EditProfileScreen: ${file}")
+
+                vm.uploadAlbum(file)
+//                vm.imageUri.value = uri.toString()
+            }
+        }
+    )
+
+    // 이미지 업로드 성공
+    if (vm.uploadSuccess) {
+        Toast.makeText(LocalContext.current, "정보 수정에 성공하였습니다.", Toast.LENGTH_SHORT).show()
+        vm.setUploadSuccess()
+
+    }
+
     Scaffold(topBar = { // TODO 세팅 아이콘 -> 채팅 아이콘
-        MainAppBar(title = "앨범", backIconEnable = false, icon = painterResource(id = CHATTING_ICON_BLACK), onIconClick = {
-            navigateChatScreen(navController)
-        })
+        MainAppBar(
+            title = "앨범",
+            backIconEnable = false,
+            icon = painterResource(id = CHATTING_ICON_BLACK),
+            onIconClick = {
+                navigateChatScreen(navController)
+            })
+    }, floatingActionButton = {
+        FloatingActionButton(
+            onClick = {
+                imagePicker.launch("image/*")
+
+            },
+            backgroundColor = MainColor
+        ) {
+            Icon(imageVector = Icons.Default.Add, contentDescription = "Add Floating Button")
+        }
     }) {
         OurHomeSurface() {
             Column(
@@ -51,13 +98,17 @@ fun AlbumScreen(navController : NavController){
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                AlbumLazyVerticalGrid(photos = listOf("https://i.pinimg.com/222x/36/30/f7/3630f7d930f91e495d93c02833b4abfc.jpg"
-                ,"https://i.pinimg.com/222x/36/30/f7/3630f7d930f91e495d93c02833b4abfc.jpg",
-                    "https://i.pinimg.com/222x/36/30/f7/3630f7d930f91e495d93c02833b4abfc.jpg",
-                    "https://i.pinimg.com/222x/36/30/f7/3630f7d930f91e495d93c02833b4abfc.jpg",
-                    "https://i.pinimg.com/222x/36/30/f7/3630f7d930f91e495d93c02833b4abfc.jpg",
-                    "https://i.pinimg.com/222x/36/30/f7/3630f7d930f91e495d93c02833b4abfc.jpg",
-                    "https://i.pinimg.com/222x/36/30/f7/3630f7d930f91e495d93c02833b4abfc.jpg"), navController = navController)
+                AlbumLazyVerticalGrid(
+                    photos = listOf(
+                        "https://i.pinimg.com/222x/36/30/f7/3630f7d930f91e495d93c02833b4abfc.jpg",
+                        "https://i.pinimg.com/222x/36/30/f7/3630f7d930f91e495d93c02833b4abfc.jpg",
+                        "https://i.pinimg.com/222x/36/30/f7/3630f7d930f91e495d93c02833b4abfc.jpg",
+                        "https://i.pinimg.com/222x/36/30/f7/3630f7d930f91e495d93c02833b4abfc.jpg",
+                        "https://i.pinimg.com/222x/36/30/f7/3630f7d930f91e495d93c02833b4abfc.jpg",
+                        "https://i.pinimg.com/222x/36/30/f7/3630f7d930f91e495d93c02833b4abfc.jpg",
+                        "https://i.pinimg.com/222x/36/30/f7/3630f7d930f91e495d93c02833b4abfc.jpg"
+                    ), navController = navController
+                )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -68,10 +119,12 @@ fun AlbumScreen(navController : NavController){
 }
 
 
-
 /** 앨범 사진 Grid Lazy **/
 @Composable
-fun AlbumLazyVerticalGrid(photos: List<String>, navController: NavController){ // 사진은 id값, 날짜, 이미지 링크 필요
+fun AlbumLazyVerticalGrid(
+    photos: List<String>,
+    navController: NavController
+) { // 사진은 id값, 날짜, 이미지 링크 필요
 
     val tmpList = listOf<List<String>>(photos, photos, photos, photos)
 
@@ -80,15 +133,17 @@ fun AlbumLazyVerticalGrid(photos: List<String>, navController: NavController){ /
 //
 //        }
 //    }
-    
-    LazyVerticalGrid(modifier = Modifier
-        .fillMaxSize()
-        .padding(horizontal = 8.dp), columns = GridCells.Fixed(3)){
+
+    LazyVerticalGrid(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 8.dp), columns = GridCells.Fixed(3)
+    ) {
         tmpList.forEach {
-            placeGridLine{
+            placeGridLine {
                 AlbumDate(year = 2022, month = 10)
             }
-            items(10){
+            items(10) {
                 PhotoItem(photo = photos[0], onClick = {
                     navigateAlbumDetail(navController)
                 })
@@ -105,16 +160,17 @@ fun AlbumLazyVerticalGrid(photos: List<String>, navController: NavController){ /
 
 /** 앨범 디테일 이동 **/
 fun navigateAlbumDetail(navController: NavController) {//https://i.pinimg.com/222x/36/30/f7/3630f7d930f91e495d93c02833b4abfc.jpg
-    navController.navigate(OurHomeScreens.AlbumDetailScreen.name + "/" +
-            encodeUrlForNavigate("https://i.pinimg.com/222x/36/30/f7/3630f7d930f91e495d93c02833b4abfc.jpg") +
-        "/" +
-        "2022년 10월 22일"
+    navController.navigate(
+        OurHomeScreens.AlbumDetailScreen.name + "/" +
+                encodeUrlForNavigate("https://i.pinimg.com/222x/36/30/f7/3630f7d930f91e495d93c02833b4abfc.jpg") +
+                "/" +
+                "2022년 10월 22일"
     )
 }
 
 /** 사진 아이템 **/
 @Composable
-fun PhotoItem(photo: String, onClick : () -> Unit){ // 사진은 id값, 날짜, 이미지 링크 필요
+fun PhotoItem(photo: String, onClick: () -> Unit) { // 사진은 id값, 날짜, 이미지 링크 필요
 
     val painter =
         rememberAsyncImagePainter("https://i.pinimg.com/222x/36/30/f7/3630f7d930f91e495d93c02833b4abfc.jpg")
@@ -126,8 +182,7 @@ fun PhotoItem(photo: String, onClick : () -> Unit){ // 사진은 id값, 날짜, 
             .clip(shape = RoundedCornerShape(8.dp))
             .clickable {
                 onClick.invoke()
-            }
-            ,
+            },
         painter = painter,
         contentScale = ContentScale.FillBounds,
         contentDescription = "펫 이미지",
@@ -137,13 +192,15 @@ fun PhotoItem(photo: String, onClick : () -> Unit){ // 사진은 id값, 날짜, 
 
 /** 앨범 날짜 **/
 @Composable
-fun AlbumDate(year: Int, month: Int){
-    
-    Text(modifier = Modifier.padding(vertical = 8.dp, horizontal = 8.dp), text = "${year}년 ${month}월",
-        style = MaterialTheme.typography.h5.copy(fontWeight = FontWeight.ExtraBold))
-    
-}
+fun AlbumDate(year: Int, month: Int) {
 
+    Text(
+        modifier = Modifier.padding(vertical = 8.dp, horizontal = 8.dp),
+        text = "${year}년 ${month}월",
+        style = MaterialTheme.typography.h5.copy(fontWeight = FontWeight.ExtraBold)
+    )
+
+}
 
 
 /** 그리드 한줄 차지 **/
@@ -154,6 +211,6 @@ fun LazyGridScope.placeGridLine(
 }
 
 
-fun encodeUrlForNavigate(url : String): String{
+fun encodeUrlForNavigate(url: String): String {
     return URLEncoder.encode(url, StandardCharsets.UTF_8.toString())
 }
