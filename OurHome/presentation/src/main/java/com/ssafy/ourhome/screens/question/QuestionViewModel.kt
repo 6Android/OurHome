@@ -52,7 +52,7 @@ class QuestionViewModel @Inject constructor(
     var detailQuestion by mutableStateOf(DomainQuestionDTO())
         private set
 
-    var familyAnswers by mutableStateOf(mutableListOf<DomainQuestionAnswerDTO>())
+    var familyAnswers by mutableStateOf(listOf<DomainQuestionAnswerDTO>())
         private set
 
     var myAnswer = mutableStateOf("")
@@ -70,6 +70,8 @@ class QuestionViewModel @Inject constructor(
     var familyUsers = mutableStateOf<MutableMap<String, DomainUserDTO>>(mutableMapOf())
 
     var familyPetProcessState by mutableStateOf(State.DEFAULT)
+
+    var familyGetState by mutableStateOf(State.DEFAULT)
 
     var answerCompleteState by mutableStateOf(State.DEFAULT)
 
@@ -128,18 +130,19 @@ class QuestionViewModel @Inject constructor(
                 is ResultType.Uninitialized -> {}
                 is ResultType.Success -> {
                     val questionAnswers = it.data!!
-                    familyAnswers.clear()
+                    var familyAnswerListTmp = mutableListOf<DomainQuestionAnswerDTO>()
 
                     for(answer in questionAnswers){
                         if(answer.email == Prefs.email){
                             myAnswer.value = answer.content
                             myAnswerPoint = answer.content.length
-                            Log.d("ddd", "getQuestionAnswers: $myAnswerPoint")
                             myAnswerAddedState = true
                         }else{
-                            familyAnswers.add(answer)
+                            familyAnswerListTmp.add(answer)
                         }
                     }
+                    familyAnswers = familyAnswerListTmp
+                    Log.d("ddd", "getQuestionAnswers: $familyAnswers")
 
                 }
                 is ResultType.Error -> {
@@ -223,10 +226,10 @@ class QuestionViewModel @Inject constructor(
                         }
                     }
 
-                    familyPetProcessState = State.SUCCESS
+                    familyGetState = State.SUCCESS
                 }
                 is ResultType.Error -> {
-                    familyPetProcessState = State.ERROR
+                    familyGetState = State.ERROR
                 }
                 else -> {
 
@@ -323,9 +326,6 @@ class QuestionViewModel @Inject constructor(
     }
 
     fun editContribution() = viewModelScope.launch(Dispatchers.IO) {
-        Log.d("ddd", "editContribution: ${myAnswer.value.length}")
-        Log.d("ddd", "editContribution: ${myAnswerPoint}")
-
         editUserContribution.execute(Prefs.familyCode, Prefs.email, 1L * myAnswer.value.length - myAnswerPoint).collect{
             when(it) {
                 is ResultType.Loading -> {}

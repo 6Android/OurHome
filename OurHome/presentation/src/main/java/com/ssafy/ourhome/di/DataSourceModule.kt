@@ -3,6 +3,8 @@ package com.ssafy.ourhome.di
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import com.ssafy.data.datasource.chat.ChatDataSource
+import com.ssafy.data.datasource.chat.ChatDataSourceImpl
 import com.ssafy.data.datasource.family.FamilyDataSource
 import com.ssafy.data.datasource.family.FamilyDataSourceImpl
 import com.ssafy.data.datasource.schedule.ScheduleDataSource
@@ -70,5 +72,14 @@ object DataSourceModule {
         fireStore: FirebaseFirestore
     ): QuestionDataSource {
         return QuestionDataSourceImpl(fireStore)
+    }
+
+    // ChatDataSource DI
+    @Provides
+    @Singleton
+    fun provideChatDataSource(
+        fireStore: FirebaseFirestore
+    ): ChatDataSource {
+        return ChatDataSourceImpl(fireStore)
     }
 }
