@@ -31,12 +31,15 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.squaredem.composecalendar.ComposeCalendar
 import com.ssafy.ourhome.R
 import com.ssafy.ourhome.components.MainAppBar
 import com.ssafy.ourhome.components.OurHomeSurface
+import com.ssafy.ourhome.utils.optimizeBitmap
+import java.io.File
 import java.time.LocalDate
 
 @Composable
@@ -53,16 +56,19 @@ fun EditProfileScreen(
         vm.setData()
     }
 
-    var hasImage by remember {
-        mutableStateOf(false)
-    }
-
+    val context = LocalContext.current
 
     val imagePicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
         onResult = { uri ->
-            hasImage = uri != null
-            vm.imageUri.value = uri.toString()
+            if(uri != null) {
+                Log.d("test5", "EditProfileScreen: $uri")
+                var file = Uri.fromFile(optimizeBitmap(context, uri)?.let { File(it) })
+                Log.d("test5", "EditProfileScreen: ${file}")
+
+                vm.imageUri.value = file.toString()
+//                vm.imageUri.value = uri.toString()
+            }
         }
     )
     // 에디트 성공
