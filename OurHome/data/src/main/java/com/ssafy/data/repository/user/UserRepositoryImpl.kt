@@ -214,17 +214,17 @@ class UserRepositoryImpl @Inject constructor(
 
             // init_date 담기위한 현재 시간
             val date = LocalDateTime.now()
-            var dateString = date.toString().split("T")[0] + "T"
-
-            dateString += date.hour.toFillZeroString() + "-"
-            dateString += date.minute.toFillZeroString() + "-"
-            dateString += date.second.toFillZeroString()
+//            var dateString = date.toString().split("T")[0] + "T"
+//
+//            dateString += date.hour.toFillZeroString() + "-"
+//            dateString += date.minute.toFillZeroString() + "-"
+//            dateString += date.second.toFillZeroString()
 
             val dateMap: Map<String, Any> = mapOf(
-                DATE to dateString,
+//                DATE to dateString,
                 YEAR to date.year,
-                MONTH to date.monthValue,
-                DAY to date.dayOfMonth
+                MONTH to date.monthValue.toFillZeroString(),
+                DAY to date.dayOfMonth.toFillZeroString()
             )
 
             fireStore.runTransaction { transaction ->
