@@ -2,6 +2,7 @@ package com.ssafy.ourhome.screens.question.pet
 
 
 import android.content.Context
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -99,7 +100,7 @@ fun PetDetailScreen(navController: NavController, vm: QuestionViewModel) {
 }
 
 fun initPetDetailScreen(vm: QuestionViewModel){
-    vm.getFamilyUsers()
+    vm.getFamilyUsersInPetDetail()
 }
 
 fun initPetDetailViewModelCallback(vm: QuestionViewModel, context: Context, familyContributeList: MutableState<PieChartData>){
