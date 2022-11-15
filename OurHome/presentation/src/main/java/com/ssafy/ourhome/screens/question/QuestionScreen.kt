@@ -1,6 +1,5 @@
 package com.ssafy.ourhome.screens.question
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -15,7 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
@@ -25,8 +24,6 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import coil.compose.AsyncImagePainter
-import coil.compose.AsyncImagePainter.State.Empty.painter
 import coil.compose.rememberAsyncImagePainter
 import com.ssafy.domain.model.pet.DomainFamilyPetDTO
 import com.ssafy.domain.model.question.DomainQuestionDTO
@@ -34,16 +31,13 @@ import com.ssafy.ourhome.R
 import com.ssafy.ourhome.components.MainAppBar
 import com.ssafy.ourhome.components.OurHomeSurface
 import com.ssafy.ourhome.navigation.OurHomeScreens
-import com.ssafy.ourhome.screens.album.encodeUrlForNavigate
 import com.ssafy.ourhome.ui.theme.Gray
 import com.ssafy.ourhome.ui.theme.MainColor
 import com.ssafy.ourhome.ui.theme.nanum
 import com.ssafy.ourhome.utils.CHATTING_ICON_BLACK
-import com.ssafy.ourhome.utils.SETTING_ICON
-import java.time.LocalDate
 
 @Composable
-fun QuestionScreen(navController: NavController, vm : QuestionViewModel) {
+fun QuestionScreen(navController: NavController, vm: QuestionViewModel) {
 
     val scrollState = rememberScrollState()
 
@@ -51,9 +45,13 @@ fun QuestionScreen(navController: NavController, vm : QuestionViewModel) {
 
 
     Scaffold(topBar = { // TODO 세팅 아이콘 -> 채팅 아이콘
-        MainAppBar(title = "질문", backIconEnable = false, icon = painterResource(id = CHATTING_ICON_BLACK), onIconClick = {
-            navigateChatScreen(navController)
-        })
+        MainAppBar(
+            title = "질문",
+            backIconEnable = false,
+            icon = painterResource(id = CHATTING_ICON_BLACK),
+            onIconClick = {
+                navigateChatScreen(navController)
+            })
     }) {
         OurHomeSurface() {
             Column(
@@ -66,61 +64,80 @@ fun QuestionScreen(navController: NavController, vm : QuestionViewModel) {
 
                 CenterHorizontalColumn {
 
-                    PetSemiDetail(vm.pet){
+                    PetSemiDetail(vm.pet) {
                         navController.navigate(OurHomeScreens.PetDetailScreen.name)
                     }
 
+                    Spacer(modifier = Modifier.height(28.dp))
+
+                    TodayQuestion(
+                        questionNumber = vm.todayQuestion.question_seq.toString(),
+                        questionContent = vm.todayQuestion.question_content
+                    )
+
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    TodayQuestion(questionNumber = vm.todayQuestion.question_seq.toString(), questionContent = vm.todayQuestion.question_content)
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
                     ReplyQuestionButton(
-                        buttonWidth = 120, buttonHeight = 40, fontSize = 20,
+                        modifier = Modifier.fillMaxWidth(0.9f).height(48.dp),
                         label = "답변 하기",
                         onClick = {
+                            vm.detailQuestionSeq = vm.todayQuestion.question_seq
                             navigateQuestionDetailScreen(navController)
-                        }, vm = vm)
+                        },
+                        fontSize = 20
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
 
                 Spacer(modifier = Modifier.height(36.dp))
 
-                LastQuestionHeader(){
+                LastQuestionHeader() {
                     navController.navigate(OurHomeScreens.QuestionListScreen.name)
                 }
 
-                QuestionLazyColumn(Modifier.height(260.dp), questionsList = vm.last3Questions, navController = navController, vm = vm)
+                QuestionLazyColumn(
+                    Modifier.height(260.dp),
+                    questionsList = vm.last3Questions,
+                    navController = navController,
+                    vm = vm
+                )
 
-                Spacer(modifier = Modifier.height(16.dp))            }
+                Spacer(modifier = Modifier.height(16.dp))
+            }
         }
     }
 
 }
 
-fun initQuestionScreen(vm: QuestionViewModel){
+fun initQuestionScreen(vm: QuestionViewModel) {
     vm.getFamiliyPet()
     vm.getTodayQuestion()
     vm.getLast3Questions()
 }
 
-fun navigateQuestionDetailScreen(navController: NavController){
+fun navigateQuestionDetailScreen(navController: NavController) {
     navController.navigate(OurHomeScreens.QuestionDetailScreen.name)
 }
 
 /** 채팅 스크린 이동 **/
-fun navigateChatScreen(navController: NavController){
+fun navigateChatScreen(navController: NavController) {
     navController.navigate(OurHomeScreens.ChatScreen.name)
 }
 
 /** 중앙 정렬 Column **/
 @Composable
-fun CenterHorizontalColumn(content : @Composable() (ColumnScope.() -> Unit) ){
-    Column(
-        modifier = Modifier
-            .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally,
-        content = content
-    )
+fun CenterHorizontalColumn(content: @Composable() (ColumnScope.() -> Unit)) {
+    Card(
+        modifier = Modifier.shadow(elevation = 2.dp, shape = RoundedCornerShape(16.dp))
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(8.dp)
+                .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally,
+            content = content
+        )
+    }
 }
 
 /** 오늘의 질문 내용 **/
@@ -154,17 +171,19 @@ fun TodayQuestion(questionNumber: String, questionContent: String) {
 /** 펫 정보 (이름, 이미지, 레벨), 클릭 시 펫 상헤 화면 이동 **/
 @Composable
 fun PetSemiDetail(pet: DomainFamilyPetDTO, onClick: () -> Unit = {}) {
-    Column(modifier = Modifier
-        .fillMaxWidth()
-        .clickable {
-            onClick.invoke()
-        }, horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                onClick.invoke()
+            }, horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         Text(
             text = pet.name,
-            style = MaterialTheme.typography.h5.copy(fontWeight = FontWeight.Bold)
+            style = MaterialTheme.typography.subtitle1
         )
 
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
         Image(
             modifier = Modifier.size(250.dp),
@@ -172,7 +191,7 @@ fun PetSemiDetail(pet: DomainFamilyPetDTO, onClick: () -> Unit = {}) {
             contentDescription = "펫 이미지"
         )
 
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         Text(
             text = "Lv. " + pet.pet_level.toString(),
@@ -187,13 +206,15 @@ fun PetSemiDetail(pet: DomainFamilyPetDTO, onClick: () -> Unit = {}) {
 fun LastQuestionHeader(onClick: () -> Unit = {}) {
     Row(
         modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.Bottom
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Text("지난 질문", style = MaterialTheme.typography.h5.copy(fontWeight = FontWeight.Bold))
+        Text("지난 질문", style = MaterialTheme.typography.subtitle2)
 
         Text(
             "더보기",
-            modifier = Modifier.clickable(onClick = onClick),
+            modifier = Modifier
+                .offset(x = 4.dp)
+                .clickable(onClick = onClick),
             style = MaterialTheme.typography.body2,
             color = Gray
         )
@@ -202,7 +223,12 @@ fun LastQuestionHeader(onClick: () -> Unit = {}) {
 
 /** 지난 질문 리스트  **/
 @Composable
-fun QuestionLazyColumn(modifier: Modifier = Modifier, questionsList: List<DomainQuestionDTO>, navController: NavController, vm: QuestionViewModel) {
+fun QuestionLazyColumn(
+    modifier: Modifier = Modifier,
+    questionsList: List<DomainQuestionDTO>,
+    navController: NavController,
+    vm: QuestionViewModel
+) {
     LazyColumn(modifier = modifier) {
         items(questionsList) {
             QuestionItem(question = it, navController = navController, vm = vm)
@@ -212,14 +238,20 @@ fun QuestionLazyColumn(modifier: Modifier = Modifier, questionsList: List<Domain
 
 /** 지난 질문 리스트 lazyColumn의 item **/
 @Composable
-fun QuestionItem(modifier: Modifier = Modifier.fillMaxWidth(), question: DomainQuestionDTO, navController: NavController, vm: QuestionViewModel) {
+fun QuestionItem(
+    modifier: Modifier = Modifier.fillMaxWidth(),
+    question: DomainQuestionDTO,
+    navController: NavController,
+    vm: QuestionViewModel
+) {
     Card(
         modifier = modifier
             .padding(vertical = 8.dp)
+            .shadow(elevation = 2.dp, shape = RoundedCornerShape(12.dp))
             .clickable {
                 vm.detailQuestionSeq = question.question_seq
                 navigateQuestionDetailScreen(navController)
-            }, elevation = 2.dp
+            }
     ) {
         Column(
             modifier = modifier,
@@ -237,7 +269,10 @@ fun QuestionItem(modifier: Modifier = Modifier.fillMaxWidth(), question: DomainQ
                 Text(
                     modifier = Modifier.padding(start = 8.dp),
                     text = question.completed_date,
-                    style = MaterialTheme.typography.caption.copy(fontWeight = FontWeight.Normal, letterSpacing = 0.sp),
+                    style = MaterialTheme.typography.caption.copy(
+                        fontWeight = FontWeight.Normal,
+                        letterSpacing = 0.sp
+                    ),
                     color = Gray
                 )
             }
@@ -257,12 +292,10 @@ fun QuestionItem(modifier: Modifier = Modifier.fillMaxWidth(), question: DomainQ
 @Composable
 fun ReplyQuestionButton(
     label: String = "Button",
+    modifier: Modifier = Modifier,
     radius: Int = 20,
     onClick: () -> Unit = {},
-    buttonWidth: Int,
-    buttonHeight: Int,
-    fontSize: Int,
-    vm: QuestionViewModel
+    fontSize: Int
 ) {
 
     Surface(
@@ -272,13 +305,10 @@ fun ReplyQuestionButton(
         color = MainColor
     ) {
         Column(
-            modifier = Modifier
-                .width(buttonWidth.dp)
-                .heightIn(buttonHeight.dp)
+            modifier = modifier
                 .clickable {
-                    vm.detailQuestionSeq = vm.todayQuestion.question_seq
                     onClick.invoke()
-                           },
+                },
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
