@@ -21,8 +21,10 @@ class UserDataSourceImpl @Inject constructor(
     private val firebaseStorage: FirebaseStorage,
     private val fireAuth: FirebaseAuth,
 ) : UserDataSource {
+
+    // 유저 정보 불러오기
     override fun getFamilyUsers(familyCode: String): Query =
-        fireStore.collection(FAMILY).document(familyCode).collection(USER)
+        fireStore.collection(FAMILY).document(familyCode).collection(USER).whereEqualTo("family_code", familyCode)
 
     // 이메일 회원 가입
     override fun joinEmail(email: String, password: String) =
@@ -101,5 +103,5 @@ class UserDataSourceImpl @Inject constructor(
 
     // 가족원 제외 (family 삭제)
     override fun outUsers(familyCode: String, email: String): Task<Void> =
-        fireStore.collection(FAMILY).document(familyCode).collection(USER).document(email).delete()
+        fireStore.collection(FAMILY).document(familyCode).collection(USER).document(email).update("family_code","")
 }
