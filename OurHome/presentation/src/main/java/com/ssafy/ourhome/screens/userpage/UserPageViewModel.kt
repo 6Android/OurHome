@@ -141,7 +141,7 @@ class UserPageViewModel @Inject constructor(
                 when (it) {
                     is ResultType.Success -> {
                         Log.d("SettingViewModel", "yes: ")
-                        editSuccess = true
+                        delegateSuccess = true
                     }
                     else -> {
                         Log.d("SettingViewModel", "no: ")
