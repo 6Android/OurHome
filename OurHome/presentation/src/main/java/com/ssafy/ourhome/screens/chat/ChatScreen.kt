@@ -31,6 +31,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavController
 import coil.compose.AsyncImagePainter.State.Empty.painter
@@ -47,6 +48,7 @@ import com.ssafy.ourhome.utils.State
 import com.ssafy.ourhome.utils.addFocusCleaner
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 
 @Composable
 fun ChatScreen(navController: NavController, vm: ChatViewModel){
@@ -60,8 +62,22 @@ fun ChatScreen(navController: NavController, vm: ChatViewModel){
 // Remember a CoroutineScope to be able to launch
     val coroutineScope = rememberCoroutineScope()
 
-    LaunchedEffect(key1 = vm.chats.size){
-        listState.animateScrollToItem(vm.chats.size)
+    val today = remember {
+        LocalDate.now()
+    }
+
+    val todayDate = "${today.year}년 ${today.monthValue}월 ${today.dayOfMonth}일"
+
+    LaunchedEffect(key1 = vm.chats[todayDate]){
+        listState.animateScrollToItem(if(vm.chats[todayDate] != null){
+            if(vm.chats[todayDate]!!.size - 1 < 0){
+                0
+            }else{
+                vm.chats[todayDate]!!.size -1
+            }
+        } else {
+            0
+        })
     }
 
     Scaffold(topBar = {
@@ -122,26 +138,32 @@ private fun ChattingMsgList(vm: ChatViewModel, listState: LazyListState) {
         vm.chats.forEach(){ mapping_date, chats ->
 
             item{
-                Row(modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp),
+                Row(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 16.dp),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically){
 
-                    Divider(modifier = Modifier.width(60.dp).height(2.dp), color = Gray)
+                    Divider(modifier = Modifier
+                        .width(60.dp)
+                        .height(2.dp), color = Gray)
 
                     Text(text = mapping_date, style = MaterialTheme.typography.body2, color = Gray)
 
-                    Divider(modifier = Modifier.width(60.dp).height(2.dp), color = Gray)
+                    Divider(modifier = Modifier
+                        .width(60.dp)
+                        .height(2.dp), color = Gray)
                 }
             }
 
             items(chats){
-                var name = if(vm.familyUsers.value[it.email]!!.name.isNullOrEmpty()){
+                var name = if(vm.familyUsers.value[it.email] == null || vm.familyUsers.value[it.email]!!.name.isNullOrEmpty()){
                     "가족 정보 없음"
                 }else{
                     vm.familyUsers.value[it.email]!!.name
                 }
 
-                var image = if(vm.familyUsers.value[it.email]!!.name.isNullOrEmpty()){
+                var image = if(vm.familyUsers.value[it.email] == null || vm.familyUsers.value[it.email]!!.name.isNullOrEmpty()){
                     "no"
                 }else{
                     vm.familyUsers.value[it.email]!!.image
@@ -229,10 +251,10 @@ fun FamilyChatItem(chat: ChatDTO) {
         ) {
             Image(
                 modifier = Modifier
-                    .size(64.dp)
+                    .size(36.dp)
                     .clip(CircleShape),
                 contentScale = ContentScale.Crop,
-                painter = rememberAsyncImagePainter(chat.img),
+                painter = rememberAsyncImagePainter(if(chat.img == "no") R.drawable.img_default_user else chat.img),
                 contentDescription = "Profile Image"
             )
             Text(
@@ -267,7 +289,7 @@ fun FamilyChatItem(chat: ChatDTO) {
         /** 시간 **/
         Text(
             text = chatTime,
-            style = MaterialTheme.typography.caption,
+            style = MaterialTheme.typography.caption.copy(fontSize = 10.sp),
             color = Gray,
             modifier = Modifier.constrainAs(time){
                 start.linkTo(msg.end, margin = 8.dp)
@@ -382,7 +404,7 @@ private fun SendIcon(vm: ChatViewModel) {
             .fillMaxWidth()
             .padding(start = 8.dp)
             .clickable {
-                if(vm.content.value.isNotBlank()) {
+                if (vm.content.value.isNotBlank()) {
                     vm.chatting()
                 }
             },
