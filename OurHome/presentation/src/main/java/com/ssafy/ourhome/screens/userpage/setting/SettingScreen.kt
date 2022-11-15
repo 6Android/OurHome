@@ -2,6 +2,7 @@ package com.ssafy.ourhome.screens.userpage.setting
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -89,7 +90,7 @@ fun SettingScreen(navController: NavController, vm: UserPageViewModel) {
                 }
 
                 Spacer(modifier = Modifier.height(42.dp))
-                Support()
+                Support(context)
 
                 Spacer(modifier = Modifier.height(56.dp))
                 ClickableText("로그아웃") {
@@ -196,7 +197,9 @@ private fun ClickableText(
 }
 
 @Composable
-private fun Support() {
+private fun Support(
+    context : Context
+) {
     TextHeader(title = "고객 지원")
     Spacer(modifier = Modifier.height(26.dp))
 
@@ -211,7 +214,9 @@ private fun Support() {
         }
         Spacer(modifier = Modifier.height(32.dp))
         TextWithNext(title = "문의 보내기") {
-
+            val i = Intent(Intent.ACTION_VIEW)
+            i.data = Uri.parse("http://pf.kakao.com/_xktsxfxj")
+            context.startActivity(i)
         }
     }
 }
