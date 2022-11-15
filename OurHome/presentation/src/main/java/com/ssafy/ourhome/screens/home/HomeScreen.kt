@@ -1,6 +1,5 @@
 package com.ssafy.ourhome.screens.home
 
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -45,7 +44,6 @@ import com.ssafy.ourhome.components.RoundedButton
 import com.ssafy.ourhome.navigation.BottomNavItem
 import com.ssafy.ourhome.navigation.OurHomeScreens
 import com.ssafy.ourhome.utils.*
-import com.ssafy.ourhome.utils.Prefs.email
 
 /** 맵 화면 이동 **/
 fun moveMap(navController: NavController, vm: HomeViewModel) {
@@ -64,6 +62,9 @@ fun HomeScreen(navController: NavController, vm: HomeViewModel) {
     val scrollState = rememberScrollState()
     val context = LocalContext.current
     val visibleBottomSheetState = remember {
+        mutableStateOf(false)
+    }
+    val visibleMoveToQuestionDialogState = remember {
         mutableStateOf(false)
     }
     val onScheduleClick: (DomainScheduleDTO) -> Unit = { schedule ->
@@ -103,6 +104,9 @@ fun HomeScreen(navController: NavController, vm: HomeViewModel) {
     }
     LaunchedEffect(key1 = "") {
         vm.getFamilyUsers()
+
+        if (vm.checkAnswerTodayQuestionProcessState.value != State.LOADING) vm.checkAnswerTodayQuestion()
+
     }
 
     when (vm.familyUsersProcessState.value) {
@@ -114,6 +118,22 @@ fun HomeScreen(navController: NavController, vm: HomeViewModel) {
         State.ERROR -> {
             Toast.makeText(context, "가족 정보를 불러오는데 실패했습니다", Toast.LENGTH_SHORT).show()
             vm.familyUsersProcessState.value = State.DEFAULT
+        }
+    }
+
+    when (vm.checkAnswerTodayQuestionProcessState.value) {
+        // 오늘의 질문에 이미 대답한 경우
+        State.SUCCESS -> {
+            vm.checkAnswerTodayQuestionProcessState.value = State.LOADING
+        }
+        // 오늘의 질문에 대답 안한 경우
+        State.FAIL -> {
+            visibleMoveToQuestionDialogState.value = true
+            vm.checkAnswerTodayQuestionProcessState.value = State.LOADING
+        }
+        // 에러
+        State.ERROR -> {
+            vm.checkAnswerTodayQuestionProcessState.value = State.LOADING
         }
     }
 
@@ -144,8 +164,8 @@ fun HomeScreen(navController: NavController, vm: HomeViewModel) {
                     // 내 이미지 클릭했을 경우 바텀 네비 마이페이지로 이동
                     if (it == Prefs.email) {
                         navController.navigate(BottomNavItem.MyPage.screenRoute)
-                    }else{
-                        navController.navigate(OurHomeScreens.UserPageScreen.name+"/$it")
+                    } else {
+                        navController.navigate(OurHomeScreens.UserPageScreen.name + "/$it")
                     }
                 }
                 Spacer(modifier = Modifier.height(24.dp))
@@ -226,6 +246,65 @@ fun HomeScreen(navController: NavController, vm: HomeViewModel) {
                         onScheduleClick = onScheduleClick
                     ) {
                         visibleBottomSheetState.value = false
+                    }
+                }
+
+                /** 오늘의 질문으로 가기 다이얼로그 */
+                if (visibleMoveToQuestionDialogState.value) {
+                    Dialog(
+                        onDismissRequest = { visibleMoveToQuestionDialogState.value = false }
+                    ) {
+                        Surface(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .wrapContentHeight(),
+                            shape = RoundedCornerShape(16.dp),
+                            color = Color.White
+                        ) {
+                            /** 오늘의 질문으로 가기 다이얼로그 내용 */
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                modifier = Modifier.padding(16.dp)
+                            ) {
+                                /** 다이얼로그 헤더 */
+                                Text(text = "오늘의 질문 알림", style = MaterialTheme.typography.subtitle1)
+
+                                Spacer(modifier = Modifier.height(32.dp))
+
+                                /** 아이콘 */
+                                Box(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Image(
+                                        modifier = Modifier.size(60.dp),
+                                        painter = painterResource(
+                                            id = R.drawable.img_question
+                                        ),
+                                        contentDescription = "icon"
+                                    )
+                                }
+
+                                Spacer(modifier = Modifier.height(32.dp))
+
+                                /** 우리집 코드 */
+                                Text(
+                                    text = "아직 오늘의 질문에 답하지 않았습니다",
+                                    style = MaterialTheme.typography.body1
+                                )
+
+                                Spacer(modifier = Modifier.height(32.dp))
+
+                                /** 답변하러가기 버튼 */
+                                RoundedButton(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(48.dp), label = "답변하러 가기"
+                                ) {
+                                    navController.navigate(BottomNavItem.Question.screenRoute)
+                                }
+                            }
+                        }
                     }
                 }
 

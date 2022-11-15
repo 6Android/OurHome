@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ssafy.domain.model.schedule.DomainScheduleDTO
 import com.ssafy.domain.model.user.DomainUserDTO
+import com.ssafy.domain.usecase.question.CheckAnswerTodayQuestionUseCase
 import com.ssafy.domain.usecase.schedule.AddFamilyScheduleUseCase
 import com.ssafy.domain.usecase.schedule.DeleteFamilyScheduleUseCase
 import com.ssafy.domain.usecase.schedule.GetFamilyScheduleUseCase
@@ -30,7 +31,8 @@ class HomeViewModel @Inject constructor(
     private val getFamilyUsersUseCase: GetFamilyUsersUseCase,
     private val getFamilyScheduleUseCase: GetFamilyScheduleUseCase,
     private val deleteFamilyScheduleUseCase: DeleteFamilyScheduleUseCase,
-    private val addFamilyScheduleUseCase: AddFamilyScheduleUseCase
+    private val addFamilyScheduleUseCase: AddFamilyScheduleUseCase,
+    private val checkAnswerTodayQuestionUseCase: CheckAnswerTodayQuestionUseCase
 ) : ViewModel() {
     val familyUsersState = mutableStateOf<List<DomainUserDTO>>(emptyList())
     val familyUsersProcessState = mutableStateOf(State.DEFAULT)
@@ -47,6 +49,8 @@ class HomeViewModel @Inject constructor(
     val addScheduleContentState = mutableStateOf("")
     val addScheduleDateState = mutableStateOf(LocalDate.now())
     val addScheduleParticipantsState = mutableStateListOf<ParticipantDTO>()
+
+    val checkAnswerTodayQuestionProcessState = mutableStateOf(State.DEFAULT)
 
 
     fun editLocationPermission(permission: Boolean) = viewModelScope.launch(Dispatchers.IO) {
@@ -180,5 +184,24 @@ class HomeViewModel @Inject constructor(
             }
         }
         addScheduleParticipantsState[idx] = addScheduleParticipantsState[idx].copy(checked = false)
+    }
+
+    // 오늘의 질문 대답했는지 체크
+    fun checkAnswerTodayQuestion() = viewModelScope.launch(Dispatchers.IO) {
+
+        checkAnswerTodayQuestionUseCase.execute(Prefs.familyCode, Prefs.email)
+            .collect { response ->
+                when (response) {
+                    is ResultType.Success -> {
+                        checkAnswerTodayQuestionProcessState.value = State.SUCCESS
+                    }
+                    is ResultType.Fail -> {
+                        checkAnswerTodayQuestionProcessState.value = State.FAIL
+                    }
+                    else -> {
+                        checkAnswerTodayQuestionProcessState.value = State.ERROR
+                    }
+                }
+            }
     }
 }
