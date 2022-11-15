@@ -72,23 +72,34 @@ fun PetDetailScreen(navController: NavController, vm: QuestionViewModel) {
 
                 CenterHorizontalColumn{
                     PetDetail(vm.pet)
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    PetExp(vm.pet)
+
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
-
-                Spacer(modifier = Modifier.height(32.dp))
-
-                PetExp(vm.pet)
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    FamilyExpPieChart(familyContributeList)
-                }
-                
-                Spacer(modifier = Modifier.height(36.dp))
-                
-                FamilyExpLazyRow(familyContributeList)
 
                 Spacer(modifier = Modifier.height(16.dp))
+
+                CenterHorizontalColumn {
+
+                    Text(text = "우리가족 기여도", style = MaterialTheme.typography.subtitle2, modifier = Modifier.fillMaxWidth().offset(x = 8.dp), textAlign = TextAlign.Start)
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    FamilyExpPieChart(familyContributeList)
+
+                    Spacer(modifier = Modifier.height(36.dp))
+
+                    FamilyExpLazyRow(familyContributeList)
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
             }
         }
 
@@ -126,7 +137,7 @@ fun initPetDetailViewModelCallback(vm: QuestionViewModel, context: Context, fami
 /** 가족 경험치 기여도 정보 리스트 **/
 @Composable
 fun FamilyExpLazyRow(familyContributeList: MutableState<PieChartData>){
-    LazyRow{
+    LazyRow(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
         items(familyContributeList.value.slices.size){
             FamilyExpLazyRowItem(familyContributeList.value.slices.get(it))
         }
@@ -170,7 +181,9 @@ fun FamilyExpPieChart(familyContributeList: MutableState<PieChartData>){
 /** 펫 경험치 text and progressbar **/
 @Composable
 fun PetExp(pet: DomainFamilyPetDTO) {
-    Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+    Row(modifier = Modifier
+        .fillMaxWidth()
+        .padding(horizontal = 8.dp), verticalAlignment = Alignment.CenterVertically) {
         Text(
             text = "경험치",
             style = MaterialTheme.typography.subtitle2

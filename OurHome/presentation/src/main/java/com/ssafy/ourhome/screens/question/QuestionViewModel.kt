@@ -1,6 +1,5 @@
 package com.ssafy.ourhome.screens.question
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -15,7 +14,6 @@ import com.ssafy.domain.usecase.pet.GetFamilyPetUseCase
 import com.ssafy.domain.usecase.question.*
 import com.ssafy.domain.usecase.user.EditUserContribution
 import com.ssafy.domain.usecase.user.GetFamilyUsersUseCase
-import com.ssafy.domain.usecase.user.GetProfileUseCase
 import com.ssafy.domain.utils.ResultType
 import com.ssafy.ourhome.utils.Prefs
 import com.ssafy.ourhome.utils.State
