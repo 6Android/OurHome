@@ -21,4 +21,7 @@ interface QuestionDataSource {
     fun answerQuestion(familyCode: String, questionSeq: Int, answer: DomainQuestionAnswerDTO): Task<Void>
 
     fun completeTodayQuestion(familyCode: String, questionSeq: Int, questionsMap: Map<String, Any>): Task<Void>
+
+    // question_info doc 반환 (question Collection -> seq Doc)
+    fun getQuestionInfoDoc(seq: String): DocumentReference
 }
