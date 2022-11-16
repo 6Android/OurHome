@@ -20,7 +20,9 @@ import com.ssafy.ourhome.ui.theme.RED
 
 /** 경고 다이얼로그 창 */
 @Composable
-fun AlertDialog(
+fun OurHomeAlertDialog(
+    header : String,
+    confirmText: String,
     onConfirmClick: () -> Unit = {},
     onDismissRequest: () -> Unit = {}
 ) {
@@ -35,7 +37,7 @@ fun AlertDialog(
             color = Color.White
         ) {
 
-            AlertDialogContent("정말로 삭제하시겠습니까?", "삭제", onConfirmClick, onDismissRequest)
+            AlertDialogContent(header, confirmText, onConfirmClick, onDismissRequest)
         }
     }
 }

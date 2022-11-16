@@ -1,5 +1,6 @@
 package com.ssafy.ourhome.screens.userpage.setting
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -11,6 +12,9 @@ import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -26,6 +30,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.ssafy.domain.model.user.DomainUserDTO
 import com.ssafy.ourhome.R
 import com.ssafy.ourhome.components.MainAppBar
+import com.ssafy.ourhome.components.OurHomeAlertDialog
 import com.ssafy.ourhome.components.OurHomeSurface
 import com.ssafy.ourhome.screens.userpage.UserPageViewModel
 import com.ssafy.ourhome.ui.theme.MainColor
@@ -41,6 +46,23 @@ fun ManageFamilyScreen(
     // 가족원 전부 불러오기
     vm.getFamilyUsers()
 
+    val visibleDelegateDialogState = remember {
+        mutableStateOf(false)
+    }
+
+    val visibleTransferDialogState = remember {
+        mutableStateOf(false)
+    }
+
+    val userEmail = remember {
+        mutableStateOf("")
+    }
+
+    val userDTO = remember {
+        mutableStateOf(DomainUserDTO())
+    }
+    Log.d("test12", "ManageFamilyScreen: $userDTO")
+
     // 가족장 위임
     if (vm.delegateSuccess) {
         navController.popBackStack()
@@ -53,6 +75,35 @@ fun ManageFamilyScreen(
     if (vm.transferSuccess) {
         vm.setTransferSuccess()
         Toast.makeText(LocalContext.current, "가족원을 내보냈습니다.", Toast.LENGTH_SHORT).show()
+    }
+
+    //가족장 위임 Dialog
+    if (visibleDelegateDialogState.value) {
+        OurHomeAlertDialog(
+            header = "정말 위임하시겠습니까?",
+            confirmText = "위임",
+            onConfirmClick = {
+                if (userEmail.value != "") {
+                    vm.editManager(userEmail.value)
+                }
+
+            },
+            onDismissRequest = { visibleDelegateDialogState.value = false }
+        )
+    }
+
+    //가족 내보내기 Dialog
+    if (visibleTransferDialogState.value) {
+        OurHomeAlertDialog(
+            header = "정말 내보내시겠습니까?",
+            confirmText = "내보내기",
+            onConfirmClick = {
+                if (userDTO.value.email!="") {
+                    vm.transferUserData(userDTO.value)
+                }
+            },
+            onDismissRequest = { visibleTransferDialogState.value = false }
+        )
     }
 
     Scaffold(topBar = {
@@ -69,12 +120,13 @@ fun ManageFamilyScreen(
             ) {
                 items(items = vm.users) { user ->
                     if (Prefs.email != user.email) {
-                        FamilyManageItem(user, editManager = {
-                            vm.editManager(it)
-                        },
-                            transferUser = {
-                                vm.transferUserData(it)
-                            })
+                        FamilyManageItem(
+                            user,
+                            visibleDelegateDialogState,
+                            visibleTransferDialogState,
+                            userDTO,
+                            userEmail
+                        )
                         Spacer(modifier = Modifier.height(12.dp))
                     }
                 }
@@ -88,8 +140,10 @@ fun ManageFamilyScreen(
 @Composable
 fun FamilyManageItem(
     user: DomainUserDTO,
-    editManager: (String) -> Unit,
-    transferUser: (DomainUserDTO) -> Unit
+    visibleAlertDialogState: MutableState<Boolean>,
+    visibleTransferDialogState: MutableState<Boolean>,
+    userDTO: MutableState<DomainUserDTO>,
+    userEmail: MutableState<String>,
 ) {
     Card(
         modifier = Modifier
@@ -133,7 +187,8 @@ fun FamilyManageItem(
                         label = "가족장 위임", modifier = Modifier
                             .weight(1f)
                     ) {
-                        editManager.invoke(user.email)
+                        visibleAlertDialogState.value = true
+                        userEmail.value = user.email
                     }
 
                     RoundedTextButton(
@@ -141,7 +196,8 @@ fun FamilyManageItem(
                             .weight(1f),
                         backGroundColor = Color(0xFFD9D9D9)
                     ) {
-                        transferUser.invoke(user)
+                        visibleTransferDialogState.value = true
+                        userDTO.value = user
                     }
 
                 }
