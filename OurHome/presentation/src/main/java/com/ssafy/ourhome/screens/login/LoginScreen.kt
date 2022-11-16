@@ -44,6 +44,8 @@ import com.ssafy.ourhome.components.PasswordInput
 import com.ssafy.ourhome.components.RoundedButton
 import com.ssafy.ourhome.navigation.BottomNavItem
 import com.ssafy.ourhome.navigation.OurHomeScreens
+import com.ssafy.ourhome.startLoading
+import com.ssafy.ourhome.stopLoading
 import com.ssafy.ourhome.utils.SocialState
 import com.ssafy.ourhome.utils.State
 import kotlinx.coroutines.launch
@@ -90,10 +92,17 @@ fun LoginScreen(
                     navigateToEnterHomeScreen(navController)
                 }
             }
-            vm.loginProcessState.value = State.DEFAULT
+            vm.loginProcessState.value = State.COMPLETED
         }
         State.FAIL -> {
             Toast.makeText(context, "아이디와 비밀번호를 확인해주세요", Toast.LENGTH_SHORT).show()
+            vm.loginProcessState.value = State.COMPLETED
+        }
+        State.LOADING -> {
+            startLoading()
+        }
+        State.COMPLETED -> {
+            stopLoading()
             vm.loginProcessState.value = State.DEFAULT
         }
     }
