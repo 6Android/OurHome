@@ -10,6 +10,7 @@ import com.ssafy.domain.model.album.DomainAlbumDTO
 import com.ssafy.domain.usecase.album.DeleteAlbumImageUseCase
 import com.ssafy.domain.usecase.album.GetAlbumImagesUseCase
 import com.ssafy.domain.usecase.album.UploadAlbumUseCase
+import com.ssafy.domain.usecase.family.GetFamilyManagerUseCase
 import com.ssafy.domain.utils.ResultType
 import com.ssafy.ourhome.utils.Prefs
 import com.ssafy.ourhome.utils.State
@@ -23,7 +24,8 @@ import javax.inject.Inject
 class AlbumViewModel @Inject constructor(
     private val uploadAlbumUseCase: UploadAlbumUseCase,
     private val getAlbumImagesUseCase: GetAlbumImagesUseCase,
-    private val deleteAlbumImageUseCase: DeleteAlbumImageUseCase
+    private val deleteAlbumImageUseCase: DeleteAlbumImageUseCase,
+    private val getFamilyManagerUseCase: GetFamilyManagerUseCase
 ) : ViewModel() {
 
     var uploadSuccess by mutableStateOf(false)
@@ -36,7 +38,31 @@ class AlbumViewModel @Inject constructor(
 
     var deleteAlbumImagesProcessState by mutableStateOf(State.DEFAULT)
 
+    var visibleDeleteIconState = mutableStateOf(false)
+
     var albumDetail by mutableStateOf(DomainAlbumDTO())
+
+    fun initAlbumDetail(){
+        if(albumDetail.email == Prefs.email){
+            visibleDeleteIconState.value = true
+        }
+    }
+
+    fun getFamilyManager() = viewModelScope.launch(Dispatchers.IO) {
+        getFamilyManagerUseCase.execute(Prefs.familyCode).collect{
+            when(it){
+                is ResultType.Uninitialized -> {}
+                is ResultType.Success -> {
+                    if(!it.data.isNullOrEmpty()){
+                        visibleDeleteIconState.value = true
+                    }
+                }
+                is ResultType.Error -> {
+
+                }
+            }
+        }
+    }
 
     fun uploadAlbum(imageUri: Uri) {
         viewModelScope.launch(Dispatchers.IO) {

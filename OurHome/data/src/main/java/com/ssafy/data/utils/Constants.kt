@@ -2,6 +2,7 @@ package com.ssafy.data.utils
 
 const val FAMILY = "family"
 const val FAMILY_CODE = "family_code"
+const val FAMILY_MANAGER = "family_manager"
 
 const val USER = "user"
 const val EMAIL = "email"

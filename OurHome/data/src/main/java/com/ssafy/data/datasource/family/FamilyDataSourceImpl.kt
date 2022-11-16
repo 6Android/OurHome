@@ -2,6 +2,7 @@ package com.ssafy.data.datasource.family
 
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.ssafy.data.utils.*
@@ -39,4 +40,7 @@ class FamilyDataSourceImpl @Inject constructor(
     // family 이미 있는지 검사
     override fun checkFamily(familyCode: String): Task<DocumentSnapshot> =
         fireStore.collection(FAMILY).document(familyCode).get()
+
+    override fun getFamilyManager(familyCode: String): DocumentReference =
+        fireStore.collection(FAMILY).document(familyCode)
 }

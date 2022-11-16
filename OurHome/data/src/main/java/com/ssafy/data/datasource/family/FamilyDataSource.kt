@@ -26,4 +26,8 @@ interface FamilyDataSource {
 
     // family 이미 있는지 검사
     fun checkFamily(email: String): Task<DocumentSnapshot>
+
+    // 가족장 email 가져오기
+    fun getFamilyManager(familyCode: String): DocumentReference
+
 }
