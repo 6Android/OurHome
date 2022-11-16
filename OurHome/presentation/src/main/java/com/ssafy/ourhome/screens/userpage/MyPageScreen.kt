@@ -29,7 +29,7 @@ fun MyPageScreen(
     val scrollState = rememberScrollState()
 
     LaunchedEffect(key1 = true) {
-        vm.setJob(vm.getProfile(Prefs.email))
+        vm.setJob(vm.getMyProfile(Prefs.email))
     }
 
 
@@ -59,7 +59,7 @@ fun MyPageScreen(
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
-                UserColorCardList(userDTO = vm.user)
+                UserColorCardList(userDTO = vm.user,vm)
 
                 Spacer(modifier = Modifier.height(16.dp))
                 UserCommonCardList(userDTO = vm.user)

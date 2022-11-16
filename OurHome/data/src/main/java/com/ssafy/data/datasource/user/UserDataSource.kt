@@ -34,6 +34,9 @@ interface UserDataSource {
     // 유저 정보 가져오기
     fun getProfile(familyCode: String, email: String): DocumentReference
 
+    //다른 유저 정보 가져오기
+    fun getOtherProfile(familyCode: String, email: String): DocumentReference
+
     // 유저 정보 수정하기
     fun editUserInfo(familyCode: String, user: DomainUserDTO): Task<Void>
 

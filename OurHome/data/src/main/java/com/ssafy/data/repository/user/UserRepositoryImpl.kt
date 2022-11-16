@@ -65,6 +65,25 @@ class UserRepositoryImpl @Inject constructor(
 
     }
 
+    //다른 유저 정보 가져오기
+    override fun getOtherProfile(familyCode: String, email: String): Flow<UserResponse> = callbackFlow {
+        val snapshotListener =
+            userDataSource.getOtherProfile(familyCode, email).addSnapshotListener { snapshot, e ->
+                val response = if (snapshot != null) {
+                    val user = snapshot.toObject(DomainUserDTO::class.java)!!
+                    ResultType.Success(user)
+                } else {
+                    ResultType.Error(e)
+                }
+                trySend(response)
+            }
+        awaitClose {
+            Log.d("test5", "getProfile: Cancel")
+            snapshotListener.remove()
+        }
+
+    }
+
     // 이메일 회원 가입
     override fun joinEmail(email: String, password: String, nickname: String, birthday: String) =
         callbackFlow {
@@ -358,6 +377,8 @@ class UserRepositoryImpl @Inject constructor(
 
             }
         }
+
+
 
     // 현재 위치 전송하기
     override fun sendLatLng(

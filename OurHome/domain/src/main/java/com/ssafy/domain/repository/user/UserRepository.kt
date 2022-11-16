@@ -51,6 +51,9 @@ interface UserRepository {
     // 유저 정보 가져오기
     fun getProfile(familyCode: String, email: String): Flow<UserResponse>
 
+    // 다른 유저 정보 가져오기
+    fun getOtherProfile(familyCode: String, email: String): Flow<UserResponse>
+
     // 유저 정보 수정하기
     fun editUserProfile(imageUri : Uri,user: DomainUserDTO) : Flow<ResultType<Unit>>
 

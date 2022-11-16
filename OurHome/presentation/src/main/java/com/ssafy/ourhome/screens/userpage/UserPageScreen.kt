@@ -8,6 +8,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -15,6 +16,7 @@ import androidx.navigation.NavController
 import com.ssafy.ourhome.components.MainAppBar
 import com.ssafy.ourhome.components.OurHomeSurface
 import com.ssafy.ourhome.navigation.OurHomeScreens
+import com.ssafy.ourhome.utils.Prefs
 
 @Composable
 fun UserPageScreen(
@@ -24,7 +26,10 @@ fun UserPageScreen(
 ) {
     val scrollState = rememberScrollState()
 
-    vm.getProfile(email)
+    LaunchedEffect(key1 = true) {
+        vm.setJob(vm.getOtherProfile(email))
+
+    }
 
     val context = LocalContext.current
     Scaffold(topBar = {
@@ -50,7 +55,7 @@ fun UserPageScreen(
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
-                UserColorCardList(userDTO = vm.user)
+                UserColorCardList(userDTO = vm.user,vm)
 
                 Spacer(modifier = Modifier.height(16.dp))
                 UserCommonCardList(userDTO = vm.user)

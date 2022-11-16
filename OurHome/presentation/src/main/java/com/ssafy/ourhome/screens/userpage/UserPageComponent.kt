@@ -30,6 +30,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
+import com.google.firebase.firestore.auth.User
 import com.ssafy.domain.model.user.DomainUserDTO
 import com.ssafy.ourhome.R
 import com.ssafy.ourhome.ui.theme.BirthDayColor
@@ -39,13 +40,13 @@ import com.ssafy.ourhome.ui.theme.hannar
 import com.ssafy.ourhome.utils.Prefs
 
 @Composable
-fun UserColorCardList(userDTO: DomainUserDTO) {
+fun UserColorCardList(userDTO: DomainUserDTO, vm : UserPageViewModel) {
 
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        BirthDayCard(cardModifier = Modifier.weight(1f), content = userDTO.birthday)
+        BirthDayCard(cardModifier = Modifier.weight(1f), content = userDTO.birthday,vm)
         Spacer(modifier = Modifier.width(12.dp))
         BloodTypeCard(cardModifier = Modifier.weight(1f), content = userDTO.blood_type)
         Spacer(modifier = Modifier.width(12.dp))
@@ -101,6 +102,7 @@ fun UserCommonCardList(
 fun BirthDayCard(
     cardModifier: Modifier = Modifier,
     content: String,
+    vm : UserPageViewModel
 ) {
     val split = content.split("-")
     val year = split[0]
@@ -124,6 +126,7 @@ fun BirthDayCard(
 
     Card(
         modifier = cardModifier
+            .clickable {  vm.job.cancel() }
             .size(110.dp)
             .shadow(elevation = 2.dp, shape = RoundedCornerShape(8.dp)),
         backgroundColor = BirthDayColor,
