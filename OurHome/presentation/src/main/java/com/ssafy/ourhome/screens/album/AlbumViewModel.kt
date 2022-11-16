@@ -6,12 +6,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ssafy.data.utils.EMAIL
 import com.ssafy.domain.model.album.DomainAlbumDTO
-import com.ssafy.domain.repository.album.AlbumRepository
+import com.ssafy.domain.usecase.album.DeleteAlbumImageUseCase
+import com.ssafy.domain.usecase.album.GetAlbumImagesUseCase
 import com.ssafy.domain.usecase.album.UploadAlbumUseCase
 import com.ssafy.domain.utils.ResultType
 import com.ssafy.ourhome.utils.Prefs
+import com.ssafy.ourhome.utils.State
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -20,11 +21,22 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AlbumViewModel @Inject constructor(
-    private val uploadAlbumUseCase: UploadAlbumUseCase
+    private val uploadAlbumUseCase: UploadAlbumUseCase,
+    private val getAlbumImagesUseCase: GetAlbumImagesUseCase,
+    private val deleteAlbumImageUseCase: DeleteAlbumImageUseCase
 ) : ViewModel() {
 
     var uploadSuccess by mutableStateOf(false)
         private set
+
+    var albumImages by mutableStateOf(mapOf<String, List<DomainAlbumDTO>>())
+        private set
+
+    var getAlbumImagesProcessState = mutableStateOf(State.DEFAULT)
+
+    var deleteAlbumImagesProcessState by mutableStateOf(State.DEFAULT)
+
+    var albumDetail by mutableStateOf(DomainAlbumDTO())
 
     fun uploadAlbum(imageUri: Uri) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -56,5 +68,36 @@ class AlbumViewModel @Inject constructor(
 
     fun setUploadSuccess(){
         this.uploadSuccess = false
+    }
+
+    fun getAlbumImages()= viewModelScope.launch(Dispatchers.IO) {
+        getAlbumImagesUseCase.execute(Prefs.familyCode).collect{
+            when(it){
+                is ResultType.Uninitialized -> {}
+                is ResultType.Success -> {
+                    albumImages = it.data.groupBy {
+                        it.mapping_date
+                    }
+                    getAlbumImagesProcessState.value = State.SUCCESS
+                }
+                is ResultType.Error -> {
+                    getAlbumImagesProcessState.value = State.ERROR
+                }
+            }
+        }
+    }
+
+    fun deleteAlbumImage() = viewModelScope.launch(Dispatchers.IO) {
+        deleteAlbumImageUseCase.execute(Prefs.familyCode, albumDetail.date).collect{
+            when(it){
+                is ResultType.Uninitialized -> {}
+                is ResultType.Success -> {
+                    deleteAlbumImagesProcessState = State.SUCCESS
+                }
+                is ResultType.Error -> {
+                    deleteAlbumImagesProcessState = State.ERROR
+                }
+            }
+        }
     }
 }

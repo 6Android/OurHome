@@ -1,13 +1,12 @@
 package com.ssafy.data.datasource.album
 
 import android.net.Uri
+import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.UploadTask
-import com.ssafy.data.utils.ALBUM
-import com.ssafy.data.utils.ALBUM_IMAGE
-import com.ssafy.data.utils.FAMILY
-import com.ssafy.data.utils.PROFILE_IMAGE
+import com.ssafy.data.utils.*
 import com.ssafy.domain.model.album.DomainAlbumDTO
 import java.time.LocalDateTime
 import javax.inject.Inject
@@ -28,4 +27,11 @@ class AlbumDataSourceImpl @Inject constructor(
                 .child(LocalDateTime.now().toString())
         return storageRef.putFile(imageUri)
     }
+
+    override fun getAlbumImages(familyCode: String): Query =
+        fireStore.collection(FAMILY).document(familyCode).collection(ALBUM).whereNotIn(DATE, listOf("")).orderBy(
+            DATE, Query.Direction.DESCENDING)
+
+    override fun deleteAlbumImage(familyCode: String, documentCode: String): Task<Void> =
+        fireStore.collection(FAMILY).document(familyCode).collection(ALBUM).document(documentCode).delete()
 }

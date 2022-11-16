@@ -17,6 +17,8 @@ val Gray = Color(0xFF8F8F8F)
 val LightGray = Color(0xFFECECEC)
 // 남색
 val Black = Color(0xFF222B45)
+// 빨강
+val RED = Color(0xFFEC1D23)
 
 
 val BirthDayColor = Color(0xFFF76808)

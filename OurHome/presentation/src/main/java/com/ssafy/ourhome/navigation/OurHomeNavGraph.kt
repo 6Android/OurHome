@@ -110,17 +110,10 @@ fun OurHomeNavGraph(navController: NavHostController) {
         }
 
         composable(
-            "${OurHomeScreens.AlbumDetailScreen.name}/{photoUrl}/{photoDate}",
-            arguments = listOf(navArgument(name = "photoUrl") {
-                type = NavType.StringType
-            }, navArgument(name = "photoDate") {
-                type = NavType.StringType
-            })
-        ) { backStackEntry ->
+            OurHomeScreens.AlbumDetailScreen.name
+        ) {
             AlbumDetailScreen(
-                navController = navController,
-                photoUrl = backStackEntry!!.arguments!!.getString("photoUrl")!!,
-                photoDate = backStackEntry!!.arguments!!.getString("photoDate")!!
+                navController = navController, vm = albumViewModel
             )
         }
 
