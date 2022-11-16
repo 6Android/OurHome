@@ -34,6 +34,8 @@ class ChatViewModel @Inject constructor(
     var chats by mutableStateOf(mapOf<String, List<DomainChatDTO>>())
         private set
 
+    var chatSize by mutableStateOf(1)
+
     var getChatsProcessState = mutableStateOf(State.DEFAULT)
 
     var getFamilyProcessState = mutableStateOf(State.DEFAULT)
