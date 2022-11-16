@@ -1,10 +1,7 @@
 package com.ssafy.ourhome.screens.question
 
 import android.util.Log
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateMapOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ssafy.domain.model.pet.DomainFamilyPetDTO
@@ -56,7 +53,7 @@ class QuestionViewModel @Inject constructor(
     var detailQuestion by mutableStateOf(DomainQuestionDTO())
         private set
 
-    var familyAnswers by mutableStateOf(listOf<DomainQuestionAnswerDTO>())
+    var familyAnswers = mutableStateListOf<DomainQuestionAnswerDTO>()
         private set
 
     var myAnswer = mutableStateOf("")
@@ -148,7 +145,8 @@ class QuestionViewModel @Inject constructor(
                             familyAnswerListTmp.add(answer)
                         }
                     }
-                    familyAnswers = familyAnswerListTmp
+                    familyAnswers.clear()
+                    familyAnswers.addAll(familyAnswerListTmp)
 
                 }
                 is ResultType.Error -> {
@@ -283,15 +281,16 @@ class QuestionViewModel @Inject constructor(
         date += today.dayOfMonth
 
         answerDetailQuestion(today, date)
+        if(isLevelUp()){
+            levelUp()
+        }
         if(myAnswerAddedState){
             editContribution()
         }else{
             editContribution(FIRST_ANSWER_POINT)
         }
         updateExp()
-        if(isLevelUp()){
-            levelUp()
-        }
+
     }
 
     fun answer() {
@@ -308,15 +307,16 @@ class QuestionViewModel @Inject constructor(
         date += today.dayOfMonth
 
         answerDetailQuestion(today, date)
+        if(isLevelUp()){
+            levelUp()
+        }
         if(myAnswerAddedState){
             editContribution()
         }else{
             editContribution(FIRST_ANSWER_POINT)
         }
         updateExp(FIRST_ANSWER_POINT)
-        if(isLevelUp()){
-            levelUp()
-        }
+
 
         if(checkCompleteAnswer()){
             completeTodayAnswer(today, date)
