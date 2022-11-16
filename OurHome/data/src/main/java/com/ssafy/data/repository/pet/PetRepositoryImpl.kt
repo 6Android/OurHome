@@ -31,4 +31,18 @@ class PetRepositoryImpl @Inject constructor(
         }
     }
 
+    override fun updatePetExp(familyCode: String, exp: Int): Flow<ResultType<Unit>> =
+        callbackFlow {
+            petDataSource.updatePetExp(familyCode, exp).addOnCompleteListener {
+                if(it.isSuccessful){
+                    trySend(ResultType.Success(Unit))
+                }else{
+                    trySend(ResultType.Error(it.exception))
+                }
+            }.addOnFailureListener {
+                trySend(ResultType.Error(it))
+            }
+            awaitClose {  }
+        }
+
 }
