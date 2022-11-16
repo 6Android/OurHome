@@ -76,7 +76,7 @@ fun UserCommonCard(
             )
             Text(
                 text = content, modifier = Modifier.align(Alignment.BottomEnd),
-                style = MaterialTheme.typography.h6
+                style = MaterialTheme.typography.h6.copy(fontWeight = FontWeight.ExtraBold)
             )
         }
     }
@@ -148,7 +148,8 @@ fun BirthDayCard(
                     text = "${year}년", style = MaterialTheme.typography.body1.copy(
                         color = Color.White,
                         fontWeight = FontWeight.Bold
-                    )
+                    ),
+                    modifier = Modifier.offset(y = 10.dp)
                 )
                 Text(text = buildAnnotatedString {
 
@@ -173,7 +174,7 @@ fun BirthDayCard(
                     ) {
                         append("일")
                     }
-                })
+                }, modifier = Modifier.offset(y = 2.dp))
             }
 
         }
@@ -185,7 +186,6 @@ fun BloodTypeCard(
     cardModifier: Modifier = Modifier,
     content: String
 ) {
-
     val rh = content.split(" ")[0]
     val type = content.split(" ")[1]
     Card(
@@ -233,7 +233,7 @@ fun BloodTypeCard(
                     }
 
                 },
-                modifier = Modifier.align(Alignment.BottomEnd),
+                modifier = Modifier.align(Alignment.BottomEnd).offset(y= (10).dp),
                 style = MaterialTheme.typography.h5.copy(color = Color.White)
             )
         }
@@ -267,8 +267,8 @@ fun MBTICard(
             )
             Text(
                 text = content,
-                modifier = Modifier.align(Alignment.BottomEnd),
-                style = MaterialTheme.typography.h5.copy(
+                modifier = Modifier.align(Alignment.BottomEnd).offset(y = (5).dp),
+                style = MaterialTheme.typography.subtitle1.copy(
                     color = Color.White,
                     fontWeight = FontWeight.ExtraBold
                 )
