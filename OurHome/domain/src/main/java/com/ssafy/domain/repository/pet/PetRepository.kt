@@ -13,4 +13,6 @@ interface PetRepository {
     fun getFamilyPet(familyCode: String): Flow<PetResponse>
 
     fun updatePetExp(familyCode: String, exp: Int): Flow<ResultType<Unit>>
+
+    fun levelUp(familyCode: String, nextPetLevel: Int): Flow<ResultType<Unit>>
 }
