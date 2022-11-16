@@ -49,7 +49,7 @@ fun QuestionDetailScreen(navController: NavController, vm: QuestionViewModel) {
     val context = LocalContext.current
 
     initQuestionDetailScreen(vm)
-    initQuestionDetailViewModelCallback(vm, context)
+    initQuestionDetailViewModelCallback(vm, context, navController)
 
     // TODO NestedScrollView 필요
     Scaffold(topBar = {
@@ -96,14 +96,15 @@ fun QuestionDetailScreen(navController: NavController, vm: QuestionViewModel) {
     }
 }
 
-fun initQuestionDetailViewModelCallback(vm: QuestionViewModel, context: Context) {
+const val FIRST_ANSWER_POINT = 100
+fun initQuestionDetailViewModelCallback(vm: QuestionViewModel, context: Context, navController: NavController) {
     when (vm.answerCompleteState) {
         State.ERROR -> {
             Toast.makeText(context, "답변 등록하는데 실패했습니다", Toast.LENGTH_SHORT).show()
             vm.answerCompleteState = State.DEFAULT
         }
         State.SUCCESS -> {
-            vm.editContribution()
+
             Toast.makeText(context, "답변 등록 성공했습니다", Toast.LENGTH_SHORT).show()
             vm.answerCompleteState = State.DEFAULT
         }
@@ -118,6 +119,7 @@ fun initQuestionDetailViewModelCallback(vm: QuestionViewModel, context: Context)
         State.SUCCESS -> {
             stopLoading()
             vm.updateCompleteState = State.DEFAULT
+            navController.popBackStack()
         }
     }
 }

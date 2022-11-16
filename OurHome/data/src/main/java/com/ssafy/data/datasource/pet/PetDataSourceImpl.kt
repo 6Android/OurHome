@@ -1,5 +1,6 @@
 package com.ssafy.data.datasource.pet
 
+import android.util.Log
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
@@ -26,12 +27,11 @@ class PetDataSourceImpl @Inject constructor(
     override fun levelUp(familyCode: String, nextPetLevel: Int): Task<Any> =
         fireStore.runTransaction { transaction ->
             val nextPet = transaction.get(fireStore.collection(PET_INFO).document(nextPetLevel.toString()))
-
             if(nextPet.exists()){
                 val description = nextPet.getString(PET_DESCRIPTION)
                 val image = nextPet.getString(PET_IMAGE)
-                val next_level = nextPet.getString(PET_NEXT_EXP)
-                val level = nextPet.getString(PET_LEVEL)
+                val next_level = nextPet.getLong(PET_NEXT_EXP)
+                val level = nextPet.getLong(PET_LEVEL)
 
                 val newPetMap = mapOf<String, Any>(
                     PET_DESCRIPTION to description!!,
