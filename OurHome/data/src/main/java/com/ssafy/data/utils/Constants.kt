@@ -20,6 +20,7 @@ const val COMPLETED = "completed"
 const val PET = "pet"
 const val PET_INFO = "pet_info"
 const val OUR_PET = "our_pet"
+const val PET_EXP = "exp"
 
 const val ALBUM = "album"
 const val INIT_DATE = "init_date"

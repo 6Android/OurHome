@@ -1,5 +1,6 @@
 package com.ssafy.domain.repository.pet
 
+import com.google.android.gms.tasks.Task
 import com.ssafy.domain.model.pet.DomainFamilyPetDTO
 import com.ssafy.domain.model.user.DomainUserDTO
 import com.ssafy.domain.utils.ResultType
@@ -11,4 +12,5 @@ interface PetRepository {
 
     fun getFamilyPet(familyCode: String): Flow<PetResponse>
 
+    fun updatePetExp(familyCode: String, exp: Int): Flow<ResultType<Unit>>
 }

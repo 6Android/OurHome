@@ -34,6 +34,8 @@ import com.ssafy.ourhome.components.OurHomeSurface
 import com.ssafy.ourhome.components.pie.PieChartData
 import com.ssafy.ourhome.navigation.OurHomeScreens
 import com.ssafy.ourhome.screens.question.pet.initPetDetailViewModelCallback
+import com.ssafy.ourhome.startLoading
+import com.ssafy.ourhome.stopLoading
 import com.ssafy.ourhome.ui.theme.Gray
 import com.ssafy.ourhome.ui.theme.MainColor
 import com.ssafy.ourhome.ui.theme.PieChartColors
@@ -104,6 +106,18 @@ fun initQuestionDetailViewModelCallback(vm: QuestionViewModel, context: Context)
             vm.editContribution()
             Toast.makeText(context, "답변 등록 성공했습니다", Toast.LENGTH_SHORT).show()
             vm.answerCompleteState = State.DEFAULT
+        }
+    }
+
+    when (vm.updateCompleteState) {
+        State.ERROR -> {
+            stopLoading()
+            Toast.makeText(context, "경험치 업데이트에 실패했습니다.\n문의사항에서 건의해주세요.", Toast.LENGTH_SHORT).show()
+            vm.updateCompleteState = State.DEFAULT
+        }
+        State.SUCCESS -> {
+            stopLoading()
+            vm.updateCompleteState = State.DEFAULT
         }
     }
 }
@@ -286,12 +300,11 @@ fun SmallRoundedButton(vm: QuestionViewModel, colorFlag: Boolean) {
                     if (vm.myAnswerAddedState) {
                         vm.modifyAnswer()
                         keyboardController?.hide()
-                        //로딩
                     } else {
                         vm.answer()
                         keyboardController?.hide()
-                        //로딩
                     }
+                    startLoading()
                 },
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally

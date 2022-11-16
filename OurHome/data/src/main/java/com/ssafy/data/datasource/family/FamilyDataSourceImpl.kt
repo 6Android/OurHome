@@ -43,4 +43,8 @@ class FamilyDataSourceImpl @Inject constructor(
 
     override fun getFamilyManager(familyCode: String): DocumentReference =
         fireStore.collection(FAMILY).document(familyCode)
+
+//    fun a (){ // familymanager 업데이트 이런식으로
+////        fireStore.collection(FAMILY).document(familyCode).update("manager", "dd")
+//    }
 }

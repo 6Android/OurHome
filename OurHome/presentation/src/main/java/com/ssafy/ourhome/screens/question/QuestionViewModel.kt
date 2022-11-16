@@ -11,6 +11,7 @@ import com.ssafy.domain.model.question.DomainQuestionAnswerDTO
 import com.ssafy.domain.model.question.DomainQuestionDTO
 import com.ssafy.domain.model.user.DomainUserDTO
 import com.ssafy.domain.usecase.pet.GetFamilyPetUseCase
+import com.ssafy.domain.usecase.pet.UpdatePetExpUseCase
 import com.ssafy.domain.usecase.question.*
 import com.ssafy.domain.usecase.user.EditUserContribution
 import com.ssafy.domain.usecase.user.GetFamilyUsersUseCase
@@ -34,7 +35,8 @@ class QuestionViewModel @Inject constructor(
     private val getFamilyUsersUseCase: GetFamilyUsersUseCase,
     private val answerQuestionUsecase: AnswerQuestionUsecase,
     private val completeTodayQuestionUseCase: CompleteTodayQuestionUseCase,
-    private val editUserContribution: EditUserContribution
+    private val editUserContribution: EditUserContribution,
+    private val updatePetExpUseCase: UpdatePetExpUseCase
 ): ViewModel(){
 
     var myProfile by mutableStateOf(DomainUserDTO())
@@ -74,6 +76,8 @@ class QuestionViewModel @Inject constructor(
     var familyGetState by mutableStateOf(State.DEFAULT)
 
     var answerCompleteState by mutableStateOf(State.DEFAULT)
+
+    var updateCompleteState by mutableStateOf(State.DEFAULT)
 
     fun getFamiliyPet() = viewModelScope.launch(Dispatchers.IO) {
         getFamilyPetUseCase.execute(Prefs.familyCode).collect{
@@ -276,6 +280,7 @@ class QuestionViewModel @Inject constructor(
         date += today.dayOfMonth
 
         answerDetailQuestion(today, date)
+        updateExp()
     }
 
     fun answer() {
@@ -292,6 +297,7 @@ class QuestionViewModel @Inject constructor(
         date += today.dayOfMonth
 
         answerDetailQuestion(today, date)
+        updateExp()
 
         if(checkCompleteAnswer()){
             completeTodayAnswer(today, date)
@@ -336,6 +342,23 @@ class QuestionViewModel @Inject constructor(
                 }
                 is ResultType.Error -> {
 
+                }
+                else -> {
+
+                }
+            }
+        }
+    }
+
+    fun updateExp() = viewModelScope.launch(Dispatchers.IO) {
+        updatePetExpUseCase.execute(Prefs.familyCode,myAnswer.value.length - myAnswerPoint).collect{
+            when(it) {
+                is ResultType.Loading -> {}
+                is ResultType.Success -> {
+                    updateCompleteState = State.SUCCESS
+                }
+                is ResultType.Error -> {
+                    updateCompleteState = State.ERROR
                 }
                 else -> {
 
