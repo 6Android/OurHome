@@ -71,7 +71,7 @@ fun ChatScreen(navController: NavController, vm: ChatViewModel){
 //    val todayDate = "${today.year}년 ${today.monthValue}월 ${today.dayOfMonth}일"
 
     LaunchedEffect(key1 = vm.chatSize){
-        listState.scrollToItem(vm.chatSize - 1)
+        listState.scrollToItem(if(vm.chatSize == 0) vm.chatSize else vm.chatSize - 1)
     }
 
     Scaffold(topBar = {
