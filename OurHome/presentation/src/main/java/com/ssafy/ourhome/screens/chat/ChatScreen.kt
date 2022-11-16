@@ -64,22 +64,14 @@ fun ChatScreen(navController: NavController, vm: ChatViewModel){
 // Remember a CoroutineScope to be able to launch
     val coroutineScope = rememberCoroutineScope()
 
-    val today = remember {
-        LocalDate.now()
-    }
+//    val today = remember {
+//        LocalDate.now()
+//    }
+//
+//    val todayDate = "${today.year}년 ${today.monthValue}월 ${today.dayOfMonth}일"
 
-    val todayDate = "${today.year}년 ${today.monthValue}월 ${today.dayOfMonth}일"
-
-    LaunchedEffect(key1 = vm.chats[todayDate]){
-        listState.animateScrollToItem(if(vm.chats[todayDate] != null){
-            if(vm.chats[todayDate]!!.size - 1 < 0){
-                0
-            }else{
-                vm.chats[todayDate]!!.size -1
-            }
-        } else {
-            0
-        })
+    LaunchedEffect(key1 = vm.chatSize){
+        listState.scrollToItem(vm.chatSize - 1)
     }
 
     Scaffold(topBar = {
@@ -123,7 +115,11 @@ fun initChatViewModelCallback(vm: ChatViewModel){
             vm.getChatsProcessState.value = State.DEFAULT
         }
         State.SUCCESS ->{
-
+            var count = 0
+            vm.chats.forEach{ mapping_date, chat_list ->
+                count += chat_list.size
+            }
+            vm.chatSize = count
         }
     }
 }
