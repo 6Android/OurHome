@@ -28,7 +28,7 @@ class AlbumViewModel @Inject constructor(
     private val getFamilyManagerUseCase: GetFamilyManagerUseCase
 ) : ViewModel() {
 
-    var uploadSuccess by mutableStateOf(false)
+    var uploadProcessState by mutableStateOf(State.DEFAULT)
         private set
 
     var albumImages by mutableStateOf(mapOf<String, List<DomainAlbumDTO>>())
@@ -36,24 +36,25 @@ class AlbumViewModel @Inject constructor(
 
     var getAlbumImagesProcessState = mutableStateOf(State.DEFAULT)
 
-    var deleteAlbumImagesProcessState by mutableStateOf(State.DEFAULT)
+    var deleteProcessState by mutableStateOf(State.DEFAULT)
+        private set
 
     var visibleDeleteIconState = mutableStateOf(false)
 
     var albumDetail by mutableStateOf(DomainAlbumDTO())
 
-    fun initAlbumDetail(){
-        if(albumDetail.email == Prefs.email){
+    fun initAlbumDetail() {
+        if (albumDetail.email == Prefs.email) {
             visibleDeleteIconState.value = true
         }
     }
 
     fun getFamilyManager() = viewModelScope.launch(Dispatchers.IO) {
-        getFamilyManagerUseCase.execute(Prefs.familyCode).collect{
-            when(it){
+        getFamilyManagerUseCase.execute(Prefs.familyCode).collect {
+            when (it) {
                 is ResultType.Uninitialized -> {}
                 is ResultType.Success -> {
-                    if(!it.data.isNullOrEmpty()){
+                    if (!it.data.isNullOrEmpty()) {
                         visibleDeleteIconState.value = true
                     }
                 }
@@ -66,6 +67,8 @@ class AlbumViewModel @Inject constructor(
 
     fun uploadAlbum(imageUri: Uri) {
         viewModelScope.launch(Dispatchers.IO) {
+            uploadProcessState = State.LOADING
+
             val today = LocalDateTime.now()
 
             uploadAlbumUseCase.execute(
@@ -86,19 +89,15 @@ class AlbumViewModel @Inject constructor(
             ).collect {
 
                 if (it is ResultType.Success) {
-                    uploadSuccess = true
+                    uploadProcessState = State.SUCCESS
                 }
             }
         }
     }
 
-    fun setUploadSuccess(){
-        this.uploadSuccess = false
-    }
-
-    fun getAlbumImages()= viewModelScope.launch(Dispatchers.IO) {
-        getAlbumImagesUseCase.execute(Prefs.familyCode).collect{
-            when(it){
+    fun getAlbumImages() = viewModelScope.launch(Dispatchers.IO) {
+        getAlbumImagesUseCase.execute(Prefs.familyCode).collect {
+            when (it) {
                 is ResultType.Uninitialized -> {}
                 is ResultType.Success -> {
                     albumImages = it.data.groupBy {
@@ -114,16 +113,33 @@ class AlbumViewModel @Inject constructor(
     }
 
     fun deleteAlbumImage() = viewModelScope.launch(Dispatchers.IO) {
-        deleteAlbumImageUseCase.execute(Prefs.familyCode, albumDetail.date).collect{
-            when(it){
+        deleteProcessState = State.LOADING
+        deleteAlbumImageUseCase.execute(Prefs.familyCode, albumDetail.date).collect {
+            when (it) {
                 is ResultType.Uninitialized -> {}
                 is ResultType.Success -> {
-                    deleteAlbumImagesProcessState = State.SUCCESS
+                    deleteProcessState = State.SUCCESS
                 }
                 is ResultType.Error -> {
-                    deleteAlbumImagesProcessState = State.ERROR
+                    deleteProcessState = State.ERROR
                 }
             }
         }
+    }
+
+    fun setUploadProcessStateCompleted() {
+        uploadProcessState = State.COMPLETED
+    }
+
+    fun setUploadProcessStateDefault() {
+        uploadProcessState = State.DEFAULT
+    }
+
+    fun setDeleteProcessStateCompleted() {
+        deleteProcessState = State.COMPLETED
+    }
+
+    fun setDeleteProcessStateDefault() {
+        deleteProcessState = State.DEFAULT
     }
 }
