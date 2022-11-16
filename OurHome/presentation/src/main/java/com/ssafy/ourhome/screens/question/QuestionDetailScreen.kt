@@ -32,6 +32,7 @@ import com.ssafy.ourhome.R
 import com.ssafy.ourhome.components.MainAppBar
 import com.ssafy.ourhome.components.OurHomeSurface
 import com.ssafy.ourhome.components.pie.PieChartData
+import com.ssafy.ourhome.navigation.OurHomeScreens
 import com.ssafy.ourhome.screens.question.pet.initPetDetailViewModelCallback
 import com.ssafy.ourhome.ui.theme.Gray
 import com.ssafy.ourhome.ui.theme.MainColor
@@ -41,7 +42,7 @@ import com.ssafy.ourhome.utils.addFocusCleaner
 
 
 @Composable
-fun QuestionDetailScreen(navController: NavController, vm : QuestionViewModel){
+fun QuestionDetailScreen(navController: NavController, vm: QuestionViewModel) {
     val scrollState = rememberScrollState()
     val context = LocalContext.current
 
@@ -52,17 +53,22 @@ fun QuestionDetailScreen(navController: NavController, vm : QuestionViewModel){
     Scaffold(topBar = {
         MainAppBar(title = "질문 상세",
             onBackClick = { navController.popBackStack() }
-        ) }
+        )
+    }
     ) {
         OurHomeSurface {
-            Column(modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp)
-                .verticalScroll(scrollState)
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp)
+                    .verticalScroll(scrollState)
             ) {
                 Spacer(modifier = Modifier.height(16.dp))
 
-                TodayQuestion(questionNumber = vm.detailQuestion.question_seq.toString(), questionContent = vm.detailQuestion.question_content)
+                TodayQuestion(
+                    questionNumber = vm.detailQuestion.question_seq.toString(),
+                    questionContent = vm.detailQuestion.question_content
+                )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -70,13 +76,17 @@ fun QuestionDetailScreen(navController: NavController, vm : QuestionViewModel){
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                Divider(modifier = Modifier
-                    .fillMaxWidth()
-                    .height(1.dp), color = Gray)
+                Divider(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(1.dp), color = Gray
+                )
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                FamilyAnswer(vm)
+                FamilyAnswer(vm){ email ->
+                    navController.navigate(OurHomeScreens.UserPageScreen.name + "/$email")
+                }
 
                 Spacer(modifier = Modifier.height(16.dp))
             }
@@ -98,7 +108,7 @@ fun initQuestionDetailViewModelCallback(vm: QuestionViewModel, context: Context)
     }
 }
 
-fun initQuestionDetailScreen(vm : QuestionViewModel){
+fun initQuestionDetailScreen(vm: QuestionViewModel) {
     vm.myAnswer.value = ""
     vm.myAnswerPoint = 0
     vm.getFamilyUsers()
@@ -108,14 +118,16 @@ fun initQuestionDetailScreen(vm : QuestionViewModel){
 
 /** 가족 답변 카드 **/
 @Composable
-fun FamilyAnswer(vm: QuestionViewModel){
+fun FamilyAnswer(vm: QuestionViewModel, onClick : (String) -> (Unit)) {
     Log.d("ddd", "FamilyAnswer: ${vm.familyAnswers}")
     LazyColumn(
         modifier = Modifier.height(600.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
-    ){
-        items(vm.familyAnswers){
-            FamilyAnswerItem(vm, it)
+    ) {
+        items(vm.familyAnswers) {
+            FamilyAnswerItem(vm, it){ email ->
+                onClick(email)
+            }
         }
     }
 
@@ -123,60 +135,78 @@ fun FamilyAnswer(vm: QuestionViewModel){
 
 /** 가족 답변 lazycolumn item **/
 @Composable
-fun FamilyAnswerItem(vm: QuestionViewModel, familyAnswers: DomainQuestionAnswerDTO){
+fun FamilyAnswerItem(
+    vm: QuestionViewModel,
+    familyAnswers: DomainQuestionAnswerDTO,
+    onClick: (String) -> (Unit)
+) {
 
     var painter = rememberAsyncImagePainter(R.drawable.img_default_user)
     var name = "가족 정보 없음"
 
-    if(vm.familyUsers.contains(familyAnswers.email)){
+    if (vm.familyUsers.contains(familyAnswers.email)) {
         painter = rememberAsyncImagePainter(vm.familyUsers[familyAnswers.email]!!.image)
         name = vm.familyUsers[familyAnswers.email]!!.name
     }
 
     GrayBorderBox {
-        Row(modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 16.dp, start = 16.dp),
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 16.dp, start = 16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Image(
                 modifier = Modifier
                     .size(42.dp)
-                    .clip(CircleShape),
+                    .clip(CircleShape)
+                    .clickable {
+                        onClick(familyAnswers.email)
+                    },
                 painter = painter,
                 contentDescription = "가족 프로필 이미지"
             )
 
             Spacer(modifier = Modifier.width(16.dp))
 
-            Text(text = name, style = MaterialTheme.typography.h5.copy(
-                    fontWeight = FontWeight.Bold))
+            Text(
+                text = name, style = MaterialTheme.typography.h5.copy(
+                    fontWeight = FontWeight.Bold
+                )
+            )
         }
-        
-        Text(modifier = Modifier.padding(16.dp), text = familyAnswers.content,
+
+        Text(
+            modifier = Modifier.padding(16.dp), text = familyAnswers.content,
             style = MaterialTheme.typography.body2
         )
-        
+
         Spacer(modifier = Modifier.height(12.dp))
     }
 }
 
 /** 내 답변 카드 **/
 @Composable
-fun MyAnswer(vm: QuestionViewModel){
+fun MyAnswer(vm: QuestionViewModel) {
 
     GrayBorderBox {
-        Column(modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
         ) {
-            Row(modifier = Modifier.fillMaxWidth(),
+            Row(
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(text = "내 답변",
+                Text(
+                    text = "내 답변",
                     style = MaterialTheme.typography.body1.copy(fontWeight = FontWeight.ExtraBold)
                 )
-                SmallRoundedButton(vm = vm, colorFlag = vm.myAnswer.value.isNotEmpty() && vm.myAnswer.value.length <= 100)
+                SmallRoundedButton(
+                    vm = vm,
+                    colorFlag = vm.myAnswer.value.isNotEmpty() && vm.myAnswer.value.length <= 100
+                )
             }
 
             NoUnderLineTextInput(myAnswerState = vm.myAnswer, height = 150)
@@ -191,16 +221,19 @@ fun MyAnswer(vm: QuestionViewModel){
 
 /** 텍스트 길이 표시 **/
 @Composable
-fun ShowTextSize(myAnswerState: MutableState<String>){
+fun ShowTextSize(myAnswerState: MutableState<String>) {
 
-    Row(modifier = Modifier.fillMaxWidth(),
+    Row(
+        modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.End
     ) {
-        Text(text = myAnswerState.value.length.toString(),
+        Text(
+            text = myAnswerState.value.length.toString(),
             style = MaterialTheme.typography.caption.copy(color = Gray)
         )
 
-        Text(text = "/ 100",
+        Text(
+            text = "/ 100",
             style = MaterialTheme.typography.caption.copy(color = Gray)
         )
     }
@@ -209,33 +242,33 @@ fun ShowTextSize(myAnswerState: MutableState<String>){
 /** 언더바 없는 TextInput **/
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun NoUnderLineTextInput(myAnswerState: MutableState<String>, height: Int){
-        TextField(modifier = Modifier.fillMaxWidth(),
-            value = myAnswerState.value,
-            onValueChange = {
-                if(it.length < 100){
-                    myAnswerState.value = it
-                }
-                else {
-                    myAnswerState.value = it.substring(0, 100)
-                }
-            },
-            colors = TextFieldDefaults.textFieldColors(
-                textColor = Color.Black,
-                disabledTextColor = Color.Transparent,
-                backgroundColor = Color.Transparent,
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                disabledIndicatorColor = Color.Transparent
-            ),
-        )
+fun NoUnderLineTextInput(myAnswerState: MutableState<String>, height: Int) {
+    TextField(
+        modifier = Modifier.fillMaxWidth(),
+        value = myAnswerState.value,
+        onValueChange = {
+            if (it.length < 100) {
+                myAnswerState.value = it
+            } else {
+                myAnswerState.value = it.substring(0, 100)
+            }
+        },
+        colors = TextFieldDefaults.textFieldColors(
+            textColor = Color.Black,
+            disabledTextColor = Color.Transparent,
+            backgroundColor = Color.Transparent,
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent,
+            disabledIndicatorColor = Color.Transparent
+        ),
+    )
 }
 
 
 /** Rounded 버튼 스몰 버전 **/
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun SmallRoundedButton(vm: QuestionViewModel, colorFlag : Boolean){
+fun SmallRoundedButton(vm: QuestionViewModel, colorFlag: Boolean) {
     val keyboardController = LocalSoftwareKeyboardController.current
 
     Surface(
@@ -243,7 +276,7 @@ fun SmallRoundedButton(vm: QuestionViewModel, colorFlag : Boolean){
             .clip(
                 RoundedCornerShape(CornerSize(20))
             ),
-        color = if(colorFlag) MainColor else Gray
+        color = if (colorFlag) MainColor else Gray
     ) {
         Column(
             modifier = Modifier
@@ -264,8 +297,11 @@ fun SmallRoundedButton(vm: QuestionViewModel, colorFlag : Boolean){
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = if(vm.myAnswerAddedState) "수정" else "등록",
-                style = MaterialTheme.typography.body1.copy(fontWeight = FontWeight.ExtraBold, color = Color.White)
+                text = if (vm.myAnswerAddedState) "수정" else "등록",
+                style = MaterialTheme.typography.body1.copy(
+                    fontWeight = FontWeight.ExtraBold,
+                    color = Color.White
+                )
             )
         }
     }
@@ -273,14 +309,15 @@ fun SmallRoundedButton(vm: QuestionViewModel, colorFlag : Boolean){
 
 /** 회색 Rounded shape 카드, 높이 변경 시 Modifier에 height만 담아서 넘겨주기 **/
 @Composable
-fun GrayBorderBox(modifier: Modifier = Modifier, content : @Composable() (ColumnScope.() -> Unit)){
-    Column(modifier = modifier
-        .fillMaxWidth()
-        .border(
-            width = 2.dp,
-            color = Gray,
-            shape = RoundedCornerShape(12.dp)
-        ),
+fun GrayBorderBox(modifier: Modifier = Modifier, content: @Composable() (ColumnScope.() -> Unit)) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .border(
+                width = 2.dp,
+                color = Gray,
+                shape = RoundedCornerShape(12.dp)
+            ),
         content = content
     )
 }

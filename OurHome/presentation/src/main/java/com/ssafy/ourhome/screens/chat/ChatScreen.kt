@@ -41,9 +41,11 @@ import com.ssafy.ourhome.R
 import com.ssafy.ourhome.components.MainAppBar
 import com.ssafy.ourhome.components.OurHomeSurface
 import com.ssafy.ourhome.model.chat.ChatDTO
+import com.ssafy.ourhome.navigation.OurHomeScreens
 import com.ssafy.ourhome.ui.theme.Gray
 import com.ssafy.ourhome.ui.theme.MainColor
 import com.ssafy.ourhome.utils.Prefs
+import com.ssafy.ourhome.utils.Prefs.email
 import com.ssafy.ourhome.utils.State
 import com.ssafy.ourhome.utils.addFocusCleaner
 import kotlinx.coroutines.CoroutineScope
@@ -91,7 +93,9 @@ fun ChatScreen(navController: NavController, vm: ChatViewModel){
                 .padding(horizontal = 16.dp)
                 .addFocusCleaner(focusManager)
             ) {
-                ChattingMsgList(vm, listState)
+                ChattingMsgList(vm, listState){ email ->
+                    navController.navigate(OurHomeScreens.UserPageScreen.name + "/$email")
+                }
 
                 ChattingTextInput(vm)
             }
@@ -126,7 +130,7 @@ fun initChatViewModelCallback(vm: ChatViewModel){
 
 /** 채팅 메세지 목록 **/
 @Composable
-private fun ChattingMsgList(vm: ChatViewModel, listState: LazyListState) {
+private fun ChattingMsgList(vm: ChatViewModel, listState: LazyListState, onClick: (String) -> Unit) {
 
     LazyColumn(
         modifier = Modifier
@@ -175,7 +179,9 @@ private fun ChattingMsgList(vm: ChatViewModel, listState: LazyListState) {
                 if(it.email == Prefs.email){
                     MyChatItem(chat)
                 }else {
-                    FamilyChatItem(chat)
+                    FamilyChatItem(chat){ email ->
+                        onClick(email)
+                    }
                 }
             }
 
@@ -233,7 +239,7 @@ fun MyChatItem(chat: ChatDTO) {
 
 /** 타인 채팅 메세지 **/
 @Composable
-fun FamilyChatItem(chat: ChatDTO) {
+fun FamilyChatItem(chat: ChatDTO, onClick : (String) -> Unit) {
 
     ConstraintLayout(
         modifier = Modifier
@@ -252,7 +258,8 @@ fun FamilyChatItem(chat: ChatDTO) {
             Image(
                 modifier = Modifier
                     .size(36.dp)
-                    .clip(CircleShape),
+                    .clip(CircleShape)
+                    .clickable { onClick(chat.email) },
                 contentScale = ContentScale.Crop,
                 painter = rememberAsyncImagePainter(if(chat.img == "no") R.drawable.img_default_user else chat.img),
                 contentDescription = "Profile Image"
