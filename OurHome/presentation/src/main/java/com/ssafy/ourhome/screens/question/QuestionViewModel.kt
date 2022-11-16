@@ -1,5 +1,6 @@
 package com.ssafy.ourhome.screens.question
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -282,7 +283,15 @@ class QuestionViewModel @Inject constructor(
         date += today.dayOfMonth
 
         answerDetailQuestion(today, date)
+        if(myAnswerAddedState){
+            editContribution()
+        }else{
+            editContribution(FIRST_ANSWER_POINT)
+        }
         updateExp()
+        if(isLevelUp()){
+            levelUp()
+        }
     }
 
     fun answer() {
@@ -298,8 +307,13 @@ class QuestionViewModel @Inject constructor(
         }
         date += today.dayOfMonth
 
-        answerDetailQuestion(today, date, 100)
-        updateExp()
+        answerDetailQuestion(today, date)
+        if(myAnswerAddedState){
+            editContribution()
+        }else{
+            editContribution(FIRST_ANSWER_POINT)
+        }
+        updateExp(FIRST_ANSWER_POINT)
         if(isLevelUp()){
             levelUp()
         }
@@ -333,9 +347,9 @@ class QuestionViewModel @Inject constructor(
         }
     }
 
-    fun answerDetailQuestion(today: LocalDate, date: String, firstAnswer: Int = 0) = viewModelScope.launch(Dispatchers.IO) {
+    fun answerDetailQuestion(today: LocalDate, date: String) = viewModelScope.launch(Dispatchers.IO) {
         answerQuestionUsecase.execute(Prefs.familyCode, detailQuestionSeq,
-            DomainQuestionAnswerDTO(Prefs.email, myAnswer.value + firstAnswer, date, today.year, today.monthValue, today.dayOfMonth)
+            DomainQuestionAnswerDTO(Prefs.email, myAnswer.value, date, today.year, today.monthValue, today.dayOfMonth)
         ).collect {
             when(it) {
                 is ResultType.Loading -> {}
@@ -379,8 +393,10 @@ class QuestionViewModel @Inject constructor(
         }
     }
 
-    fun updateExp() = viewModelScope.launch(Dispatchers.IO) {
-        updatePetExpUseCase.execute(Prefs.familyCode,myAnswer.value.length - myAnswerPoint).collect{
+    fun updateExp(firstAnswerPoint : Int = 0) = viewModelScope.launch(Dispatchers.IO) {
+        Log.d("ddd", "updateExp: myAnswer.value ${myAnswer.value.length}")
+        Log.d("ddd", "updateExp: myAnswerPoint ${myAnswerPoint}")
+        updatePetExpUseCase.execute(Prefs.familyCode,myAnswer.value.length - myAnswerPoint + firstAnswerPoint).collect{
             when(it) {
                 is ResultType.Loading -> {}
                 is ResultType.Success -> {
@@ -396,8 +412,10 @@ class QuestionViewModel @Inject constructor(
         }
     }
 
-    fun editContribution() = viewModelScope.launch(Dispatchers.IO) {
-        editUserContribution.execute(Prefs.familyCode, Prefs.email, 1L * myAnswer.value.length - myAnswerPoint).collect{
+    fun editContribution(firstAnswerPoint : Int = 0) = viewModelScope.launch(Dispatchers.IO) {
+        Log.d("ddd", "updateExp: myAnswer.value ${myAnswer.value.length}")
+        Log.d("ddd", "updateExp: myAnswerPoint ${myAnswerPoint}")
+        editUserContribution.execute(Prefs.familyCode, Prefs.email, 1L * myAnswer.value.length - myAnswerPoint + firstAnswerPoint).collect{
             when(it) {
                 is ResultType.Loading -> {}
                 is ResultType.Success -> {

@@ -1,5 +1,6 @@
 package com.ssafy.data.repository.pet
 
+import android.util.Log
 import com.ssafy.data.datasource.pet.PetDataSource
 import com.ssafy.domain.model.pet.DomainFamilyPetDTO
 import com.ssafy.domain.model.user.DomainUserDTO
