@@ -442,12 +442,18 @@ class UserRepositoryImpl @Inject constructor(
             userDataSource.editManager(familyCode, myEmail, false).addOnCompleteListener { my ->
                 if (my.isSuccessful) {
                     // 가족장 전달받음
-                    userDataSource.editManager(familyCode, otherEmail, true).addOnSuccessListener {
-                        val response2 = ResultType.Success(Unit)
-                        trySend(response2)
-                    }.addOnFailureListener {
-                        trySend(ResultType.Error(it))
-                    }
+                    userDataSource.editManager(familyCode, otherEmail, true)
+                        .addOnCompleteListener { other ->
+                            if (other.isSuccessful) {
+                                familyDataSource.updateFamilyManager(familyCode, otherEmail)
+                                    .addOnSuccessListener {
+                                        val response2 = ResultType.Success(Unit)
+                                        trySend(response2)
+                                    }.addOnFailureListener {
+                                    trySend(ResultType.Error(it))
+                                }
+                            }
+                        }
                 } else {
                     trySend(ResultType.Fail)
                 }

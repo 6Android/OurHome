@@ -65,14 +65,16 @@ fun ManageFamilyScreen(
 
     // 가족장 위임
     if (vm.delegateSuccess) {
-        navController.popBackStack()
-        navController.popBackStack()
         vm.setDelegateSuccess()
+        visibleDelegateDialogState.value = false
         Toast.makeText(LocalContext.current, "가족장이 위임되었습니다.", Toast.LENGTH_SHORT).show()
+        navController.popBackStack()
+        navController.popBackStack()
     }
 
     // 가족 내보내기
     if (vm.transferSuccess) {
+        visibleTransferDialogState.value = false
         vm.setTransferSuccess()
         Toast.makeText(LocalContext.current, "가족원을 내보냈습니다.", Toast.LENGTH_SHORT).show()
     }

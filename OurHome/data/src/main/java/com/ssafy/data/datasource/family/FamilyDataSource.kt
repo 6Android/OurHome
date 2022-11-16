@@ -30,4 +30,7 @@ interface FamilyDataSource {
     // 가족장 email 가져오기
     fun getFamilyManager(familyCode: String): DocumentReference
 
+    //가족장 email 업데이트하기
+    fun updateFamilyManager(familyCode: String, email: String) : Task<Void>
+
 }
