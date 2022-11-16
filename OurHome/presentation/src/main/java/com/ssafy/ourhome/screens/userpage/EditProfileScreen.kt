@@ -81,10 +81,14 @@ fun EditProfileScreen(
 
             Toast.makeText(LocalContext.current, "정보 수정에 성공하였습니다.", Toast.LENGTH_SHORT).show()
             navController.popBackStack()
-            vm.seteditProcessStateDefault()
+            vm.seteditProcessStateCompleted()
         }
         State.LOADING -> {
             startLoading()
+        }
+        State.COMPLETED -> {
+            stopLoading()
+            vm.seteditProcessStateDefault()
         }
     }
 

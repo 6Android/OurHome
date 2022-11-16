@@ -214,6 +214,11 @@ class UserPageViewModel @Inject constructor(
         editProcessState = State.FAIL
     }
 
+    fun seteditProcessStateCompleted(){
+        editProcessState = State.COMPLETED
+
+    }
+
     fun seteditProcessStateDefault(){
         editProcessState = State.DEFAULT
 
