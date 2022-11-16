@@ -9,25 +9,20 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import coil.compose.AsyncImagePainter.State.Empty.painter
 import coil.compose.rememberAsyncImagePainter
 import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -35,19 +30,19 @@ import com.ssafy.domain.model.album.DomainAlbumDTO
 import com.ssafy.ourhome.components.MainAppBar
 import com.ssafy.ourhome.components.OurHomeSurface
 import com.ssafy.ourhome.navigation.OurHomeScreens
-import com.ssafy.ourhome.screens.chat.ChatViewModel
 import com.ssafy.ourhome.screens.question.navigateChatScreen
+import com.ssafy.ourhome.startLoading
+import com.ssafy.ourhome.stopLoading
 import com.ssafy.ourhome.ui.theme.MainColor
 import com.ssafy.ourhome.utils.CHATTING_ICON_BLACK
 import com.ssafy.ourhome.utils.State
 import com.ssafy.ourhome.utils.optimizeBitmap
-import okhttp3.internal.checkOffsetAndCount
 import java.io.File
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
 @Composable
-fun AlbumScreen(navController: NavController, vm : AlbumViewModel) {
+fun AlbumScreen(navController: NavController, vm: AlbumViewModel) {
     val systemUiController: SystemUiController = rememberSystemUiController()
     systemUiController.isStatusBarVisible = true // Status bar 안보이기
 
@@ -60,7 +55,7 @@ fun AlbumScreen(navController: NavController, vm : AlbumViewModel) {
     val imagePicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
         onResult = { uri ->
-            if(uri != null) {
+            if (uri != null) {
                 Log.d("test5", "EditProfileScreen: $uri")
                 var file = Uri.fromFile(optimizeBitmap(context, uri)?.let { File(it) })
                 Log.d("test5", "EditProfileScreen: ${file}")
@@ -72,10 +67,19 @@ fun AlbumScreen(navController: NavController, vm : AlbumViewModel) {
     )
 
     // 이미지 업로드 성공
-    if (vm.uploadSuccess) {
-        Toast.makeText(LocalContext.current, "정보 수정에 성공하였습니다.", Toast.LENGTH_SHORT).show()
-        vm.setUploadSuccess()
+    when (vm.uploadProcessState) {
+        State.SUCCESS -> {
+            Toast.makeText(LocalContext.current, "정보 수정에 성공하였습니다.", Toast.LENGTH_SHORT).show()
 
+            vm.setUploadProcessStateCompleted()
+        }
+        State.LOADING -> {
+            startLoading()
+        }
+        State.COMPLETED -> {
+            stopLoading()
+            vm.setUploadProcessStateDefault()
+        }
     }
 
     Scaffold(topBar = { // TODO 세팅 아이콘 -> 채팅 아이콘
@@ -117,17 +121,17 @@ fun AlbumScreen(navController: NavController, vm : AlbumViewModel) {
 
 }
 
-fun initAlbumScreen(vm: AlbumViewModel){
+fun initAlbumScreen(vm: AlbumViewModel) {
     vm.getAlbumImages()
 }
 
-fun initAlbumViewModelCallback(vm: AlbumViewModel, context: Context){
-    when(vm.getAlbumImagesProcessState.value){
+fun initAlbumViewModelCallback(vm: AlbumViewModel, context: Context) {
+    when (vm.getAlbumImagesProcessState.value) {
         State.ERROR -> {
             vm.getAlbumImagesProcessState.value = State.DEFAULT
             Toast.makeText(context, "앨범 사진을 불러오는 데 실패했습니다.", Toast.LENGTH_SHORT).show()
         }
-        State.SUCCESS ->{
+        State.SUCCESS -> {
 
         }
     }

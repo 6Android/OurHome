@@ -28,25 +28,18 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import coil.compose.AsyncImagePainter
-import coil.compose.AsyncImagePainter.State.Empty.painter
 import coil.compose.rememberAsyncImagePainter
 import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import com.ssafy.ourhome.components.RoundedButton
-import com.ssafy.ourhome.screens.home.InviteDialog
-import com.ssafy.ourhome.screens.home.InviteDialogContent
-import com.ssafy.ourhome.ui.theme.MainColor
+import com.ssafy.ourhome.stopLoading
 import com.ssafy.ourhome.ui.theme.RED
-import com.ssafy.ourhome.utils.Prefs.familyCode
 import com.ssafy.ourhome.utils.State
-import com.ssafy.ourhome.utils.shareFamilyCode
 
 @Composable
-fun AlbumDetailScreen(navController : NavController, vm : AlbumViewModel){
+fun AlbumDetailScreen(navController: NavController, vm: AlbumViewModel) {
     val systemUiController: SystemUiController = rememberSystemUiController()
     systemUiController.isStatusBarVisible = false // Status bar 안보이기
     val context = LocalContext.current
@@ -61,7 +54,7 @@ fun AlbumDetailScreen(navController : NavController, vm : AlbumViewModel){
     }
 
     initAlbumDetailScreen(vm)
-    initAlbumDetailViewModelCallback(vm, context, navController)
+    initAlbumDetailViewModelCallback(vm, context, navController, visibleDeleteDialogState)
 
     /** 삭제하기 다이얼로그 */
     if (visibleDeleteDialogState.value) {
@@ -79,29 +72,47 @@ fun AlbumDetailScreen(navController : NavController, vm : AlbumViewModel){
             .clickable {
                 isVisible = isVisible.not()
             }
-    ){
+    ) {
         AlbumImage(rememberAsyncImagePainter(model = vm.albumDetail.imageUri))
 
-        AlbumTopBar(isVisible, navController, "${vm.albumDetail.year}년 ${vm.albumDetail.month}월 ${vm.albumDetail.day}일",
-            visibleDeleteDialogState, vm.visibleDeleteIconState)
+        AlbumTopBar(
+            isVisible,
+            navController,
+            "${vm.albumDetail.year}년 ${vm.albumDetail.month}월 ${vm.albumDetail.day}일",
+            visibleDeleteDialogState,
+            vm.visibleDeleteIconState
+        )
     }
 }
 
-fun initAlbumDetailScreen(vm: AlbumViewModel){
+fun initAlbumDetailScreen(vm: AlbumViewModel) {
     vm.visibleDeleteIconState.value = false
     vm.initAlbumDetail()
 }
 
-fun initAlbumDetailViewModelCallback(vm: AlbumViewModel, context: Context, navController: NavController){
-    when (vm.deleteAlbumImagesProcessState) {
-        State.ERROR -> {
-            Toast.makeText(context, "사진을 삭제하는데 실패했습니다", Toast.LENGTH_SHORT).show()
-            vm.deleteAlbumImagesProcessState = State.DEFAULT
-        }
+fun initAlbumDetailViewModelCallback(
+    vm: AlbumViewModel,
+    context: Context,
+    navController: NavController,
+    visibleDeleteDialogState: MutableState<Boolean>
+) {
+    when (vm.deleteProcessState) {
         State.SUCCESS -> {
             Toast.makeText(context, "사진을 삭제했습니다.", Toast.LENGTH_SHORT).show()
-            vm.deleteAlbumImagesProcessState = State.DEFAULT
+            vm.setDeleteProcessStateCompleted()
+            stopLoading()
+
             navController.popBackStack()
+        }
+        State.ERROR -> {
+            Toast.makeText(context, "사진을 삭제하는데 실패했습니다", Toast.LENGTH_SHORT).show()
+            vm.setDeleteProcessStateCompleted()
+        }
+        State.LOADING -> {
+        }
+        State.COMPLETED -> {
+            visibleDeleteDialogState.value = false
+            vm.setDeleteProcessStateDefault()
         }
     }
 }
@@ -109,7 +120,7 @@ fun initAlbumDetailViewModelCallback(vm: AlbumViewModel, context: Context, navCo
 /** 엘범 탑 바 **/
 @Composable
 private fun AlbumTopBar(
-    isVisible : Boolean,
+    isVisible: Boolean,
     navController: NavController,
     photoDate: String,
     visibleDeleteDialogState: MutableState<Boolean>,
@@ -150,7 +161,7 @@ private fun AlbumTopBar(
                 color = Color.White,
             )
 
-            if(visibleDeleteIconState.value){
+            if (visibleDeleteIconState.value) {
                 /** 휴지통 아이콘 **/
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -229,8 +240,10 @@ fun AlertDialogContent(
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        Row(modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             AlertRoundedButton(
                 modifier = Modifier.weight(1F), label = confirmText
             ) {
@@ -239,7 +252,8 @@ fun AlertDialogContent(
             Text(
                 text = "닫기",
                 style = MaterialTheme.typography.button.copy(color = Color.Gray),
-                modifier = Modifier.weight(1F)
+                modifier = Modifier
+                    .weight(1F)
                     .clickable { onDismissRequest() },
                 textAlign = TextAlign.Center
             )
