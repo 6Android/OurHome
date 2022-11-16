@@ -52,6 +52,7 @@ fun MainAppBar(
                             painter = icon,
                             contentDescription = "IconButton",
                             modifier = Modifier
+                                .padding(end = 12.dp)
                                 .clickable {
                                     onIconClick.invoke()
                                 }

@@ -245,7 +245,8 @@ private fun TextWithDropDown(
             Row(
                 Modifier
                     .fillMaxWidth()
-                    .height(30.dp),
+                    .height(30.dp)
+                    .clickable { expanded = true },
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
@@ -255,7 +256,7 @@ private fun TextWithDropDown(
                 )
 
                 IconButton(
-                    onClick = { expanded = true }) {
+                    onClick = { expanded = true  }) {
                     Icon(
                         imageVector = Icons.Default.ArrowDropDown,
                         contentDescription = "Drop Down Button",
