@@ -69,7 +69,7 @@ fun AlbumScreen(navController: NavController, vm: AlbumViewModel) {
     // 이미지 업로드 성공
     when (vm.uploadProcessState) {
         State.SUCCESS -> {
-            Toast.makeText(LocalContext.current, "정보 수정에 성공하였습니다.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(LocalContext.current, "사진 업로드에 성공했습니다.", Toast.LENGTH_SHORT).show()
 
             vm.setUploadProcessStateCompleted()
         }
