@@ -1,5 +1,6 @@
 package com.ssafy.ourhome.screens.album
 
+import android.content.Context
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
@@ -30,12 +31,15 @@ import coil.compose.AsyncImagePainter.State.Empty.painter
 import coil.compose.rememberAsyncImagePainter
 import com.google.accompanist.systemuicontroller.SystemUiController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.ssafy.domain.model.album.DomainAlbumDTO
 import com.ssafy.ourhome.components.MainAppBar
 import com.ssafy.ourhome.components.OurHomeSurface
 import com.ssafy.ourhome.navigation.OurHomeScreens
+import com.ssafy.ourhome.screens.chat.ChatViewModel
 import com.ssafy.ourhome.screens.question.navigateChatScreen
 import com.ssafy.ourhome.ui.theme.MainColor
 import com.ssafy.ourhome.utils.CHATTING_ICON_BLACK
+import com.ssafy.ourhome.utils.State
 import com.ssafy.ourhome.utils.optimizeBitmap
 import okhttp3.internal.checkOffsetAndCount
 import java.io.File
@@ -49,6 +53,9 @@ fun AlbumScreen(navController: NavController, vm : AlbumViewModel) {
 
 
     val context = LocalContext.current
+
+    initAlbumScreen(vm)
+    initAlbumViewModelCallback(vm, context)
 
     val imagePicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
@@ -99,15 +106,7 @@ fun AlbumScreen(navController: NavController, vm : AlbumViewModel) {
                 Spacer(modifier = Modifier.height(16.dp))
 
                 AlbumLazyVerticalGrid(
-                    photos = listOf(
-                        "https://i.pinimg.com/222x/36/30/f7/3630f7d930f91e495d93c02833b4abfc.jpg",
-                        "https://i.pinimg.com/222x/36/30/f7/3630f7d930f91e495d93c02833b4abfc.jpg",
-                        "https://i.pinimg.com/222x/36/30/f7/3630f7d930f91e495d93c02833b4abfc.jpg",
-                        "https://i.pinimg.com/222x/36/30/f7/3630f7d930f91e495d93c02833b4abfc.jpg",
-                        "https://i.pinimg.com/222x/36/30/f7/3630f7d930f91e495d93c02833b4abfc.jpg",
-                        "https://i.pinimg.com/222x/36/30/f7/3630f7d930f91e495d93c02833b4abfc.jpg",
-                        "https://i.pinimg.com/222x/36/30/f7/3630f7d930f91e495d93c02833b4abfc.jpg"
-                    ), navController = navController
+                    vm = vm, navController = navController
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -118,15 +117,29 @@ fun AlbumScreen(navController: NavController, vm : AlbumViewModel) {
 
 }
 
+fun initAlbumScreen(vm: AlbumViewModel){
+    vm.getAlbumImages()
+}
+
+fun initAlbumViewModelCallback(vm: AlbumViewModel, context: Context){
+    when(vm.getAlbumImagesProcessState.value){
+        State.ERROR -> {
+            vm.getAlbumImagesProcessState.value = State.DEFAULT
+            Toast.makeText(context, "앨범 사진을 불러오는 데 실패했습니다.", Toast.LENGTH_SHORT).show()
+        }
+        State.SUCCESS ->{
+
+        }
+    }
+
+}
 
 /** 앨범 사진 Grid Lazy **/
 @Composable
 fun AlbumLazyVerticalGrid(
-    photos: List<String>,
+    vm: AlbumViewModel,
     navController: NavController
 ) { // 사진은 id값, 날짜, 이미지 링크 필요
-
-    val tmpList = listOf<List<String>>(photos, photos, photos, photos)
 
 //    LazyVerticalGrid(columns = GridCells.Fixed(3)){
 //        items(span = ) {
@@ -139,12 +152,13 @@ fun AlbumLazyVerticalGrid(
             .fillMaxSize()
             .padding(horizontal = 8.dp), columns = GridCells.Fixed(3)
     ) {
-        tmpList.forEach {
+        vm.albumImages.forEach { mapping_date, images ->
             placeGridLine {
-                AlbumDate(year = 2022, month = 10)
+                AlbumDate(mapping_date)
             }
-            items(10) {
-                PhotoItem(photo = photos[0], onClick = {
+            items(images) {
+                PhotoItem(image = it, onClick = {
+                    vm.albumDetail = it
                     navigateAlbumDetail(navController)
                 })
             }
@@ -161,19 +175,16 @@ fun AlbumLazyVerticalGrid(
 /** 앨범 디테일 이동 **/
 fun navigateAlbumDetail(navController: NavController) {//https://i.pinimg.com/222x/36/30/f7/3630f7d930f91e495d93c02833b4abfc.jpg
     navController.navigate(
-        OurHomeScreens.AlbumDetailScreen.name + "/" +
-                encodeUrlForNavigate("https://i.pinimg.com/222x/36/30/f7/3630f7d930f91e495d93c02833b4abfc.jpg") +
-                "/" +
-                "2022년 10월 22일"
+        OurHomeScreens.AlbumDetailScreen.name
     )
 }
 
 /** 사진 아이템 **/
 @Composable
-fun PhotoItem(photo: String, onClick: () -> Unit) { // 사진은 id값, 날짜, 이미지 링크 필요
+fun PhotoItem(image: DomainAlbumDTO, onClick: () -> Unit) { // 사진은 id값, 날짜, 이미지 링크 필요
 
     val painter =
-        rememberAsyncImagePainter("https://i.pinimg.com/222x/36/30/f7/3630f7d930f91e495d93c02833b4abfc.jpg")
+        rememberAsyncImagePainter(image.imageUri)
 
     Image(
         modifier = Modifier
@@ -192,11 +203,11 @@ fun PhotoItem(photo: String, onClick: () -> Unit) { // 사진은 id값, 날짜, 
 
 /** 앨범 날짜 **/
 @Composable
-fun AlbumDate(year: Int, month: Int) {
+fun AlbumDate(date: String) {
 
     Text(
         modifier = Modifier.padding(vertical = 8.dp, horizontal = 8.dp),
-        text = "${year}년 ${month}월",
+        text = date,
         style = MaterialTheme.typography.h5.copy(fontWeight = FontWeight.ExtraBold)
     )
 
