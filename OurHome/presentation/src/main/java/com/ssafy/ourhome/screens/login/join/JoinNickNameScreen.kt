@@ -20,6 +20,8 @@ import com.ssafy.ourhome.components.OurHomeSurface
 import com.ssafy.ourhome.components.TextInput
 import com.ssafy.ourhome.navigation.OurHomeScreens
 import com.ssafy.ourhome.screens.login.LoginViewModel
+import com.ssafy.ourhome.startLoading
+import com.ssafy.ourhome.stopLoading
 import com.ssafy.ourhome.utils.State
 import java.time.LocalDate
 
@@ -35,11 +37,18 @@ fun JoinNickNameScreen(
     when (vm.joinProcessState.value) {
         State.SUCCESS -> {
             navigateToEnterHomeScreen(navController)
-            vm.joinProcessState.value = State.DEFAULT
+            vm.joinProcessState.value = State.COMPLETED
         }
         State.FAIL -> {
             Toast.makeText(context, "회원가입에 실패했습니다.", Toast.LENGTH_SHORT).show()
-            vm.joinProcessState.value = State.DEFAULT
+            vm.joinProcessState.value = State.COMPLETED
+        }
+        State.LOADING -> {
+            startLoading()
+        }
+        State.COMPLETED -> {
+            stopLoading()
+            vm.loginProcessState.value = State.DEFAULT
         }
     }
 

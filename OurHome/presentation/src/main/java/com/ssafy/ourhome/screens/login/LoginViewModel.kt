@@ -52,6 +52,8 @@ class LoginViewModel @Inject constructor(
 
     fun joinEmail() =
         viewModelScope.launch(Dispatchers.IO) {
+            joinProcessState.value = State.LOADING
+
             joinEmailUseCase.execute(
                 joinIdState.value,
                 joinPasswordState.value,
@@ -72,6 +74,8 @@ class LoginViewModel @Inject constructor(
 
     fun joinSocial() =
         viewModelScope.launch(Dispatchers.IO) {
+            joinProcessState.value = State.LOADING
+
             joinSocialUseCase.execute(
                 socialEmail,
                 joinNickNameState.value,
@@ -141,6 +145,8 @@ class LoginViewModel @Inject constructor(
 
     // 이메일 로그인
     fun signInEmail() = viewModelScope.launch(Dispatchers.IO) {
+
+        loginProcessState.value = State.LOADING
 
         if (loginIdState.value.isBlank() || loginPasswordState.value.isBlank()) {
             loginProcessState.value = State.FAIL

@@ -43,7 +43,11 @@ fun SplashScreen(navController: NavHostController, vm: LoginViewModel = hiltView
             if (user != null) {
                 vm.checkSocialEmail(user.email!!)
             } else {
-                navController.navigate(OurHomeScreens.LoginScreen.name)
+                navController.navigate(OurHomeScreens.LoginScreen.name) {
+                    popUpTo(OurHomeScreens.SplashScreen.name) {
+                        inclusive = true
+                    }
+                }
             }
         }
 
