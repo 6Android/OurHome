@@ -11,6 +11,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.ssafy.domain.model.user.DomainUserDTO
 import com.ssafy.domain.usecase.user.*
 import com.ssafy.domain.utils.ResultType
+import com.ssafy.ourhome.MainActivity
 import com.ssafy.ourhome.utils.Prefs
 import com.ssafy.ourhome.utils.State
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -189,6 +190,7 @@ class UserPageViewModel @Inject constructor(
     }
 
     fun logout() {
+        MainActivity.stopWorkManager()
         firebaseAuth.signOut()
         Prefs.email = ""
         Prefs.familyCode = ""
