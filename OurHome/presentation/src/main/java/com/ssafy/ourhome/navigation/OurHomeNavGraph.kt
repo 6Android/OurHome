@@ -1,12 +1,20 @@
 package com.ssafy.ourhome.navigation
 
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.CubicBezierEasing
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.unit.IntOffset
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.navArgument
+import androidx.navigation.navArgument
+import com.google.accompanist.navigation.animation.AnimatedNavHost
+import com.google.accompanist.navigation.animation.composable
 import com.ssafy.ourhome.screens.NextScreen
 import com.ssafy.ourhome.screens.SplashScreen
 import com.ssafy.ourhome.screens.album.AlbumDetailScreen
@@ -40,6 +48,7 @@ import com.ssafy.ourhome.screens.userpage.setting.ManageFamilyScreen
 import com.ssafy.ourhome.screens.userpage.setting.SettingScreen
 
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun OurHomeNavGraph(navController: NavHostController) {
     val loginViewModel: LoginViewModel = hiltViewModel()
@@ -52,9 +61,30 @@ fun OurHomeNavGraph(navController: NavHostController) {
     val chatViewModel: ChatViewModel = hiltViewModel()
     val albumViewModel: AlbumViewModel = hiltViewModel()
 
-    NavHost(
+    val springSpec = spring<IntOffset>(
+        dampingRatio = Spring.DampingRatioNoBouncy,
+        stiffness = Spring.StiffnessMediumLow
+    )
+    val tweenSpec = tween<IntOffset>(
+        durationMillis = 2000,
+        easing = CubicBezierEasing(0.08f, 0.93f, 0.68f, 1.27f)
+    )
+
+    AnimatedNavHost(
         navController = navController,
-        startDestination = OurHomeScreens.SplashScreen.name
+        startDestination = OurHomeScreens.SplashScreen.name,
+        enterTransition = {
+            slideInHorizontally(initialOffsetX = { 1000 }, animationSpec = springSpec)
+        },
+        exitTransition = {
+            slideOutHorizontally(targetOffsetX = { -1000 }, animationSpec = springSpec)
+        },
+        popEnterTransition = {
+            slideInHorizontally(initialOffsetX = { -1000 }, animationSpec = springSpec)
+        },
+        popExitTransition = {
+            slideOutHorizontally(targetOffsetX = { 1000 }, animationSpec = springSpec)
+        }
     ) {
         composable(OurHomeScreens.SplashScreen.name) {
             SplashScreen(navController = navController, loginViewModel)

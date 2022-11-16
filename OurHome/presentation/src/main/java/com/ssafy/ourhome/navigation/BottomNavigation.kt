@@ -60,6 +60,7 @@ fun BottomNavigation(navController: NavController, bottomBarState: MutableState<
                         selected = currentRoute == item.screenRoute,
                         alwaysShowLabel = false,
                         onClick = {
+                            if (navController.currentBackStackEntry?.destination?.route == item.screenRoute) return@BottomNavigationItem
                             navController.navigate(item.screenRoute) {
 //                                navController.graph.startDestinationRoute?.let {
 //                                    popUpTo(it) { saveState = true }
