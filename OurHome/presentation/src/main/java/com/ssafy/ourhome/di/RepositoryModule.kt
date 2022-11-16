@@ -10,12 +10,14 @@ import com.ssafy.data.datasource.schedule.ScheduleDataSource
 import com.ssafy.data.datasource.user.UserDataSource
 import com.ssafy.data.repository.album.AlbumRepositoryImpl
 import com.ssafy.data.repository.chat.ChatRepositoryImpl
+import com.ssafy.data.repository.family.FamilyRepositoryImpl
 import com.ssafy.data.repository.pet.PetRepositoryImpl
 import com.ssafy.data.repository.question.QuestionRepositoryImpl
 import com.ssafy.data.repository.schedule.ScheduleRepositoryImpl
 import com.ssafy.data.repository.user.UserRepositoryImpl
 import com.ssafy.domain.repository.album.AlbumRepository
 import com.ssafy.domain.repository.chat.ChatRepository
+import com.ssafy.domain.repository.family.FamilyRepository
 import com.ssafy.domain.repository.pet.PetRepository
 import com.ssafy.domain.repository.question.QuestionRepository
 import com.ssafy.domain.repository.schedule.ScheduleRepository
@@ -94,5 +96,14 @@ object RepositoryModule {
         albumDataSource: AlbumDataSource
     ): AlbumRepository {
         return AlbumRepositoryImpl(albumDataSource)
+    }
+
+    // Familiy DI
+    @Provides
+    @Singleton
+    fun provideFamiliyRepository(
+        familyDataSource: FamilyDataSource
+    ): FamilyRepository {
+        return FamilyRepositoryImpl(familyDataSource)
     }
 }

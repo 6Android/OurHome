@@ -60,6 +60,7 @@ fun AlbumDetailScreen(navController : NavController, vm : AlbumViewModel){
         mutableStateOf(false)
     }
 
+    initAlbumDetailScreen(vm)
     initAlbumDetailViewModelCallback(vm, context, navController)
 
     /** 삭제하기 다이얼로그 */
@@ -81,8 +82,14 @@ fun AlbumDetailScreen(navController : NavController, vm : AlbumViewModel){
     ){
         AlbumImage(rememberAsyncImagePainter(model = vm.albumDetail.imageUri))
 
-        AlbumTopBar(isVisible, navController, "${vm.albumDetail.year}년 ${vm.albumDetail.month}월 ${vm.albumDetail.day}일", visibleDeleteDialogState)//년월일 넣기
+        AlbumTopBar(isVisible, navController, "${vm.albumDetail.year}년 ${vm.albumDetail.month}월 ${vm.albumDetail.day}일",
+            visibleDeleteDialogState, vm.visibleDeleteIconState)
     }
+}
+
+fun initAlbumDetailScreen(vm: AlbumViewModel){
+    vm.visibleDeleteIconState.value = false
+    vm.initAlbumDetail()
 }
 
 fun initAlbumDetailViewModelCallback(vm: AlbumViewModel, context: Context, navController: NavController){
@@ -105,7 +112,8 @@ private fun AlbumTopBar(
     isVisible : Boolean,
     navController: NavController,
     photoDate: String,
-    visibleDeleteDialogState: MutableState<Boolean>
+    visibleDeleteDialogState: MutableState<Boolean>,
+    visibleDeleteIconState: MutableState<Boolean>
 ) {
     AnimatedVisibility(
         visible = isVisible,
@@ -142,20 +150,23 @@ private fun AlbumTopBar(
                 color = Color.White,
             )
 
-            /** 휴지통 아이콘 **/
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = "Delete",
-                    modifier = Modifier.clickable { // 사진 삭제
-                        visibleDeleteDialogState.value = true
-                    },
-                    tint = Color.White
-                )
+            if(visibleDeleteIconState.value){
+                /** 휴지통 아이콘 **/
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End,
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Delete",
+                        modifier = Modifier.clickable { // 사진 삭제
+                            visibleDeleteDialogState.value = true
+                        },
+                        tint = Color.White
+                    )
+                }
             }
+
         }
     }
 
