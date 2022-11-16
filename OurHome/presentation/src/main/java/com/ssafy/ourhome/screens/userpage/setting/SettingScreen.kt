@@ -28,6 +28,7 @@ import androidx.navigation.NavController
 import com.ssafy.domain.model.user.DomainUserDTO
 import com.ssafy.ourhome.MainActivity
 import com.ssafy.ourhome.components.MainAppBar
+import com.ssafy.ourhome.components.OurHomeAlertDialog
 import com.ssafy.ourhome.components.OurHomeSurface
 import com.ssafy.ourhome.navigation.OurHomeScreens
 import com.ssafy.ourhome.screens.userpage.UserPageViewModel
@@ -46,12 +47,31 @@ fun SettingScreen(navController: NavController, vm: UserPageViewModel) {
 
     val context = LocalContext.current
 
-    if(vm.transferSuccess){
+    val visibleTransferDialogState = remember {
+        mutableStateOf(false)
+    }
+
+    //가족 끊기 Dialog
+    if (visibleTransferDialogState.value) {
+        OurHomeAlertDialog(
+            header = "가족을 나가시겠습니까?",
+            confirmText = "나가기",
+            onConfirmClick = {
+                vm.job.cancel()
+                vm.transferUserData(vm.user)
+            },
+            onDismissRequest = { visibleTransferDialogState.value = false }
+        )
+    }
+
+    if (vm.transferSuccess) {
         val intent = Intent(context, MainActivity::class.java)
         context.startActivity(intent)
         (context as MainActivity).finish()
         vm.setTransferSuccess()
     }
+
+
     Scaffold(topBar = {
         MainAppBar(title = "설정", backIconEnable = true, onBackClick = {
             navController.popBackStack()
@@ -81,13 +101,10 @@ fun SettingScreen(navController: NavController, vm: UserPageViewModel) {
                 OurHomeSetting(
                     code = Prefs.familyCode,
                     navAction = { navController.navigate(OurHomeScreens.ManageFamilyScreen.name) },
+                    visibleTransferDialogState,
                     vm.user.manager,
                     context
-                ) {
-                    vm.job.cancel()
-                    vm.transferUserData(vm.user)
-
-                }
+                )
 
                 Spacer(modifier = Modifier.height(42.dp))
                 Support(context)
@@ -148,9 +165,9 @@ fun SettingScreen(navController: NavController, vm: UserPageViewModel) {
 private fun OurHomeSetting(
     code: String,
     navAction: () -> Unit,
+    visibleTransferDialogState: MutableState<Boolean>,
     isManager: Boolean,
-    context: Context,
-    transfer: () -> Unit
+    context: Context
 ) {
     TextHeader(title = "가족 설정")
     Spacer(modifier = Modifier.height(26.dp))
@@ -175,7 +192,7 @@ private fun OurHomeSetting(
         }
         Spacer(modifier = Modifier.height(32.dp))
         TextWithNext(title = "가족 끊기") {
-            transfer()
+            visibleTransferDialogState.value = true
         }
     }
 }
@@ -198,7 +215,7 @@ private fun ClickableText(
 
 @Composable
 private fun Support(
-    context : Context
+    context: Context
 ) {
     TextHeader(title = "고객 지원")
     Spacer(modifier = Modifier.height(26.dp))
