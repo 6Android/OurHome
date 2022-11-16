@@ -191,7 +191,7 @@ fun PetExp(pet: DomainFamilyPetDTO) {
 
         Spacer(modifier = Modifier.width(12.dp))
 
-        customProgressBar(progress = (pet.pet_level * 100 / pet.next_level_exp))
+        customProgressBar(progress = (pet.exp * 100 / pet.next_level_exp))
     }
 }
 

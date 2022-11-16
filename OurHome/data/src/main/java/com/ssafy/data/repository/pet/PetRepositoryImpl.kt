@@ -45,4 +45,17 @@ class PetRepositoryImpl @Inject constructor(
             awaitClose {  }
         }
 
+    override fun levelUp(familyCode: String, nextPetLevel: Int): Flow<ResultType<Unit>> = callbackFlow {
+        petDataSource.levelUp(familyCode, nextPetLevel).addOnCompleteListener{
+            if(it.isSuccessful){
+                trySend(ResultType.Success(Unit))
+            }else{
+                trySend(ResultType.Error(it.exception))
+            }
+        }.addOnFailureListener {
+            trySend(ResultType.Error(it))
+        }
+        awaitClose {  }
+    }
+
 }

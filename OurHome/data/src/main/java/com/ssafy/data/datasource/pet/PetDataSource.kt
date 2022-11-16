@@ -12,4 +12,6 @@ interface PetDataSource {
     fun getPetInfoDoc(seq: String): DocumentReference
 
     fun updatePetExp(familyCode: String, exp: Int): Task<Void>
+
+    fun levelUp(familyCode: String, nextPetLevel: Int): Task<Any>
 }

@@ -11,6 +11,7 @@ import com.ssafy.domain.model.question.DomainQuestionAnswerDTO
 import com.ssafy.domain.model.question.DomainQuestionDTO
 import com.ssafy.domain.model.user.DomainUserDTO
 import com.ssafy.domain.usecase.pet.GetFamilyPetUseCase
+import com.ssafy.domain.usecase.pet.LevelUpUseCase
 import com.ssafy.domain.usecase.pet.UpdatePetExpUseCase
 import com.ssafy.domain.usecase.question.*
 import com.ssafy.domain.usecase.user.EditUserContribution
@@ -36,7 +37,8 @@ class QuestionViewModel @Inject constructor(
     private val answerQuestionUsecase: AnswerQuestionUsecase,
     private val completeTodayQuestionUseCase: CompleteTodayQuestionUseCase,
     private val editUserContribution: EditUserContribution,
-    private val updatePetExpUseCase: UpdatePetExpUseCase
+    private val updatePetExpUseCase: UpdatePetExpUseCase,
+    private val levelUpUseCase: LevelUpUseCase
 ): ViewModel(){
 
     var myProfile by mutableStateOf(DomainUserDTO())
@@ -296,17 +298,44 @@ class QuestionViewModel @Inject constructor(
         }
         date += today.dayOfMonth
 
-        answerDetailQuestion(today, date)
+        answerDetailQuestion(today, date, 100)
         updateExp()
+        if(isLevelUp()){
+            levelUp()
+        }
 
         if(checkCompleteAnswer()){
             completeTodayAnswer(today, date)
         }
     }
 
-    fun answerDetailQuestion(today: LocalDate, date: String) = viewModelScope.launch(Dispatchers.IO) {
+    fun isLevelUp() : Boolean {
+        if(pet.exp + myAnswer.value.length - myAnswerPoint >= pet.next_level_exp){
+            return true
+        }
+        return false
+    }
+
+    fun levelUp() = viewModelScope.launch(Dispatchers.IO) {
+        levelUpUseCase.execute(Prefs.familyCode, pet.pet_level + 1).collect {
+            when(it) {
+                is ResultType.Loading -> {}
+                is ResultType.Success -> {
+
+                }
+                is ResultType.Error -> {
+
+                }
+                else -> {
+
+                }
+            }
+        }
+    }
+
+    fun answerDetailQuestion(today: LocalDate, date: String, firstAnswer: Int = 0) = viewModelScope.launch(Dispatchers.IO) {
         answerQuestionUsecase.execute(Prefs.familyCode, detailQuestionSeq,
-            DomainQuestionAnswerDTO(Prefs.email, myAnswer.value, date, today.year, today.monthValue, today.dayOfMonth)
+            DomainQuestionAnswerDTO(Prefs.email, myAnswer.value + firstAnswer, date, today.year, today.monthValue, today.dayOfMonth)
         ).collect {
             when(it) {
                 is ResultType.Loading -> {}
