@@ -72,6 +72,7 @@ fun HomeScreen(navController: NavController, vm: HomeViewModel) {
     }
     val onScheduleClick: (DomainScheduleDTO) -> Unit = { schedule ->
         vm.setScheduleDetail(schedule)
+        visibleBottomSheetState.value = false
         navController.navigate(OurHomeScreens.ScheduleDetailScreen.name)
     }
     val visibleInviteDialogState = remember {
@@ -250,6 +251,7 @@ fun HomeScreen(navController: NavController, vm: HomeViewModel) {
                         ),
                         onAddScheduleClick = {
                             vm.addScheduleDateState.value = selection.value!!.date
+                            visibleBottomSheetState.value = false
                             moveToAddScheduleScreen(navController)
                         },
                         onScheduleClick = onScheduleClick
