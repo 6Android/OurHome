@@ -518,10 +518,6 @@ class QuestionViewModel @Inject constructor(
         val questionMap = mapOf<String, Any>(
             "question_seq" to todayQuestion.question_seq,
             "question_content" to todayQuestion.question_content,
-            "completed_date" to date,
-            "completed_year" to today.year,
-            "completed_month" to today.monthValue,
-            "completed_day" to today.dayOfMonth
         )
         checkCompleteTodayQuestionUseCase.execute(Prefs.familyCode, todayQuestion.question_seq, questionMap).collect{
             when(it) {
