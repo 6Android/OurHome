@@ -1,12 +1,7 @@
 package com.ssafy.ourhome.navigation
 
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.core.CubicBezierEasing
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.core.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.IntOffset
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -72,19 +67,7 @@ fun OurHomeNavGraph(navController: NavHostController) {
 
     AnimatedNavHost(
         navController = navController,
-        startDestination = OurHomeScreens.SplashScreen.name,
-        enterTransition = {
-            slideInHorizontally(initialOffsetX = { 1000 }, animationSpec = springSpec)
-        },
-        exitTransition = {
-            slideOutHorizontally(targetOffsetX = { -1000 }, animationSpec = springSpec)
-        },
-        popEnterTransition = {
-            slideInHorizontally(initialOffsetX = { -1000 }, animationSpec = springSpec)
-        },
-        popExitTransition = {
-            slideOutHorizontally(targetOffsetX = { 1000 }, animationSpec = springSpec)
-        }
+        startDestination = OurHomeScreens.SplashScreen.name
     ) {
         composable(OurHomeScreens.SplashScreen.name) {
             SplashScreen(navController = navController, loginViewModel)
