@@ -26,10 +26,7 @@ fun UserPageScreen(
 ) {
     val scrollState = rememberScrollState()
 
-    LaunchedEffect(key1 = true) {
-        vm.setJob(vm.getOtherProfile(email))
-
-    }
+    vm.getOtherProfile(email)
 
     val context = LocalContext.current
     Scaffold(topBar = {
@@ -50,15 +47,15 @@ fun UserPageScreen(
             ) {
                 Spacer(modifier = Modifier.padding(top = 16.dp))
 
-                UserInfoCard(userDTO = vm.user, context = context) {
+                UserInfoCard(userDTO = vm.otherUser, context = context) {
                     navController.navigate(OurHomeScreens.EditProfileScreen.name)
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
-                UserColorCardList(userDTO = vm.user,vm)
+                UserColorCardList(userDTO = vm.otherUser)
 
                 Spacer(modifier = Modifier.height(16.dp))
-                UserCommonCardList(userDTO = vm.user)
+                UserCommonCardList(userDTO = vm.otherUser)
             }
         }
     }

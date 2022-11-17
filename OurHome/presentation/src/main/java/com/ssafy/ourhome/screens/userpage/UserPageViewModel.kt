@@ -42,6 +42,9 @@ class UserPageViewModel @Inject constructor(
     var user by mutableStateOf(DomainUserDTO())
         private set
 
+    var otherUser by mutableStateOf(DomainUserDTO())
+        private set
+
     var nicknameState = mutableStateOf(user.name)
     var phoneState = mutableStateOf(user.phone)
     var birthDayState = mutableStateOf(LocalDate.parse(user.birthday))
@@ -88,12 +91,11 @@ class UserPageViewModel @Inject constructor(
 
     fun getOtherProfile(email: String) = viewModelScope.launch(Dispatchers.IO) {
 
-
         getOtherProfileUseCase.execute(Prefs.familyCode, email).collect {
             when (it) {
                 is ResultType.Uninitialized -> {}
                 is ResultType.Success -> {
-                    user = it.data
+                    otherUser = it.data
                 }
                 is ResultType.Error -> {
                     getProfileFail = true
