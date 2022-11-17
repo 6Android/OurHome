@@ -2,6 +2,7 @@ package com.ssafy.ourhome.screens.chat
 
 import android.util.Log
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
@@ -42,7 +43,7 @@ class ChatViewModel @Inject constructor(
 
     var content = mutableStateOf("")
 
-    var familyUsers = mutableStateOf<MutableMap<String, DomainUserDTO>>(mutableMapOf())
+    val familyUsers = mutableStateMapOf<String, DomainUserDTO>()
 
     fun getChats() = viewModelScope.launch(Dispatchers.IO) {
         getChatsUseCase.execute(Prefs.familyCode).collect{
@@ -98,7 +99,7 @@ class ChatViewModel @Inject constructor(
                     val familyUserList = it.data
 
                     for(user in familyUserList){
-                        familyUsers.value[user.email] = user
+                        familyUsers[user.email] = user
                     }
                     getFamilyProcessState.value = State.SUCCESS
                 }

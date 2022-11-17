@@ -1,9 +1,13 @@
 package com.ssafy.ourhome.model.chat
 
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.painterResource
+import com.ssafy.ourhome.R
+
 data class ChatDTO(
     var email: String = "",
     var name: String = "",
-    var img: String = "",
+    var img: Painter? = null,
     var content: String = "",
     var date: String = "",
     var year: Int = 0,
