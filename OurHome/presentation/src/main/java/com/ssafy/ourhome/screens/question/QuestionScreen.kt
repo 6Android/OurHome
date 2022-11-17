@@ -1,5 +1,6 @@
 package com.ssafy.ourhome.screens.question
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -43,13 +44,13 @@ fun QuestionScreen(navController: NavController, vm: QuestionViewModel) {
 
     val scrollState = rememberScrollState()
 
-    initQuestionScreen(vm)
-
-    LaunchedEffect(key1 = vm.familyAnswers, vm.familyUsers){
-        vm.checkCompleteAnswerInScreen()
+    LaunchedEffect(key1 = true) {
+        initQuestionScreen(vm)
     }
 
     initQuestionScreenViewModelCallback(vm)
+
+    Log.d("TAG", "QuestionScreen() recomposition")
 
     Scaffold(topBar = {
         MainAppBar(
@@ -85,7 +86,9 @@ fun QuestionScreen(navController: NavController, vm: QuestionViewModel) {
                     Spacer(modifier = Modifier.height(24.dp))
 
                     ReplyQuestionButton(
-                        modifier = Modifier.fillMaxWidth(0.9f).height(48.dp),
+                        modifier = Modifier
+                            .fillMaxWidth(0.9f)
+                            .height(48.dp),
                         label = "답변 하기",
                         onClick = {
                             vm.detailQuestionSeq = vm.todayQuestion.question_seq
@@ -118,11 +121,11 @@ fun QuestionScreen(navController: NavController, vm: QuestionViewModel) {
 }
 
 fun initQuestionScreen(vm: QuestionViewModel) {
+    vm.myAnswer.value = ""
     vm.initDate()
     vm.getFamiliyPet()
     vm.getFamilyUsers()
-    vm.getQuestionAnswers()
-    vm.getTodayQuestion()
+    vm.getTodayQuestion()   //today가져오고 그담에 questionAnswers 가져온 담에 오늘의 질문 compmlete됐는지 확인
     vm.getLast3Questions()
 }
 
@@ -134,6 +137,19 @@ fun initQuestionScreenViewModelCallback(vm: QuestionViewModel){
         }
     }
 
+    when(vm.getTodayQuestionState){
+        State.SUCCESS ->{
+            vm.getTodayQuestionAnswers()
+            vm.getTodayQuestionState = State.DEFAULT
+        }
+    }
+
+    when(vm.getTodayQuestionAnswerState){
+        State.SUCCESS ->{
+            vm.checkCompleteAnswerInScreen()
+            vm.getTodayQuestionAnswerState = State.DEFAULT
+        }
+    }
 }
 
 

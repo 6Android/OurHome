@@ -53,7 +53,10 @@ fun AlbumDetailScreen(navController: NavController, vm: AlbumViewModel) {
         mutableStateOf(false)
     }
 
-    initAlbumDetailScreen(vm)
+    LaunchedEffect(key1 = true){
+        initAlbumDetailScreen(vm)
+    }
+
     initAlbumDetailViewModelCallback(vm, context, navController, visibleDeleteDialogState)
 
     /** 삭제하기 다이얼로그 */

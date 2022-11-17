@@ -42,7 +42,9 @@ fun QuestionDetailScreen(navController: NavController, vm: QuestionViewModel) {
     val scrollState = rememberScrollState()
     val context = LocalContext.current
 
-    initQuestionDetailScreen(vm)
+    LaunchedEffect(key1 = true){
+        initQuestionDetailScreen(vm)
+    }
     initQuestionDetailViewModelCallback(vm, context, navController)
 
     // TODO NestedScrollView 필요
@@ -108,15 +110,15 @@ fun initQuestionDetailViewModelCallback(
         }
     }
 
-    when (vm.updateCompleteState) {
+    when (vm.updateExpCompleteState) {
         State.ERROR -> {
             stopLoading()
             Toast.makeText(context, "경험치 업데이트에 실패했습니다.\n문의사항에서 건의해주세요.", Toast.LENGTH_SHORT).show()
-            vm.updateCompleteState = State.DEFAULT
+            vm.updateExpCompleteState = State.DEFAULT
         }
         State.SUCCESS -> {
             stopLoading()
-            vm.updateCompleteState = State.DEFAULT
+            vm.updateExpCompleteState = State.DEFAULT
             navController.popBackStack()
         }
     }
@@ -125,7 +127,7 @@ fun initQuestionDetailViewModelCallback(
 fun initQuestionDetailScreen(vm: QuestionViewModel) {
     vm.myAnswer.value = ""
     vm.myAnswerPoint = 0
-    vm.getFamilyUsers()
+//    vm.getFamilyUsers()
     vm.getQuestionAnswers()
     vm.getDetailQuestion()
 }
