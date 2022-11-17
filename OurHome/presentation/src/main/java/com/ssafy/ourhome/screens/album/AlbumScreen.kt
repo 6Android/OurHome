@@ -199,7 +199,7 @@ fun PhotoItem(image: DomainAlbumDTO, onClick: () -> Unit) { // 사진은 id값, 
                 onClick.invoke()
             },
         painter = painter,
-        contentScale = ContentScale.FillBounds,
+        contentScale = ContentScale.Crop,
         contentDescription = "펫 이미지",
     )
 }
