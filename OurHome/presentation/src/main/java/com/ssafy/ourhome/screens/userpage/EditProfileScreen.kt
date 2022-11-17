@@ -228,10 +228,6 @@ private fun TextWithDropDown(
         mutableStateOf(false)
     }
 
-    var selectedIndex by remember {
-        mutableStateOf(itemList.indexOf(textState.value))
-    }
-
     Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         Text(
             text = title, modifier = Modifier.weight(1f),
@@ -251,12 +247,12 @@ private fun TextWithDropDown(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = itemList[selectedIndex], modifier = Modifier,
+                    text = textState.value, modifier = Modifier,
                     style = MaterialTheme.typography.h6.copy(fontWeight = FontWeight.Bold)
                 )
 
                 IconButton(
-                    onClick = { expanded = true  }) {
+                    onClick = { expanded = true }) {
                     Icon(
                         imageVector = Icons.Default.ArrowDropDown,
                         contentDescription = "Drop Down Button",
@@ -273,9 +269,8 @@ private fun TextWithDropDown(
                     .heightIn(max = 235.dp)
 
             ) {
-                itemList.forEachIndexed { index, item ->
+                itemList.forEachIndexed { _, item ->
                     DropdownMenuItem(modifier = Modifier.wrapContentHeight(), onClick = {
-                        selectedIndex = index
                         textState.value = item
                         expanded = false
                     }) {
