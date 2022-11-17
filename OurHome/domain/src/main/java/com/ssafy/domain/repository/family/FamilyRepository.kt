@@ -7,5 +7,5 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 
 interface FamilyRepository {
-    fun getFamilyManager(familyCode: String): Flow<ResultType<String?>>
+    fun getFamilyManager(familyCode: String): Flow<ResultType<Any>>
 }

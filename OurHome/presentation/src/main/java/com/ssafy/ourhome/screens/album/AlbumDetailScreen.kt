@@ -88,6 +88,7 @@ fun AlbumDetailScreen(navController: NavController, vm: AlbumViewModel) {
 fun initAlbumDetailScreen(vm: AlbumViewModel) {
     vm.visibleDeleteIconState.value = false
     vm.initAlbumDetail()
+    vm.getFamilyManager()
 }
 
 fun initAlbumDetailViewModelCallback(
