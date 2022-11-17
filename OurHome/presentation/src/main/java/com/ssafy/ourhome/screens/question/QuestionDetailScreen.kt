@@ -1,7 +1,6 @@
 package com.ssafy.ourhome.screens.question
 
 import android.content.Context
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -16,14 +15,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
@@ -31,16 +29,12 @@ import com.ssafy.domain.model.question.DomainQuestionAnswerDTO
 import com.ssafy.ourhome.R
 import com.ssafy.ourhome.components.MainAppBar
 import com.ssafy.ourhome.components.OurHomeSurface
-import com.ssafy.ourhome.components.pie.PieChartData
 import com.ssafy.ourhome.navigation.OurHomeScreens
-import com.ssafy.ourhome.screens.question.pet.initPetDetailViewModelCallback
 import com.ssafy.ourhome.startLoading
 import com.ssafy.ourhome.stopLoading
 import com.ssafy.ourhome.ui.theme.Gray
 import com.ssafy.ourhome.ui.theme.MainColor
-import com.ssafy.ourhome.ui.theme.PieChartColors
 import com.ssafy.ourhome.utils.State
-import com.ssafy.ourhome.utils.addFocusCleaner
 
 
 @Composable
@@ -81,12 +75,12 @@ fun QuestionDetailScreen(navController: NavController, vm: QuestionViewModel) {
                 Divider(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(1.dp), color = Gray
+                        .height(1.dp), color = Color.LightGray
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                FamilyAnswer(vm){ email ->
+                FamilyAnswer(vm) { email ->
                     navController.navigate(OurHomeScreens.UserPageScreen.name + "/$email")
                 }
 
@@ -97,7 +91,11 @@ fun QuestionDetailScreen(navController: NavController, vm: QuestionViewModel) {
 }
 
 const val FIRST_ANSWER_POINT = 100
-fun initQuestionDetailViewModelCallback(vm: QuestionViewModel, context: Context, navController: NavController) {
+fun initQuestionDetailViewModelCallback(
+    vm: QuestionViewModel,
+    context: Context,
+    navController: NavController
+) {
     when (vm.answerCompleteState) {
         State.ERROR -> {
             Toast.makeText(context, "답변 등록하는데 실패했습니다", Toast.LENGTH_SHORT).show()
@@ -134,14 +132,13 @@ fun initQuestionDetailScreen(vm: QuestionViewModel) {
 
 /** 가족 답변 카드 **/
 @Composable
-fun FamilyAnswer(vm: QuestionViewModel, onClick : (String) -> (Unit)) {
-    Log.d("ddd", "FamilyAnswer: ${vm.familyAnswers}")
+fun FamilyAnswer(vm: QuestionViewModel, onClick: (String) -> (Unit)) {
     LazyColumn(
         modifier = Modifier.height(600.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         items(vm.familyAnswers) {
-            FamilyAnswerItem(vm, it){ email ->
+            FamilyAnswerItem(vm, it) { email ->
                 onClick(email)
             }
         }
@@ -157,44 +154,51 @@ fun FamilyAnswerItem(
     onClick: (String) -> (Unit)
 ) {
 
-    var painter = rememberAsyncImagePainter(R.drawable.img_default_user)
+    var painter = painterResource(R.drawable.img_default_user)
     var name = "가족 정보 없음"
 
     if (vm.familyUsers.contains(familyAnswers.email)) {
-        painter = rememberAsyncImagePainter(vm.familyUsers[familyAnswers.email]!!.image)
+        painter =
+            if (vm.familyUsers[familyAnswers.email]!!.image == "default") painterResource(R.drawable.img_default_user)
+            else rememberAsyncImagePainter(vm.familyUsers[familyAnswers.email]!!.image)
         name = vm.familyUsers[familyAnswers.email]!!.name
     }
 
-    GrayBorderBox {
+    CenterHorizontalColumn {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 16.dp, start = 16.dp),
+                .padding(4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Image(
                 modifier = Modifier
-                    .size(42.dp)
+                    .size(40.dp)
                     .clip(CircleShape)
                     .clickable {
                         onClick(familyAnswers.email)
                     },
+                contentScale = ContentScale.Crop,
                 painter = painter,
                 contentDescription = "가족 프로필 이미지"
             )
 
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(12.dp))
 
             Text(
-                text = name, style = MaterialTheme.typography.h5.copy(
-                    fontWeight = FontWeight.Bold
+                text = name,
+                style = MaterialTheme.typography.h6.copy(
+                    fontWeight = FontWeight.ExtraBold
                 )
             )
         }
 
         Text(
-            modifier = Modifier.padding(16.dp), text = familyAnswers.content,
-            style = MaterialTheme.typography.body2
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp), text = familyAnswers.content,
+            style = MaterialTheme.typography.body1,
+            textAlign = TextAlign.Start
         )
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -205,42 +209,39 @@ fun FamilyAnswerItem(
 @Composable
 fun MyAnswer(vm: QuestionViewModel) {
 
-    GrayBorderBox {
-        Column(
+    CenterHorizontalColumn {
+        Row(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
+                .fillMaxWidth()
+                .padding(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = "내 답변",
-                    style = MaterialTheme.typography.body1.copy(fontWeight = FontWeight.ExtraBold)
-                )
-                SmallRoundedButton(
-                    vm = vm,
-                    colorFlag = vm.myAnswer.value.isNotEmpty() && vm.myAnswer.value.length <= 100
-                )
-            }
-
-            NoUnderLineTextInput(myAnswerState = vm.myAnswer, height = 150)
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            ShowTextSize(vm.myAnswer)
+            Text(
+                text = "내 답변",
+                style = MaterialTheme.typography.h6.copy(fontWeight = FontWeight.ExtraBold)
+            )
+            SmallRoundedButton(
+                vm = vm,
+                colorFlag = vm.myAnswer.value.isNotEmpty() && vm.myAnswer.value.length <= 100
+            )
         }
-    }
 
+        NoUnderLineTextInput(myAnswerState = vm.myAnswer, height = 150)
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        ShowTextSize(vm.myAnswer)
+    }
 }
 
 /** 텍스트 길이 표시 **/
 @Composable
 fun ShowTextSize(myAnswerState: MutableState<String>) {
-
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
         horizontalArrangement = Arrangement.End
     ) {
         Text(
