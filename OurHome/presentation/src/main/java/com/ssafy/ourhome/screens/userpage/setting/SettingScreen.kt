@@ -51,14 +51,24 @@ fun SettingScreen(navController: NavController, vm: UserPageViewModel) {
         mutableStateOf(false)
     }
 
+    val isManager = remember {
+        mutableStateOf(vm.user.manager)
+    }
+
     //가족 끊기 Dialog
     if (visibleTransferDialogState.value) {
         OurHomeAlertDialog(
             header = "가족을 나가시겠습니까?",
             confirmText = "나가기",
             onConfirmClick = {
-                vm.job.cancel()
-                vm.transferUserData(vm.user)
+                // 가족장인 경우
+                if(isManager.value){
+                    Toast.makeText(context, "가족장은 탈퇴할 수 없습니다.", Toast.LENGTH_SHORT).show()
+                    visibleTransferDialogState.value = false
+                }else {
+                    vm.job.cancel()
+                    vm.transferUserData(vm.user)
+                }
             },
             onDismissRequest = { visibleTransferDialogState.value = false }
         )
