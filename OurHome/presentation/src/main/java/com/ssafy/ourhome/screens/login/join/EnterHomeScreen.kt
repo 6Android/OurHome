@@ -1,5 +1,6 @@
 package com.ssafy.ourhome.screens.login.join
 
+import android.content.Intent
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -8,6 +9,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Logout
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -25,6 +27,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.ssafy.ourhome.MainActivity
 import com.ssafy.ourhome.R
 import com.ssafy.ourhome.components.OurHomeSurface
 import com.ssafy.ourhome.components.RoundedButton
@@ -65,6 +68,19 @@ fun EnterHomeScreen(navController: NavController, vm: LoginViewModel = hiltViewM
     }
 
     OurHomeSurface {
+        Icon(
+            modifier = Modifier
+                .padding(top = 24.dp, end = 24.dp)
+                .size(32.dp)
+                .clickable { //todo : 로그아웃
+                    vm.logout()
+                    val intent = Intent(context, MainActivity::class.java)
+                    context.startActivity(intent)
+                    (context as MainActivity).finish()
+                }
+                .align(alignment = Alignment.TopEnd),
+            imageVector = Icons.Default.Logout, contentDescription = "로그아웃",
+        )
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -171,9 +187,11 @@ fun DialogContent(
         Spacer(modifier = Modifier.height(60.dp))
 
         /** 입주하기 버튼 */
-        RoundedButton(modifier = Modifier
-            .fillMaxWidth()
-            .height(48.dp), label = "입주하기") {
+        RoundedButton(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(48.dp), label = "입주하기"
+        ) {
             onEnterClick()
         }
     }

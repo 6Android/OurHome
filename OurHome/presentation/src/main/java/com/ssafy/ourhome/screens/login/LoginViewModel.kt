@@ -3,12 +3,14 @@ package com.ssafy.ourhome.screens.login
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
 import com.ssafy.data.utils.EMAIL
 import com.ssafy.data.utils.FAMILY_CODE
 import com.ssafy.data.utils.MANAGER
 import com.ssafy.domain.model.family.DomainFamilyDTO
 import com.ssafy.domain.usecase.user.*
 import com.ssafy.domain.utils.ResultType
+import com.ssafy.ourhome.MainActivity
 import com.ssafy.ourhome.utils.Prefs
 import com.ssafy.ourhome.utils.SocialState
 import com.ssafy.ourhome.utils.State
@@ -28,7 +30,8 @@ class LoginViewModel @Inject constructor(
     private val getUserUseCase: GetUserUseCase,
     private val joinSocialUseCase: JoinSocialUseCase,
     private val insertFamilyUseCase: InsertFamilyUseCase,
-    private val enterFamilyUseCase: EnterFamilyUseCase
+    private val enterFamilyUseCase: EnterFamilyUseCase,
+    private val firebaseAuth: FirebaseAuth
 ) : ViewModel() {
 
     val loginIdState = mutableStateOf("")
@@ -229,4 +232,12 @@ class LoginViewModel @Inject constructor(
 
             }
         }
+
+    // 로그아웃
+    fun logout() {
+        MainActivity.stopWorkManager()
+        firebaseAuth.signOut()
+        Prefs.email = ""
+        Prefs.familyCode = ""
+    }
 }
