@@ -180,7 +180,8 @@ fun CenterHorizontalColumn(content: @Composable() (ColumnScope.() -> Unit)) {
 /** 오늘의 질문 내용 **/
 @Composable
 fun TodayQuestion(questionNumber: String, questionContent: String) {
-    Row(modifier = Modifier.fillMaxWidth()){
+    Row(modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center){
         Text(text = "Q" + questionNumber + ". ", style = MaterialTheme.typography.h2.copy(fontWeight = FontWeight.ExtraBold),
         color = MainColor)
 
