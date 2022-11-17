@@ -1,5 +1,6 @@
 package com.ssafy.ourhome.screens.question
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -43,9 +44,13 @@ fun QuestionScreen(navController: NavController, vm: QuestionViewModel) {
 
     val scrollState = rememberScrollState()
 
-    initQuestionScreen(vm)
+    LaunchedEffect(key1 = true) {
+        initQuestionScreen(vm)
+    }
 
     initQuestionScreenViewModelCallback(vm)
+
+    Log.d("TAG", "QuestionScreen() recomposition")
 
     Scaffold(topBar = {
         MainAppBar(
@@ -81,7 +86,9 @@ fun QuestionScreen(navController: NavController, vm: QuestionViewModel) {
                     Spacer(modifier = Modifier.height(24.dp))
 
                     ReplyQuestionButton(
-                        modifier = Modifier.fillMaxWidth(0.9f).height(48.dp),
+                        modifier = Modifier
+                            .fillMaxWidth(0.9f)
+                            .height(48.dp),
                         label = "답변 하기",
                         onClick = {
                             vm.detailQuestionSeq = vm.todayQuestion.question_seq

@@ -416,7 +416,7 @@ class QuestionViewModel @Inject constructor(
             return false
         }
 
-        if(familyAnswers.size + (if(todayQuestionMyAnswer.content == "") 1 else 0) != familyUsers.size){
+        if(familyAnswers.size + (if(todayQuestionMyAnswer.content == "") 0 else 1) != familyUsers.size){
             return false
         }
 
