@@ -203,12 +203,14 @@ class QuestionViewModel @Inject constructor(
         }
     }
 
+    // todayQuestion 완료 재확인
     fun checkTodayQuestion(){
-        if(isCompletedAnswer1DayLater()){
+        if(checkCompleteAnswer() && isCompletedAnswer1DayLater()){
             updateTodayQuestion(todayQuestion.question_seq + 1)
         }
     }
 
+    // 오늘의 답변이 완료되었고 하루가 지났는지
     fun isCompletedAnswer1DayLater() : Boolean{
         if(todayQuestion.completed_date.isNotEmpty()){
             val completedQuestionDate = LocalDate.of(todayQuestion.completed_year, todayQuestion.completed_month, todayQuestion.completed_day)
@@ -419,7 +421,17 @@ class QuestionViewModel @Inject constructor(
         }
     }
 
-    fun checkCompleteAnswer() = familyAnswers.size + 1 == familyUsers.size
+    fun checkCompleteAnswer() : Boolean {
+        if(familyUsers.size == 1){
+            return false
+        }
+
+        if(familyAnswers.size + 1 != familyUsers.size){
+            return false
+        }
+
+        return true
+    }
 
     fun completeTodayAnswer(today: LocalDate, date: String) = viewModelScope.launch(Dispatchers.IO) {
         val questionMap = mapOf<String, Any>(

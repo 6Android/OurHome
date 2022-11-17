@@ -120,11 +120,10 @@ fun QuestionScreen(navController: NavController, vm: QuestionViewModel) {
 fun initQuestionScreen(vm: QuestionViewModel) {
     vm.initDate()
     vm.getFamiliyPet()
-    vm.getTodayQuestion()
-    vm.getLast3Questions()
     vm.getFamilyUsers()
     vm.getQuestionAnswers()
-
+    vm.getTodayQuestion()
+    vm.getLast3Questions()
 }
 
 fun initQuestionScreenViewModelCallback(vm: QuestionViewModel){
