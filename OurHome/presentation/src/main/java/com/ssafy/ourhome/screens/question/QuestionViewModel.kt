@@ -1,6 +1,5 @@
 package com.ssafy.ourhome.screens.question
 
-import android.util.Log
 import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -36,7 +35,8 @@ class QuestionViewModel @Inject constructor(
     private val completeTodayQuestionUseCase: CompleteTodayQuestionUseCase,
     private val editUserContribution: EditUserContribution,
     private val updatePetExpUseCase: UpdatePetExpUseCase,
-    private val levelUpUseCase: LevelUpUseCase
+    private val levelUpUseCase: LevelUpUseCase,
+    private val checkCompleteTodayQuestionUseCase : CheckCompleteTodayQuestionUseCase
 ): ViewModel(){
 
     var myProfile by mutableStateOf(DomainUserDTO())
@@ -74,10 +74,28 @@ class QuestionViewModel @Inject constructor(
     var familyPetProcessState by mutableStateOf(State.DEFAULT)
 
     var familyGetState by mutableStateOf(State.DEFAULT)
+    var familyAnswersGetState by mutableStateOf(State.DEFAULT)
 
     var answerCompleteState by mutableStateOf(State.DEFAULT)
 
     var updateCompleteState by mutableStateOf(State.DEFAULT)
+
+    lateinit var today: LocalDate
+    lateinit var date: String
+
+    fun initDate(){
+        today = LocalDate.now()
+        date = today.year.toString() + "."
+        if(today.monthValue < 10){
+            date += "0"
+        }
+        date = date + today.monthValue + "."
+
+        if(today.dayOfMonth < 10){
+            date += "0"
+        }
+        date += today.dayOfMonth
+    }
 
     fun getFamiliyPet() = viewModelScope.launch(Dispatchers.IO) {
         getFamilyPetUseCase.execute(Prefs.familyCode).collect{
@@ -85,6 +103,7 @@ class QuestionViewModel @Inject constructor(
                 is ResultType.Uninitialized -> {}
                 is ResultType.Success -> {
                     pet = it.data!!
+                    isLevelUp()
                 }
                 is ResultType.Error -> {
 
@@ -147,7 +166,7 @@ class QuestionViewModel @Inject constructor(
                     }
                     familyAnswers.clear()
                     familyAnswers.addAll(familyAnswerListTmp)
-
+                    familyAnswersGetState = State.SUCCESS
                 }
                 is ResultType.Error -> {
 
@@ -268,8 +287,8 @@ class QuestionViewModel @Inject constructor(
     }
 
     fun modifyAnswer(){
-        val today = LocalDate.now()
-        var date = today.year.toString() + "."
+        today = LocalDate.now()
+        date = today.year.toString() + "."
         if(today.monthValue < 10){
             date += "0"
         }
@@ -281,9 +300,8 @@ class QuestionViewModel @Inject constructor(
         date += today.dayOfMonth
 
         answerDetailQuestion(today, date)
-        if(isLevelUp()){
-            levelUp()
-        }
+        isLevelUp()
+
         if(myAnswerAddedState){
             editContribution()
         }else{
@@ -294,8 +312,8 @@ class QuestionViewModel @Inject constructor(
     }
 
     fun answer() {
-        val today = LocalDate.now()
-        var date = today.year.toString() + "."
+        today = LocalDate.now()
+        date = today.year.toString() + "."
         if(today.monthValue < 10){
             date += "0"
         }
@@ -307,9 +325,8 @@ class QuestionViewModel @Inject constructor(
         date += today.dayOfMonth
 
         answerDetailQuestion(today, date)
-        if(isLevelUp()){
-            levelUp()
-        }
+        isLevelUp()
+
         if(myAnswerAddedState){
             editContribution()
         }else{
@@ -324,24 +341,27 @@ class QuestionViewModel @Inject constructor(
     }
 
     fun isLevelUp() : Boolean {
-        if(pet.exp + myAnswer.value.length - myAnswerPoint >= pet.next_level_exp){
+        if(pet.exp >= pet.next_level_exp){
+            levelUp()
             return true
         }
         return false
     }
 
-    fun levelUp() = viewModelScope.launch(Dispatchers.IO) {
-        levelUpUseCase.execute(Prefs.familyCode, pet.pet_level + 1).collect {
-            when(it) {
-                is ResultType.Loading -> {}
-                is ResultType.Success -> {
+    fun levelUp() {
+        viewModelScope.launch(Dispatchers.IO) {
+            levelUpUseCase.execute(Prefs.familyCode, pet.pet_level + 1).collect {
+                when(it) {
+                    is ResultType.Loading -> {}
+                    is ResultType.Success -> {
 
-                }
-                is ResultType.Error -> {
+                    }
+                    is ResultType.Error -> {
 
-                }
-                else -> {
+                    }
+                    else -> {
 
+                    }
                 }
             }
         }
@@ -358,6 +378,39 @@ class QuestionViewModel @Inject constructor(
                 }
                 is ResultType.Error -> {
                     answerCompleteState = State.ERROR
+                }
+                else -> {
+
+                }
+            }
+        }
+    }
+
+    //QuestionScreen에서 오늘의 질문 완료되었는지 재확인
+    fun checkCompleteAnswerInScreen() {
+        if(checkCompleteAnswer()){
+            checkCompleteTodayQuestionAnswer()
+        }
+    }
+
+    // 오늘의 질문이 완성되어있지 않으면 재확인하여 갱신
+    fun checkCompleteTodayQuestionAnswer() = viewModelScope.launch(Dispatchers.IO){
+        val questionMap = mapOf<String, Any>(
+            "question_seq" to todayQuestion.question_seq,
+            "question_content" to todayQuestion.question_content,
+            "completed_date" to date,
+            "completed_year" to today.year,
+            "completed_month" to today.monthValue,
+            "completed_day" to today.dayOfMonth
+        )
+        checkCompleteTodayQuestionUseCase.execute(Prefs.familyCode, todayQuestion.question_seq, questionMap).collect{
+            when(it) {
+                is ResultType.Loading -> {}
+                is ResultType.Success -> {
+
+                }
+                is ResultType.Error -> {
+
                 }
                 else -> {
 
@@ -394,8 +447,6 @@ class QuestionViewModel @Inject constructor(
     }
 
     fun updateExp(firstAnswerPoint : Int = 0) = viewModelScope.launch(Dispatchers.IO) {
-        Log.d("ddd", "updateExp: myAnswer.value ${myAnswer.value.length}")
-        Log.d("ddd", "updateExp: myAnswerPoint ${myAnswerPoint}")
         updatePetExpUseCase.execute(Prefs.familyCode,myAnswer.value.length - myAnswerPoint + firstAnswerPoint).collect{
             when(it) {
                 is ResultType.Loading -> {}
@@ -413,8 +464,6 @@ class QuestionViewModel @Inject constructor(
     }
 
     fun editContribution(firstAnswerPoint : Int = 0) = viewModelScope.launch(Dispatchers.IO) {
-        Log.d("ddd", "updateExp: myAnswer.value ${myAnswer.value.length}")
-        Log.d("ddd", "updateExp: myAnswerPoint ${myAnswerPoint}")
         editUserContribution.execute(Prefs.familyCode, Prefs.email, 1L * myAnswer.value.length - myAnswerPoint + firstAnswerPoint).collect{
             when(it) {
                 is ResultType.Loading -> {}

@@ -2,6 +2,7 @@ package com.ssafy.data.datasource.question
 
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.QuerySnapshot
@@ -49,6 +50,21 @@ class QuestionDataSourceImpl @Inject constructor(
     override fun answerQuestion(familyCode: String, questionSeq: Int, answer: DomainQuestionAnswerDTO): Task<Void> =
         firestore.collection(FAMILY).document(familyCode).collection(QUESTION).document(questionSeq.toString()).collection(
             QUESTION_ANSWER).document(answer.email).set(answer)
+
+    override fun checkCompleteTodayQuestion(
+        familyCode: String,
+        questionSeq: Int,
+        questionsMap: Map<String, Any>
+    ): Task<Unit> =
+        firestore.runTransaction{ transaction ->
+            val todayQuestion = transaction.get(firestore.collection(FAMILY).document(familyCode).collection(
+                QUESTION).document(questionSeq.toString()))
+
+            if(todayQuestion.getLong(COMPLETED_YEAR) == null){
+                transaction.set(firestore.collection(FAMILY).document(familyCode).collection(QUESTION).document(questionSeq.toString()), questionsMap, SetOptions.merge())
+            }
+
+        }
 
     override fun completeTodayQuestion(
         familyCode: String,

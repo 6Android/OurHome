@@ -39,7 +39,6 @@ class PetDataSourceImpl @Inject constructor(
                     PET_NEXT_EXP to next_level!!.toInt(),
                     PET_LEVEL to level!!.toInt()
                 )
-
                 transaction.set(fireStore.collection(FAMILY).document(familyCode).collection(PET).document(
                     OUR_PET), newPetMap, SetOptions.merge())
             }else{

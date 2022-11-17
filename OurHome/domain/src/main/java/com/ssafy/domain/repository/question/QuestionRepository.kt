@@ -28,6 +28,13 @@ interface QuestionRepository {
 
     fun completeTodayQuestion(familyCode: String, questionSeq: Int, questionsMap: Map<String, Any>): Flow<ResultType<Unit>>
 
+    // 오늘의 질문 완료되었는지 재 확인
+    fun checkCompleteTodayQuestion(
+        familyCode: String,
+        questionSeq: Int,
+        questionsMap: Map<String, Any>
+    ): Flow<ResultType<Unit>>
+
     // 오늘의 질문에 답 했는지 안했는지 체크
     fun checkAnswerTodayQuestion(familyCode: String, email: String): Flow<ResultType<Unit>>
 }

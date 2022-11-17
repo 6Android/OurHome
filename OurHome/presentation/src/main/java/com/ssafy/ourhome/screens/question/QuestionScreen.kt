@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,6 +36,7 @@ import com.ssafy.ourhome.ui.theme.Gray
 import com.ssafy.ourhome.ui.theme.MainColor
 import com.ssafy.ourhome.ui.theme.nanum
 import com.ssafy.ourhome.utils.CHATTING_ICON_BLACK
+import com.ssafy.ourhome.utils.State
 
 @Composable
 fun QuestionScreen(navController: NavController, vm: QuestionViewModel) {
@@ -43,8 +45,13 @@ fun QuestionScreen(navController: NavController, vm: QuestionViewModel) {
 
     initQuestionScreen(vm)
 
+    LaunchedEffect(key1 = vm.familyAnswers, vm.familyUsers){
+        vm.checkCompleteAnswerInScreen()
+    }
 
-    Scaffold(topBar = { // TODO 세팅 아이콘 -> 채팅 아이콘
+    initQuestionScreenViewModelCallback(vm)
+
+    Scaffold(topBar = {
         MainAppBar(
             title = "질문",
             backIconEnable = false,
@@ -111,10 +118,25 @@ fun QuestionScreen(navController: NavController, vm: QuestionViewModel) {
 }
 
 fun initQuestionScreen(vm: QuestionViewModel) {
+    vm.initDate()
     vm.getFamiliyPet()
     vm.getTodayQuestion()
     vm.getLast3Questions()
+    vm.getFamilyUsers()
+    vm.getQuestionAnswers()
+
 }
+
+fun initQuestionScreenViewModelCallback(vm: QuestionViewModel){
+    when(vm.familyAnswersGetState){
+        State.SUCCESS ->{
+            vm.checkCompleteAnswerInScreen()
+            vm.familyAnswersGetState = State.DEFAULT
+        }
+    }
+
+}
+
 
 fun navigateQuestionDetailScreen(navController: NavController) {
     navController.navigate(OurHomeScreens.QuestionDetailScreen.name)
@@ -143,29 +165,12 @@ fun CenterHorizontalColumn(content: @Composable() (ColumnScope.() -> Unit)) {
 /** 오늘의 질문 내용 **/
 @Composable
 fun TodayQuestion(questionNumber: String, questionContent: String) {
-    Text(
-        buildAnnotatedString {
-            withStyle(
-                style = SpanStyle(
-                    color = MainColor,
-                    fontFamily = nanum,
-                    fontWeight = FontWeight.ExtraBold,
-                    fontSize = 34.sp
-                )
-            ) {
-                append("Q" + questionNumber + ". ")
-            }
-            withStyle(
-                style = SpanStyle(
-                    fontFamily = nanum,
-                    fontWeight = FontWeight.ExtraBold,
-                    fontSize = 28.sp
-                )
-            ) {
-                append(questionContent)
-            }
-        }
-    )
+    Row(modifier = Modifier.fillMaxWidth()){
+        Text(text = "Q" + questionNumber + ". ", style = MaterialTheme.typography.h2.copy(fontWeight = FontWeight.ExtraBold),
+        color = MainColor)
+
+        Text(text = questionContent, style = MaterialTheme.typography.h3.copy(fontWeight = FontWeight.ExtraBold))
+    }
 }
 
 /** 펫 정보 (이름, 이미지, 레벨), 클릭 시 펫 상헤 화면 이동 **/
