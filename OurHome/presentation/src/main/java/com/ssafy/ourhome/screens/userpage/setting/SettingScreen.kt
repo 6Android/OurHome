@@ -1,6 +1,9 @@
 package com.ssafy.ourhome.screens.userpage.setting
 
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
+import android.content.Context.CLIPBOARD_SERVICE
 import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
@@ -25,7 +28,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.ssafy.domain.model.user.DomainUserDTO
 import com.ssafy.ourhome.MainActivity
 import com.ssafy.ourhome.components.MainAppBar
 import com.ssafy.ourhome.components.OurHomeAlertDialog
@@ -62,10 +64,10 @@ fun SettingScreen(navController: NavController, vm: UserPageViewModel) {
             confirmText = "나가기",
             onConfirmClick = {
                 // 가족장인 경우
-                if(isManager.value){
+                if (isManager.value) {
                     Toast.makeText(context, "가족장은 탈퇴할 수 없습니다.", Toast.LENGTH_SHORT).show()
                     visibleTransferDialogState.value = false
-                }else {
+                } else {
                     vm.job.cancel()
                     vm.transferUserData(vm.user)
                 }
@@ -87,7 +89,6 @@ fun SettingScreen(navController: NavController, vm: UserPageViewModel) {
             navController.popBackStack()
         })
     }) {
-        // TODO : 옵션 로직 작성
         OurHomeSurface() {
             Column(
                 modifier = Modifier
@@ -128,44 +129,6 @@ fun SettingScreen(navController: NavController, vm: UserPageViewModel) {
                 }
                 Spacer(modifier = Modifier.height(32.dp))
 
-                // TEST : 유저 넣기
-                ClickableText("회원탈퇴") {
-                    vm.insertUser(
-                        DomainUserDTO(
-                            email = "test1@naver.com",
-                            name = "테스트1",
-                            family_code = "TEST"
-                        )
-                    )
-                    vm.insertUser(
-                        DomainUserDTO(
-                            email = "test2@naver.com",
-                            name = "테스트2",
-                            family_code = "TEST"
-                        )
-                    )
-                    vm.insertUser(
-                        DomainUserDTO(
-                            email = "test3@naver.com",
-                            name = "테스트3",
-                            family_code = "TEST"
-                        )
-                    )
-                    vm.insertUser(
-                        DomainUserDTO(
-                            email = "test4@naver.com",
-                            name = "테스트4",
-                            family_code = "TEST"
-                        )
-                    )
-                    vm.insertUser(
-                        DomainUserDTO(
-                            email = "test5@naver.com",
-                            name = "테스트5",
-                            family_code = "TEST"
-                        )
-                    )
-                }
             }
         }
     }
@@ -182,14 +145,17 @@ private fun OurHomeSetting(
     TextHeader(title = "가족 설정")
     Spacer(modifier = Modifier.height(26.dp))
 
-    // TODO : 클릭 이벤트
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(start = 16.dp)
     ) {
         TextWithCode(title = "우리집 코드", code = code) {
+            val clipboardManager = context.getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
+            val clipData = ClipData.newPlainText("FamilyCode", code)
+            clipboardManager.setPrimaryClip(clipData)
 
+            Toast.makeText(context, "우리집 코드가 복사되었습니다.", Toast.LENGTH_SHORT).show()
         }
         Spacer(modifier = Modifier.height(32.dp))
         TextWithNext(title = "가족 관리") {
@@ -230,14 +196,16 @@ private fun Support(
     TextHeader(title = "고객 지원")
     Spacer(modifier = Modifier.height(26.dp))
 
-    // TODO : 클릭 이벤트
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(start = 16.dp)
     ) {
         TextWithNext(title = "이용 약관") {
-
+            val i = Intent(Intent.ACTION_VIEW)
+            i.data =
+                Uri.parse("https://sweltering-enthusiasm-d6a.notion.site/02cbd0ae63ac4030a30887a6d1ee3138")
+            context.startActivity(i)
         }
         Spacer(modifier = Modifier.height(32.dp))
         TextWithNext(title = "문의 보내기") {
