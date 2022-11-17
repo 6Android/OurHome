@@ -127,6 +127,23 @@ class QuestionRepositoryImpl @Inject constructor(
         awaitClose {  }
     }
 
+    override fun checkCompleteTodayQuestion(
+        familyCode: String,
+        questionSeq: Int,
+        questionsMap: Map<String, Any>
+    ): Flow<ResultType<Unit>> = callbackFlow {
+        questionDataSource.checkCompleteTodayQuestion(familyCode, questionSeq, questionsMap).addOnCompleteListener{
+            if(it.isSuccessful){
+                trySend(ResultType.Success(Unit))
+            }else{
+                trySend(ResultType.Error(it.exception))
+            }
+        }.addOnFailureListener {
+            trySend(ResultType.Error(it))
+        }
+        awaitClose {  }
+    }
+
     // 오늘의 질문에 답 했는지 안했는지 체크
     override fun checkAnswerTodayQuestion(
         familyCode: String,
