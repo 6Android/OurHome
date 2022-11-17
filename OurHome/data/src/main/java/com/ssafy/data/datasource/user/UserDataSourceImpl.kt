@@ -47,12 +47,12 @@ class UserDataSourceImpl @Inject constructor(
         fireStore.collection(USER).document(email)
 
     // 유저 정보 가져오기
-    override fun getProfile(familyCode: String, email: String) =
+    override fun getMyProfile(familyCode: String, email: String) =
         fireStore.collection(FAMILY).document(familyCode).collection(USER).document(email)
 
     //다른 유저 정보 가져오기
-    override fun getOtherProfile(familyCode: String, email: String): DocumentReference =
-        fireStore.collection(FAMILY).document(familyCode).collection(USER).document(email)
+    override fun getOtherProfile(familyCode: String, email: String)  =
+        fireStore.collection(FAMILY).document(familyCode).collection(USER).document(email).get()
 
     // 유저 정보 수정하기
     override fun editUserInfo(familyCode: String, user: DomainUserDTO): Task<Void> =

@@ -59,7 +59,7 @@ fun MyPageScreen(
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
-                UserColorCardList(userDTO = vm.user,vm)
+                UserColorCardList(userDTO = vm.user)
 
                 Spacer(modifier = Modifier.height(16.dp))
                 UserCommonCardList(userDTO = vm.user)

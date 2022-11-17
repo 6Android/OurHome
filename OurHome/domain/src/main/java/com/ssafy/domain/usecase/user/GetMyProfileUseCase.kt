@@ -8,5 +8,5 @@ import javax.inject.Singleton
 class GetMyProfileUseCase @Inject constructor(
     private val userRepository: UserRepository
 ){
-    fun execute(familyCode: String, email: String) = userRepository.getProfile(familyCode, email)
+    fun execute(familyCode: String, email: String) = userRepository.getMyProfile(familyCode, email)
 }
