@@ -42,7 +42,9 @@ fun QuestionDetailScreen(navController: NavController, vm: QuestionViewModel) {
     val scrollState = rememberScrollState()
     val context = LocalContext.current
 
-    initQuestionDetailScreen(vm)
+    LaunchedEffect(key1 = true){
+        initQuestionDetailScreen(vm)
+    }
     initQuestionDetailViewModelCallback(vm, context, navController)
 
     // TODO NestedScrollView 필요

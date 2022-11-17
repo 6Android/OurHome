@@ -53,7 +53,9 @@ fun PetDetailScreen(navController: NavController, vm: QuestionViewModel) {
 //        PieChartData(listOf(Slice(0.5F, Color.Red, "아빠"), Slice(0.3F, Color.Blue, "엄마"), Slice(0.2F, Color.Green, "아들")))
     val context = LocalContext.current
 
-    initPetDetailScreen(vm)
+    LaunchedEffect(key1 = true){
+        initPetDetailScreen(vm)
+    }
     initPetDetailViewModelCallback(vm, context, familyContributeList)
 
     Scaffold(topBar = {
@@ -84,7 +86,9 @@ fun PetDetailScreen(navController: NavController, vm: QuestionViewModel) {
 
                 CenterHorizontalColumn {
 
-                    Text(text = "우리가족 기여도", style = MaterialTheme.typography.subtitle2, modifier = Modifier.fillMaxWidth().offset(x = 8.dp), textAlign = TextAlign.Start)
+                    Text(text = "우리가족 기여도", style = MaterialTheme.typography.subtitle2, modifier = Modifier
+                        .fillMaxWidth()
+                        .offset(x = 8.dp), textAlign = TextAlign.Start)
 
                     Spacer(modifier = Modifier.height(16.dp))
 

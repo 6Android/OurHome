@@ -58,7 +58,9 @@ fun ChatScreen(navController: NavController, vm: ChatViewModel){
 
     val focusManager = LocalFocusManager.current
 
-    initChatScreen(vm)
+    LaunchedEffect(key1 = true){
+        initChatScreen(vm)
+    }
     initChatViewModelCallback(vm)
 
     val listState = rememberLazyListState()

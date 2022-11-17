@@ -15,6 +15,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -49,7 +50,9 @@ fun AlbumScreen(navController: NavController, vm: AlbumViewModel) {
 
     val context = LocalContext.current
 
-    initAlbumScreen(vm)
+    LaunchedEffect(key1 = true){
+        initAlbumScreen(vm)
+    }
     initAlbumViewModelCallback(vm, context)
 
     val imagePicker = rememberLauncherForActivityResult(
