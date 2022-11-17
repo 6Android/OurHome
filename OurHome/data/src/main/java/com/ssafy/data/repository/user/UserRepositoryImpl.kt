@@ -47,23 +47,40 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     // 유저 정보 가져오기
-    override fun getProfile(familyCode: String, email: String): Flow<UserResponse> = callbackFlow {
-        val snapshotListener =
-            userDataSource.getProfile(familyCode, email).addSnapshotListener { snapshot, e ->
-                val response = if (snapshot != null) {
-                    val user = snapshot.toObject(DomainUserDTO::class.java)!!
-                    ResultType.Success(user)
-                } else {
-                    ResultType.Error(e)
+    override fun getMyProfile(familyCode: String, email: String): Flow<UserResponse> =
+        callbackFlow {
+            val snapshotListener =
+                userDataSource.getMyProfile(familyCode, email).addSnapshotListener { snapshot, e ->
+                    val response = if (snapshot != null) {
+                        val user = snapshot.toObject(DomainUserDTO::class.java)!!
+                        ResultType.Success(user)
+                    } else {
+                        ResultType.Error(e)
+                    }
+                    trySend(response)
                 }
-                trySend(response)
+            awaitClose {
+                Log.d("test5", "getProfile: Cancel")
+                snapshotListener.remove()
             }
-        awaitClose {
-            Log.d("test5", "getProfile: Cancel")
-            snapshotListener.remove()
+
         }
 
-    }
+    //다른 유저 정보 가져오기
+    override fun getOtherProfile(familyCode: String, email: String): Flow<UserResponse> =
+        callbackFlow {
+                userDataSource.getOtherProfile(familyCode, email).addOnSuccessListener {
+                    val otherUser = it.toObject(DomainUserDTO::class.java) ?: DomainUserDTO()
+                    trySend(ResultType.Success(otherUser))
+                }.addOnFailureListener {
+                    trySend(ResultType.Error(it))
+
+                }
+            awaitClose {
+
+            }
+
+        }
 
     // 이메일 회원 가입
     override fun joinEmail(email: String, password: String, nickname: String, birthday: String) =
@@ -359,6 +376,7 @@ class UserRepositoryImpl @Inject constructor(
             }
         }
 
+
     // 현재 위치 전송하기
     override fun sendLatLng(
         familyCode: String,
@@ -450,8 +468,8 @@ class UserRepositoryImpl @Inject constructor(
                                         val response2 = ResultType.Success(Unit)
                                         trySend(response2)
                                     }.addOnFailureListener {
-                                    trySend(ResultType.Error(it))
-                                }
+                                        trySend(ResultType.Error(it))
+                                    }
                             }
                         }
                 } else {

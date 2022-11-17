@@ -3,10 +3,7 @@ package com.ssafy.data.datasource.user
 import android.net.Uri
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.DocumentSnapshot
-import com.google.firebase.firestore.FieldValue
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.*
 import com.ssafy.data.utils.CONTRIBUTION
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.UploadTask
@@ -50,8 +47,12 @@ class UserDataSourceImpl @Inject constructor(
         fireStore.collection(USER).document(email)
 
     // 유저 정보 가져오기
-    override fun getProfile(familyCode: String, email: String) =
+    override fun getMyProfile(familyCode: String, email: String) =
         fireStore.collection(FAMILY).document(familyCode).collection(USER).document(email)
+
+    //다른 유저 정보 가져오기
+    override fun getOtherProfile(familyCode: String, email: String)  =
+        fireStore.collection(FAMILY).document(familyCode).collection(USER).document(email).get()
 
     // 유저 정보 수정하기
     override fun editUserInfo(familyCode: String, user: DomainUserDTO): Task<Void> =

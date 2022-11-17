@@ -29,7 +29,7 @@ fun MyPageScreen(
     val scrollState = rememberScrollState()
 
     LaunchedEffect(key1 = true) {
-        vm.setJob(vm.getProfile(Prefs.email))
+        vm.setJob(vm.getMyProfile(Prefs.email))
     }
 
 

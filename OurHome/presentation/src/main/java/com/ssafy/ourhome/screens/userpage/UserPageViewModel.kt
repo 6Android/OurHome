@@ -28,7 +28,8 @@ class UserPageViewModel @Inject constructor(
     private val editManagerUseCase: EditManagerUseCase,
     private val transferUserDataUseCase: TransferUserDataUseCase,
     private val insertUserUseCase: InsertUserUseCase,
-    private val getProfileUseCase: GetProfileUseCase,
+    private val getMyProfileUseCase: GetMyProfileUseCase,
+    private val getOtherProfileUseCase: GetOtherProfileUseCase,
     private val editUserProfileUseCase: EditUserProfileUseCase
 ) : ViewModel() {
 
@@ -39,6 +40,9 @@ class UserPageViewModel @Inject constructor(
         private set
 
     var user by mutableStateOf(DomainUserDTO())
+        private set
+
+    var otherUser by mutableStateOf(DomainUserDTO())
         private set
 
     var nicknameState = mutableStateOf(user.name)
@@ -69,19 +73,38 @@ class UserPageViewModel @Inject constructor(
     lateinit var job: Job
         private set
 
-    fun getProfile(email: String) = viewModelScope.launch(Dispatchers.IO) {
-        getProfileUseCase.execute(Prefs.familyCode, email).collect {
+    fun getMyProfile(email: String) = viewModelScope.launch(Dispatchers.IO) {
+
+            getMyProfileUseCase.execute(Prefs.familyCode, email).collect {
+                when (it) {
+                    is ResultType.Uninitialized -> {}
+                    is ResultType.Success -> {
+                        user = it.data
+                    }
+                    is ResultType.Error -> {
+                        getProfileFail = true
+                    }
+                }
+            }
+
+    }
+
+    fun getOtherProfile(email: String) = viewModelScope.launch(Dispatchers.IO) {
+
+        getOtherProfileUseCase.execute(Prefs.familyCode, email).collect {
             when (it) {
                 is ResultType.Uninitialized -> {}
                 is ResultType.Success -> {
-                    user = it.data
+                    otherUser = it.data
                 }
                 is ResultType.Error -> {
                     getProfileFail = true
                 }
             }
         }
+
     }
+
 
     fun editProfile() = viewModelScope.launch(Dispatchers.IO) {
         editProcessState = State.LOADING

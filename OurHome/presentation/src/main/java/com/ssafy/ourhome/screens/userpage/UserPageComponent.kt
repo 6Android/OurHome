@@ -30,6 +30,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
+import com.google.firebase.firestore.auth.User
 import com.ssafy.domain.model.user.DomainUserDTO
 import com.ssafy.ourhome.R
 import com.ssafy.ourhome.ui.theme.BirthDayColor
@@ -100,7 +101,7 @@ fun UserCommonCardList(
 @Composable
 fun BirthDayCard(
     cardModifier: Modifier = Modifier,
-    content: String,
+    content: String
 ) {
     val split = content.split("-")
     val year = split[0]
@@ -233,7 +234,9 @@ fun BloodTypeCard(
                     }
 
                 },
-                modifier = Modifier.align(Alignment.BottomEnd).offset(y= (10).dp),
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .offset(y = (10).dp),
                 style = MaterialTheme.typography.h5.copy(color = Color.White)
             )
         }
@@ -267,7 +270,9 @@ fun MBTICard(
             )
             Text(
                 text = content,
-                modifier = Modifier.align(Alignment.BottomEnd).offset(y = (5).dp),
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .offset(y = (5).dp),
                 style = MaterialTheme.typography.subtitle1.copy(
                     color = Color.White,
                     fontWeight = FontWeight.ExtraBold
@@ -280,7 +285,7 @@ fun MBTICard(
 @Composable
 fun UserInfoCard(
     userDTO: DomainUserDTO,
-    context : Context,
+    context: Context,
     navAction: () -> Unit,
 ) {
     Card(
@@ -333,11 +338,11 @@ fun UserInfoCard(
                 modifier = Modifier.clickable {
 
                     val u = Uri.parse("tel:" + userDTO.phone)
-                    val i = Intent(Intent.ACTION_DIAL,u)
+                    val i = Intent(Intent.ACTION_DIAL, u)
 
-                    try{
+                    try {
                         context.startActivity(i)
-                    }catch (s: SecurityException) {
+                    } catch (s: SecurityException) {
 
                         Toast.makeText(context, " 에러", Toast.LENGTH_SHORT)
                             .show()
