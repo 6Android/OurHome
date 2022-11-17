@@ -160,9 +160,9 @@ fun FamilyManageItem(
             //이미지
             Image(
                 modifier = Modifier
-                    .size(100.dp)
-                    .clip(CircleShape)
-                    .padding(12.dp),
+                    .padding(12.dp)
+                    .size(80.dp)
+                    .clip(CircleShape),
                 contentScale = ContentScale.Crop,
                 painter =
                 if (user.image == "default") painterResource(R.drawable.img_default_user)
