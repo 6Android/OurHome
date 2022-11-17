@@ -411,12 +411,24 @@ class QuestionViewModel @Inject constructor(
     }
 
     // answer complete 되었는지 false, true 확인
-    fun checkCompleteAnswer() : Boolean {
+    fun checkCompleteAnswerInQuestionScreen() : Boolean {
         if(familyUsers.size == 1){
             return false
         }
 
         if(familyAnswers.size + (if(todayQuestionMyAnswer.content == "") 0 else 1) != familyUsers.size){
+            return false
+        }
+
+        return true
+    }
+
+    fun checkCompleteAnswer() : Boolean {
+        if(familyUsers.size == 1){
+            return false
+        }
+
+        if(familyAnswers.size + 1 != familyUsers.size){
             return false
         }
 
@@ -508,7 +520,7 @@ class QuestionViewModel @Inject constructor(
 
     //QuestionScreen에서 오늘의 질문 완료되었는지 재확인
     fun checkCompleteAnswerInScreen() {
-        if(checkCompleteAnswer()){
+        if(checkCompleteAnswerInQuestionScreen()){
             checkCompleteTodayQuestionAnswer()
         }
     }
