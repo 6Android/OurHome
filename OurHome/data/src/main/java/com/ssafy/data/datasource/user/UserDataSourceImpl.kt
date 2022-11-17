@@ -104,5 +104,5 @@ class UserDataSourceImpl @Inject constructor(
 
     // 가족원 제외 (family 삭제)
     override fun outUsers(familyCode: String, email: String): Task<Void> =
-        fireStore.collection(FAMILY).document(familyCode).collection(USER).document(email).update("family_code","")
+        fireStore.collection(FAMILY).document(familyCode).collection(USER).document(email).update("family_code","", "contribute_point", 0, "manager", false)
 }

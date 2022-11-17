@@ -483,7 +483,7 @@ class UserRepositoryImpl @Inject constructor(
 
     // 가족 정보 이전 후 삭제
     override fun transferUserData(user: DomainUserDTO): Flow<ResultType<Unit>> = callbackFlow {
-        userDataSource.moveUserData(user.copy(family_code = "")).addOnCompleteListener { move ->
+        userDataSource.moveUserData(user.copy(family_code = "", contribute_point = 0L, manager = false)).addOnCompleteListener { move ->
             // 정보 이동 성공 시
             if (move.isSuccessful) {
                 // 가족 정보에 있는 유저 정보 지움
