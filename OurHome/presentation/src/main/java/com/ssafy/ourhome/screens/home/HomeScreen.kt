@@ -420,17 +420,32 @@ private fun PersonListItem(item: DomainUserDTO, onImageClick: (String) -> Unit) 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
         /** 프사 */
-        Image(
-            modifier = Modifier
-                .size(64.dp)
-                .clip(CircleShape)
-                .clickable { onImageClick(item.email) },
-            contentScale = ContentScale.Crop,
-            painter =
-            if (item.image == "default") painterResource(R.drawable.img_default_user)
-            else rememberAsyncImagePainter(item.image),
-            contentDescription = "Profile Image"
-        )
+        Box(
+            modifier = Modifier.size(64.dp)
+        ) {
+            Image(
+                modifier = Modifier
+                    .size(64.dp)
+                    .clip(CircleShape)
+                    .clickable { onImageClick(item.email) },
+                contentScale = ContentScale.Crop,
+                painter =
+                if (item.image == "default") painterResource(R.drawable.img_default_user)
+                else rememberAsyncImagePainter(item.image),
+                contentDescription = "Profile Image"
+            )
+
+            if (item.manager) {
+                Image(
+                    modifier = Modifier
+                        .size(24.dp)
+                        .clip(CircleShape)
+                        .align(Alignment.BottomEnd),
+                    painter = painterResource(R.drawable.img_manager),
+                    contentDescription = "Manager Image",
+                )
+            }
+        }
         Spacer(modifier = Modifier.height(12.dp))
 
         /** 이름 */
