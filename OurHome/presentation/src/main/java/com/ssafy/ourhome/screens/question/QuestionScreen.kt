@@ -45,10 +45,6 @@ fun QuestionScreen(navController: NavController, vm: QuestionViewModel) {
 
     initQuestionScreen(vm)
 
-    LaunchedEffect(key1 = vm.familyAnswers, vm.familyUsers){
-        vm.checkCompleteAnswerInScreen()
-    }
-
     initQuestionScreenViewModelCallback(vm)
 
     Scaffold(topBar = {
@@ -118,11 +114,11 @@ fun QuestionScreen(navController: NavController, vm: QuestionViewModel) {
 }
 
 fun initQuestionScreen(vm: QuestionViewModel) {
+    vm.myAnswer.value = ""
     vm.initDate()
     vm.getFamiliyPet()
     vm.getFamilyUsers()
-    vm.getQuestionAnswers()
-    vm.getTodayQuestion()
+    vm.getTodayQuestion()   //today가져오고 그담에 questionAnswers 가져온 담에 오늘의 질문 compmlete됐는지 확인
     vm.getLast3Questions()
 }
 
@@ -134,6 +130,19 @@ fun initQuestionScreenViewModelCallback(vm: QuestionViewModel){
         }
     }
 
+    when(vm.getTodayQuestionState){
+        State.SUCCESS ->{
+            vm.getTodayQuestionAnswers()
+            vm.getTodayQuestionState = State.DEFAULT
+        }
+    }
+
+    when(vm.getTodayQuestionAnswerState){
+        State.SUCCESS ->{
+            vm.checkCompleteAnswerInScreen()
+            vm.getTodayQuestionAnswerState = State.DEFAULT
+        }
+    }
 }
 
 

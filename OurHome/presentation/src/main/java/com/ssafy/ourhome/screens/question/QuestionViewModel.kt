@@ -1,6 +1,7 @@
 package com.ssafy.ourhome.screens.question
 
 import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ssafy.domain.model.pet.DomainFamilyPetDTO
@@ -48,6 +49,8 @@ class QuestionViewModel @Inject constructor(
     var todayQuestion by mutableStateOf(DomainQuestionDTO())
         private set
 
+    var todayQuestionMyAnswer by mutableStateOf(DomainQuestionAnswerDTO())
+
     var detailQuestionSeq by mutableStateOf(1)
 
     var detailQuestion by mutableStateOf(DomainQuestionDTO())
@@ -78,11 +81,16 @@ class QuestionViewModel @Inject constructor(
 
     var answerCompleteState by mutableStateOf(State.DEFAULT)
 
-    var updateCompleteState by mutableStateOf(State.DEFAULT)
+    var updateExpCompleteState by mutableStateOf(State.DEFAULT)
+
+    var getTodayQuestionState by mutableStateOf(State.DEFAULT)
+
+    var getTodayQuestionAnswerState by mutableStateOf(State.DEFAULT)
 
     lateinit var today: LocalDate
     lateinit var date: String
 
+    // today, date 초기 설정 (lateinit var 때문)
     fun initDate(){
         today = LocalDate.now()
         date = today.year.toString() + "."
@@ -97,6 +105,7 @@ class QuestionViewModel @Inject constructor(
         date += today.dayOfMonth
     }
 
+    // Pet 받아오면 levelUp 가능한지 확인
     fun getFamiliyPet() = viewModelScope.launch(Dispatchers.IO) {
         getFamilyPetUseCase.execute(Prefs.familyCode).collect{
             when(it){
@@ -112,12 +121,43 @@ class QuestionViewModel @Inject constructor(
         }
     }
 
+    // 레벨업 할 수 있는지 확인
+    fun isLevelUp() : Boolean {
+        if(pet.exp >= pet.next_level_exp){
+            levelUp()
+            return true
+        }
+        return false
+    }
+
+    // 레벨업 시키기 (pet_info에서 다음 레벨 가져온 뒤 Family pet에 넣어줌)
+    fun levelUp() {
+        viewModelScope.launch(Dispatchers.IO) {
+            levelUpUseCase.execute(Prefs.familyCode, pet.pet_level + 1).collect {
+                when(it) {
+                    is ResultType.Loading -> {}
+                    is ResultType.Success -> {
+
+                    }
+                    is ResultType.Error -> {
+
+                    }
+                    else -> {
+
+                    }
+                }
+            }
+        }
+    }
+
+    // 오늘의 질문 가져오고 complete 됐는지 재확인
     fun getTodayQuestion() = viewModelScope.launch(Dispatchers.IO) {
         getTodayQuestionUseCase.execute(Prefs.familyCode).collect{
             when(it){
                 is ResultType.Uninitialized -> {}
                 is ResultType.Success -> {
                     todayQuestion = it.data[0]
+                    getTodayQuestionState = State.SUCCESS
                     checkTodayQuestion()
                 }
                 is ResultType.Error -> {
@@ -127,6 +167,7 @@ class QuestionViewModel @Inject constructor(
         }
     }
 
+    // questioinDetailScreen에서 확인할 질문의 seq (detailQeustionSeq)정보를 detailQuestion에 넣어줌
     fun getDetailQuestion() {
         if(todayQuestion.question_seq == detailQuestionSeq){
             detailQuestion = todayQuestion
@@ -147,13 +188,42 @@ class QuestionViewModel @Inject constructor(
         }
     }
 
+    // TodayQuestion의 답변 가져오기
+    fun getTodayQuestionAnswers() = viewModelScope.launch(Dispatchers.IO) {
+        getQuestionAnswersUseCase.execute(Prefs.familyCode, todayQuestion.question_seq).collect{
+            when(it) {
+                is ResultType.Uninitialized -> {}
+                is ResultType.Success -> {
+                    val questionAnswers = it.data!!
+                    var familyAnswerListTmp = mutableStateListOf<DomainQuestionAnswerDTO>()
+
+                    for(answer in questionAnswers){
+                        if(answer.email == Prefs.email){
+                            todayQuestionMyAnswer = answer
+                        }else{
+                            familyAnswerListTmp.add(answer)
+                        }
+                    }
+
+                    familyAnswers = familyAnswerListTmp
+
+                    getTodayQuestionAnswerState = State.SUCCESS
+                }
+                is ResultType.Error -> {
+
+                }
+            }
+        }
+    }
+
+    // detailQuestionSeq에 해당하는 질문의 답변들을 가져옴
     fun getQuestionAnswers() = viewModelScope.launch(Dispatchers.IO) {
         getQuestionAnswersUseCase.execute(Prefs.familyCode, detailQuestionSeq).collect{
             when(it) {
                 is ResultType.Uninitialized -> {}
                 is ResultType.Success -> {
                     val questionAnswers = it.data!!
-                    var familyAnswerListTmp = mutableListOf<DomainQuestionAnswerDTO>()
+                    var familyAnswerListTmp = mutableStateListOf<DomainQuestionAnswerDTO>()
 
                     for(answer in questionAnswers){
                         if(answer.email == Prefs.email){
@@ -164,8 +234,9 @@ class QuestionViewModel @Inject constructor(
                             familyAnswerListTmp.add(answer)
                         }
                     }
-                    familyAnswers.clear()
-                    familyAnswers.addAll(familyAnswerListTmp)
+
+                    familyAnswers = familyAnswerListTmp
+
                     familyAnswersGetState = State.SUCCESS
                 }
                 is ResultType.Error -> {
@@ -175,6 +246,7 @@ class QuestionViewModel @Inject constructor(
         }
     }
 
+    // questionScreen에 지난 질문 3개 가져오기
     fun getLast3Questions() = viewModelScope.launch(Dispatchers.IO) {
         getLast3QuestionsUseCase.execute(Prefs.familyCode).collect{
             when(it) {
@@ -189,6 +261,7 @@ class QuestionViewModel @Inject constructor(
         }
     }
 
+    // 지난 질문 리스트 가져오기
     fun getLastAllQuestions() = viewModelScope.launch(Dispatchers.IO) {
         getLastAllQuestionsUseCase.execute(Prefs.familyCode).collect{
             when(it) {
@@ -203,9 +276,9 @@ class QuestionViewModel @Inject constructor(
         }
     }
 
-    // todayQuestion 완료 재확인
+    // todayQuestion 완료 확인
     fun checkTodayQuestion(){
-        if(checkCompleteAnswer() && isCompletedAnswer1DayLater()){
+        if(isCompletedAnswer1DayLater()){
             updateTodayQuestion(todayQuestion.question_seq + 1)
         }
     }
@@ -223,6 +296,7 @@ class QuestionViewModel @Inject constructor(
         return false
     }
 
+    // TodayQuestion으로 업데이트
     fun updateTodayQuestion(newQuestionSeq: Int) = viewModelScope.launch(Dispatchers.IO) {
         updateTodayQuestionUseCase.execute(Prefs.familyCode, newQuestionSeq).collect{
             when(it) {
@@ -237,6 +311,7 @@ class QuestionViewModel @Inject constructor(
         }
     }
 
+    // PetDetail에서 familyUsers 가져오는 코드 (state 관리때문에 따로 뺌)
     fun getFamilyUsersInPetDetail() = viewModelScope.launch(Dispatchers.IO) {
         getFamilyUsersUseCase.execute(Prefs.familyCode).collect{
             when(it) {
@@ -262,6 +337,7 @@ class QuestionViewModel @Inject constructor(
         }
     }
 
+    // 가족 유저들 가져와서 familyUsers(map형태)에 정보들 담아줌
     fun getFamilyUsers() = viewModelScope.launch(Dispatchers.IO) {
         getFamilyUsersUseCase.execute(Prefs.familyCode).collect{
             when(it) {
@@ -288,6 +364,7 @@ class QuestionViewModel @Inject constructor(
         }
     }
 
+    // 수정 시 답변 로직
     fun modifyAnswer(){
         today = LocalDate.now()
         date = today.year.toString() + "."
@@ -301,18 +378,14 @@ class QuestionViewModel @Inject constructor(
         }
         date += today.dayOfMonth
 
-        answerDetailQuestion(today, date)
-        isLevelUp()
-
-        if(myAnswerAddedState){
-            editContribution()
-        }else{
-            editContribution(FIRST_ANSWER_POINT)
-        }
-        updateExp()
+        answerDetailQuestion(today, date)   //답변
+        isLevelUp()     //레벨업 가능한지 확인
+        editContribution()  // 유저 기여도 업데이트
+        updateExp() // 펫 경험치 업데이트
 
     }
 
+    // 수정말고 첫 답변 시 로직
     fun answer() {
         today = LocalDate.now()
         date = today.year.toString() + "."
@@ -326,49 +399,94 @@ class QuestionViewModel @Inject constructor(
         }
         date += today.dayOfMonth
 
-        answerDetailQuestion(today, date)
-        isLevelUp()
-
-        if(myAnswerAddedState){
-            editContribution()
-        }else{
-            editContribution(FIRST_ANSWER_POINT)
-        }
-        updateExp(FIRST_ANSWER_POINT)
+        answerDetailQuestion(today, date)   //답변
+        isLevelUp()     //레벨업 가능한지 확인
+        editContribution(FIRST_ANSWER_POINT)  // 유저 기여도 업데이트 (첫 답변 시 포인트 추가)
+        updateExp(FIRST_ANSWER_POINT) // 펫 경험치 업데이트 (첫 답변 시 포인트 추가)
 
 
-        if(checkCompleteAnswer()){
-            completeTodayAnswer(today, date)
+        if(checkCompleteAnswer()){  // 첫 답변 시 answer complete 되었는지 확인
+            completeTodayAnswer(today, date)    // answer complete로 바꾸기
         }
     }
 
-    fun isLevelUp() : Boolean {
-        if(pet.exp >= pet.next_level_exp){
-            levelUp()
-            return true
+    // answer complete 되었는지 false, true 확인
+    fun checkCompleteAnswer() : Boolean {
+        if(familyUsers.size == 1){
+            return false
         }
-        return false
+
+        if(familyAnswers.size + (if(todayQuestionMyAnswer.content == "") 1 else 0) != familyUsers.size){
+            return false
+        }
+
+        return true
     }
 
-    fun levelUp() {
-        viewModelScope.launch(Dispatchers.IO) {
-            levelUpUseCase.execute(Prefs.familyCode, pet.pet_level + 1).collect {
-                when(it) {
-                    is ResultType.Loading -> {}
-                    is ResultType.Success -> {
+    // todayAnswer의 completedate 삽입
+    fun completeTodayAnswer(today: LocalDate, date: String) = viewModelScope.launch(Dispatchers.IO) {
+        val questionMap = mapOf<String, Any>(
+            "question_seq" to detailQuestionSeq,
+            "question_content" to detailQuestion.question_content,
+            "completed_date" to date,
+            "completed_year" to today.year,
+            "completed_month" to today.monthValue,
+            "completed_day" to today.dayOfMonth
+        )
+        completeTodayQuestionUseCase.execute(Prefs.familyCode, detailQuestionSeq, questionMap).collect{
+            when(it) {
+                is ResultType.Loading -> {}
+                is ResultType.Success -> {
 
-                    }
-                    is ResultType.Error -> {
+                }
+                is ResultType.Error -> {
 
-                    }
-                    else -> {
+                }
+                else -> {
 
-                    }
                 }
             }
         }
     }
 
+    // 펫의 경험치 업데이트
+    fun updateExp(firstAnswerPoint : Int = 0) = viewModelScope.launch(Dispatchers.IO) {
+        updatePetExpUseCase.execute(Prefs.familyCode,myAnswer.value.length - myAnswerPoint + firstAnswerPoint).collect{
+            when(it) {
+                is ResultType.Loading -> {}
+                is ResultType.Success -> {
+                    updateExpCompleteState = State.SUCCESS
+                }
+                is ResultType.Error -> {
+                    updateExpCompleteState = State.ERROR
+                }
+                else -> {
+
+                }
+            }
+        }
+    }
+
+    // 유저의 기여도 업데이트
+    fun editContribution(firstAnswerPoint : Int = 0) = viewModelScope.launch(Dispatchers.IO) {
+        editUserContribution.execute(Prefs.familyCode, Prefs.email, 1L * myAnswer.value.length - myAnswerPoint + firstAnswerPoint).collect{
+            when(it) {
+                is ResultType.Loading -> {}
+                is ResultType.Success -> {
+
+                }
+                is ResultType.Error -> {
+
+                }
+                else -> {
+
+                }
+            }
+        }
+    }
+
+
+    // 질문 답변하기 (수정도 가능)
     fun answerDetailQuestion(today: LocalDate, date: String) = viewModelScope.launch(Dispatchers.IO) {
         answerQuestionUsecase.execute(Prefs.familyCode, detailQuestionSeq,
             DomainQuestionAnswerDTO(Prefs.email, myAnswer.value, date, today.year, today.monthValue, today.dayOfMonth)
@@ -421,76 +539,6 @@ class QuestionViewModel @Inject constructor(
         }
     }
 
-    fun checkCompleteAnswer() : Boolean {
-        if(familyUsers.size == 1){
-            return false
-        }
-
-        if(familyAnswers.size + 1 != familyUsers.size){
-            return false
-        }
-
-        return true
-    }
-
-    fun completeTodayAnswer(today: LocalDate, date: String) = viewModelScope.launch(Dispatchers.IO) {
-        val questionMap = mapOf<String, Any>(
-            "question_seq" to detailQuestionSeq,
-            "question_content" to detailQuestion.question_content,
-            "completed_date" to date,
-            "completed_year" to today.year,
-            "completed_month" to today.monthValue,
-            "completed_day" to today.dayOfMonth
-        )
-        completeTodayQuestionUseCase.execute(Prefs.familyCode, detailQuestionSeq, questionMap).collect{
-            when(it) {
-                is ResultType.Loading -> {}
-                is ResultType.Success -> {
-
-                }
-                is ResultType.Error -> {
-
-                }
-                else -> {
-
-                }
-            }
-        }
-    }
-
-    fun updateExp(firstAnswerPoint : Int = 0) = viewModelScope.launch(Dispatchers.IO) {
-        updatePetExpUseCase.execute(Prefs.familyCode,myAnswer.value.length - myAnswerPoint + firstAnswerPoint).collect{
-            when(it) {
-                is ResultType.Loading -> {}
-                is ResultType.Success -> {
-                    updateCompleteState = State.SUCCESS
-                }
-                is ResultType.Error -> {
-                    updateCompleteState = State.ERROR
-                }
-                else -> {
-
-                }
-            }
-        }
-    }
-
-    fun editContribution(firstAnswerPoint : Int = 0) = viewModelScope.launch(Dispatchers.IO) {
-        editUserContribution.execute(Prefs.familyCode, Prefs.email, 1L * myAnswer.value.length - myAnswerPoint + firstAnswerPoint).collect{
-            when(it) {
-                is ResultType.Loading -> {}
-                is ResultType.Success -> {
-
-                }
-                is ResultType.Error -> {
-
-                }
-                else -> {
-
-                }
-            }
-        }
-    }
 
 
 }
