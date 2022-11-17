@@ -36,6 +36,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavController
 import coil.compose.AsyncImagePainter.State.Empty.painter
 import coil.compose.rememberAsyncImagePainter
+import com.google.common.base.Strings.isNullOrEmpty
 import com.ssafy.domain.model.chat.DomainChatDTO
 import com.ssafy.ourhome.R
 import com.ssafy.ourhome.components.MainAppBar
@@ -157,20 +158,19 @@ private fun ChattingMsgList(vm: ChatViewModel, listState: LazyListState, onClick
             }
 
             items(chats){
-                var name = if(vm.familyUsers.value[it.email] == null || vm.familyUsers.value[it.email]!!.name.isNullOrEmpty()){
-                    "가족 정보 없음"
-                }else{
-                    vm.familyUsers.value[it.email]!!.name
+
+                var painter = painterResource(R.drawable.img_default_user)
+                var name = "가족 정보 없음"
+
+                if (vm.familyUsers.contains(it.email)) {
+                    painter =
+                        if (vm.familyUsers[it.email]!!.image == "default") painterResource(R.drawable.img_default_user)
+                        else rememberAsyncImagePainter(vm.familyUsers[it.email]!!.image)
+                    name = vm.familyUsers[it.email]!!.name
                 }
 
-                var image = if(vm.familyUsers.value[it.email] == null || vm.familyUsers.value[it.email]!!.name.isNullOrEmpty()){
-                    "no"
-                }else{
-                    vm.familyUsers.value[it.email]!!.image
-                }
 
-
-                var chat = ChatDTO(it.email, name, image, it.content, it.date, it.year, it.month, it.day, it.hour, it.minute)
+                var chat = ChatDTO(it.email, name, painter, it.content, it.date, it.year, it.month, it.day, it.hour, it.minute)
 
                 if(it.email == Prefs.email){
                     MyChatItem(chat)
@@ -257,35 +257,45 @@ fun FamilyChatItem(chat: ChatDTO, onClick : (String) -> Unit) {
                     .clip(CircleShape)
                     .clickable { onClick(chat.email) },
                 contentScale = ContentScale.Crop,
-                painter = rememberAsyncImagePainter(if(chat.img == "no") R.drawable.img_default_user else chat.img),
+                painter = chat.img!!,
                 contentDescription = "Profile Image"
             )
-            Text(
-                modifier = Modifier.padding(top = 8.dp),
-                text = chat.name,
-                style = MaterialTheme.typography.body2
-            )
         }
-        /** 채팅 메세지 **/
+
         Column(
             modifier = Modifier
                 .constrainAs(msg) {
                     top.linkTo(profile.top)
                     start.linkTo(profile.end, margin = 8.dp)
                 }
-                .clip(RoundedCornerShape(12.dp))
-                .background(Color.White)
-                .widthIn(16.dp, 188.dp)
-                .wrapContentHeight()
-                .padding(8.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
+        ){
+            /** 이름 **/
             Text(
-                text = chat.content,
-                style = MaterialTheme.typography.body1
+                modifier = Modifier.padding(bottom = 8.dp),
+                text = chat.name,
+                style = MaterialTheme.typography.body2
             )
+
+            /** 채팅 메세지 **/
+            Column(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(Color.White)
+                    .widthIn(16.dp, 188.dp)
+                    .wrapContentHeight()
+                    .padding(8.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+
+
+                Text(
+                    text = chat.content,
+                    style = MaterialTheme.typography.body1
+                )
+            }
         }
+
 
         val chatTime = makeChatTime(chat)
 
