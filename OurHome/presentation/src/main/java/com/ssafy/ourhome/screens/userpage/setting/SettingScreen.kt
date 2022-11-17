@@ -6,20 +6,19 @@ import android.content.Context
 import android.content.Context.CLIPBOARD_SERVICE
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.NavigateNext
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -42,6 +41,11 @@ import com.ssafy.ourhome.utils.permissions
 @Composable
 fun SettingScreen(navController: NavController, vm: UserPageViewModel) {
 
+    LaunchedEffect(key1 = true) {
+        // 가족원 전부 불러오기
+        vm.getFamilyUsers()
+    }
+
     val switchChecked = remember {
         mutableStateOf(vm.user.location_permit)
     }
@@ -63,14 +67,21 @@ fun SettingScreen(navController: NavController, vm: UserPageViewModel) {
             header = "가족을 나가시겠습니까?",
             confirmText = "나가기",
             onConfirmClick = {
-                // 가족장인 경우
-                if (isManager.value) {
-                    Toast.makeText(context, "가족장은 탈퇴할 수 없습니다.", Toast.LENGTH_SHORT).show()
-                    visibleTransferDialogState.value = false
-                } else {
+                visibleTransferDialogState.value = false
+                // 가족장이 아닌 경우
+                if(!isManager.value) {
                     vm.job.cancel()
                     vm.transferUserData(vm.user)
+                    return@OurHomeAlertDialog
                 }
+
+                if(vm.users.size == 1) {
+                    vm.job.cancel()
+                    vm.transferUserData(vm.user)
+                    return@OurHomeAlertDialog
+                }
+
+                Toast.makeText(context, "가족장은 탈퇴할 수 없습니다.", Toast.LENGTH_SHORT).show()
             },
             onDismissRequest = { visibleTransferDialogState.value = false }
         )

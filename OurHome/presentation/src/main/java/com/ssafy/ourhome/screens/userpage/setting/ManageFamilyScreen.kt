@@ -43,8 +43,8 @@ fun ManageFamilyScreen(
     vm: UserPageViewModel
 ) {
 
-    // 가족원 전부 불러오기
-    vm.getFamilyUsers()
+//    // 가족원 전부 불러오기
+//    vm.getFamilyUsers()
 
     val visibleDelegateDialogState = remember {
         mutableStateOf(false)
