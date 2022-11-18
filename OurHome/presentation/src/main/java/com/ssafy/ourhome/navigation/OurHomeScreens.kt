@@ -1,16 +1,26 @@
 package com.ssafy.ourhome.navigation
 
-import java.lang.IllegalStateException
-
 enum class OurHomeScreens {
 
-    NextScreen;
-
-    companion object {
-        fun fromRoute(route: String?): OurHomeScreens = when (route?.substringBefore("/")) {
-            NextScreen.name -> NextScreen
-
-            else -> throw IllegalStateException("Route $route is not recognized")
-        }
-    }
+    SplashScreen,
+    LoginScreen,
+    JoinEmailScreen,
+    JoinPasswordScreen,
+    JoinNickNameScreen,
+    QuestionListScreen,
+    PetDetailScreen,
+    QuestionDetailScreen,
+    SettingScreen,
+    ManageFamilyScreen,
+    ChatScreen,
+    EnterHomeScreen,
+    AddScheduleScreen,
+    AddMemberScreen,
+    ScheduleDetailScreen,
+    AlbumScreen,
+    AlbumDetailScreen,
+    UserPageScreen,
+    EditProfileScreen,
+    MapScreen
+    ;
 }
