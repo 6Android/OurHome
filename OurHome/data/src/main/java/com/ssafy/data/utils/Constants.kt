@@ -16,6 +16,7 @@ const val QUESTION_SEQ = "question_seq"
 const val QUESTION_ANSWER = "answers"
 const val COMPLETED_YEAR = "completed_year"
 const val COMPLETED = "completed"
+const val COMPLETED_DATE = "completed_date"
 
 const val PET = "pet"
 const val PET_INFO = "pet_info"

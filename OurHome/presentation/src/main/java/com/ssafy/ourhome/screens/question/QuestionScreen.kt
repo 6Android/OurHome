@@ -132,7 +132,6 @@ fun initQuestionScreen(vm: QuestionViewModel) {
 fun initQuestionScreenViewModelCallback(vm: QuestionViewModel){
     when(vm.familyAnswersGetState){
         State.SUCCESS ->{
-            vm.checkCompleteAnswerInScreen()
             vm.familyAnswersGetState = State.DEFAULT
         }
     }

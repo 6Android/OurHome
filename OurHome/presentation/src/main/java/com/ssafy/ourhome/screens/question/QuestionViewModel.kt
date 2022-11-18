@@ -158,7 +158,6 @@ class QuestionViewModel @Inject constructor(
                 is ResultType.Success -> {
                     todayQuestion = it.data[0]
                     getTodayQuestionState = State.SUCCESS
-                    checkTodayQuestion()
                 }
                 is ResultType.Error -> {
 
@@ -248,7 +247,7 @@ class QuestionViewModel @Inject constructor(
 
     // questionScreen에 지난 질문 3개 가져오기
     fun getLast3Questions() = viewModelScope.launch(Dispatchers.IO) {
-        getLast3QuestionsUseCase.execute(Prefs.familyCode).collect{
+        getLast3QuestionsUseCase.execute(Prefs.familyCode, date).collect{
             when(it) {
                 is ResultType.Uninitialized -> {}
                 is ResultType.Success -> {
@@ -263,7 +262,7 @@ class QuestionViewModel @Inject constructor(
 
     // 지난 질문 리스트 가져오기
     fun getLastAllQuestions() = viewModelScope.launch(Dispatchers.IO) {
-        getLastAllQuestionsUseCase.execute(Prefs.familyCode).collect{
+        getLastAllQuestionsUseCase.execute(Prefs.familyCode, date).collect{
             when(it) {
                 is ResultType.Uninitialized -> {}
                 is ResultType.Success -> {
@@ -530,6 +529,10 @@ class QuestionViewModel @Inject constructor(
         val questionMap = mapOf<String, Any>(
             "question_seq" to todayQuestion.question_seq,
             "question_content" to todayQuestion.question_content,
+            "completed_date" to date,
+            "completed_year" to today.year,
+            "completed_month" to today.monthValue,
+            "completed_day" to today.dayOfMonth
         )
         checkCompleteTodayQuestionUseCase.execute(Prefs.familyCode, todayQuestion.question_seq, questionMap).collect{
             when(it) {

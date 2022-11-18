@@ -23,11 +23,11 @@ class QuestionDataSourceImpl @Inject constructor(
         firestore.collection(FAMILY).document(familyCode).collection(QUESTION).document(questionSeq.toString()).collection(
             QUESTION_ANSWER).get()
 
-    override fun getLast3Questions(familyCode: String): Query =
-        firestore.collection(FAMILY).document(familyCode).collection(QUESTION).whereGreaterThan(COMPLETED_YEAR, 1).orderBy(COMPLETED_YEAR).limitToLast(3)
+    override fun getLast3Questions(familyCode: String, today:String): Query =
+        firestore.collection(FAMILY).document(familyCode).collection(QUESTION).whereLessThan(COMPLETED_DATE, today).orderBy(COMPLETED_DATE).limitToLast(3)
 
-    override fun getLastAllQuestions(familyCode: String): Query=
-        firestore.collection(FAMILY).document(familyCode).collection(QUESTION).whereGreaterThan(COMPLETED_YEAR, 1)
+    override fun getLastAllQuestions(familyCode: String, today: String): Query=
+        firestore.collection(FAMILY).document(familyCode).collection(QUESTION).whereLessThan(COMPLETED_DATE, today)
 
     override fun updateTodayQuestion(familyCode: String, newQuestionSeq: Int): Task<Unit> =
         firestore.runTransaction{ transaction ->
