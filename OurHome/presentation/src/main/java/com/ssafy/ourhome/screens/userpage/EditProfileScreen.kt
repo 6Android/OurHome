@@ -64,12 +64,8 @@ fun EditProfileScreen(
         contract = ActivityResultContracts.GetContent(),
         onResult = { uri ->
             if (uri != null) {
-                Log.d("test5", "EditProfileScreen: $uri")
                 var file = Uri.fromFile(optimizeBitmap(context, uri)?.let { File(it) })
-                Log.d("test5", "EditProfileScreen: ${file}")
-
                 vm.imageUri.value = file.toString()
-//                vm.imageUri.value = uri.toString()
             }
         }
     )
@@ -96,7 +92,6 @@ fun EditProfileScreen(
         ComposeCalendar(
             onDone = { it: LocalDate ->
                 // Hide dialog
-                Log.d("test5", "EditProfileScreen: $it")
                 vm.birthDayState.value = it
                 showDialog.value = false
                 // Do something with the date
@@ -414,11 +409,3 @@ private fun NoLabelTextInput(
         }
     )
 }
-
-//@Preview(showBackground = true)
-//@Composable
-//private fun EditProfilePreview() {
-//    OurHomeTheme {
-//        EditProfileScreen()
-//    }
-//}

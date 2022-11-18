@@ -47,7 +47,6 @@ fun QuestionDetailScreen(navController: NavController, vm: QuestionViewModel) {
     }
     initQuestionDetailViewModelCallback(vm, context, navController)
 
-    // TODO NestedScrollView 필요
     Scaffold(topBar = {
         MainAppBar(title = "질문 상세",
             onBackClick = { navController.popBackStack() }

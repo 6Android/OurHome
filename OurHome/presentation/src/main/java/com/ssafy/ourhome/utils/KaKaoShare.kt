@@ -36,14 +36,10 @@ fun shareFamilyCode(context: Context, familyCode: String) {
         // 카카오톡으로 카카오톡 공유 가능
         ShareClient.instance.shareDefault(context, ourHomeShare) { sharingResult, error ->
             if (error != null) {
-                Log.e("TAG", "카카오톡 공유 실패", error)
             } else if (sharingResult != null) {
-                Log.d("TAG", "카카오톡 공유 성공 ${sharingResult.intent}")
                 context.startActivity(sharingResult.intent)
 
                 // 카카오톡 공유에 성공했지만 아래 경고 메시지가 존재할 경우 일부 컨텐츠가 정상 동작하지 않을 수 있습니다.
-                Log.w("TAG", "Warning Msg: ${sharingResult.warningMsg}")
-                Log.w("TAG", "Argument Msg: ${sharingResult.argumentMsg}")
             }
         }
     } else {

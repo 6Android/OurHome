@@ -76,7 +76,6 @@ fun TodayScheduleListItem(
     ) {
         Column(
             modifier = modifier.clickable {
-                // todo: 일정 상세로 이동
                 onScheduleClick(schedule)
             }
         ) {

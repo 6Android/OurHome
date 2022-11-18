@@ -70,7 +70,6 @@ fun JoinPasswordScreen(
                     enabled = true,
                     imeAction = ImeAction.Next,
                     onAction = KeyboardActions(onNext = {
-                        // todo: 다음 버튼
                         if (vm.joinPasswordState.value.length >= 6 &&joinPasswordSameState.value) {
                             navigateToNickNameScreen(navController)
                         }

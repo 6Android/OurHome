@@ -1,7 +1,5 @@
 package com.ssafy.ourhome.screens.home.map
 
-import android.graphics.BitmapFactory
-import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -28,7 +26,10 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.model.*
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
 import com.google.maps.android.compose.*
 import com.holix.android.bottomsheetdialog.compose.BottomSheetDialog
 import com.holix.android.bottomsheetdialog.compose.BottomSheetDialogProperties
@@ -43,7 +44,6 @@ fun MapScreen(
 ) {
 
     vm.getFamilyUsers()
-    Log.d("test6", "MapScreen: ${vm.users}")
 
     val width = remember {
         mutableStateOf(0)
@@ -214,7 +214,10 @@ private fun UserListView(list: List<DomainUserDTO>, onItemClick: (LatLng) -> (Un
                     modifier = Modifier
                         .weight(5f)
                         .padding(horizontal = 32.dp),
-                    style = MaterialTheme.typography.h6.copy(fontWeight = FontWeight.Bold, color = if(user.location_permit) Color.Black else Color.LightGray)
+                    style = MaterialTheme.typography.h6.copy(
+                        fontWeight = FontWeight.Bold,
+                        color = if (user.location_permit) Color.Black else Color.LightGray
+                    )
                 )
                 Column(
                     modifier = Modifier.weight(3f),
@@ -315,12 +318,3 @@ private fun MapBackButton(navController: NavController) {
         )
     }
 }
-
-
-//@Preview(showBackground = true)
-//@Composable
-//private fun MapPreview() {
-//    OurHomeTheme {
-//        MapScreen()
-//    }
-//}

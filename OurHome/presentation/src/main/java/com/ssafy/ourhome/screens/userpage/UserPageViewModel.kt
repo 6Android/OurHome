@@ -27,7 +27,6 @@ class UserPageViewModel @Inject constructor(
     private val getFamilyUsersUseCase: GetFamilyUsersUseCase,
     private val editManagerUseCase: EditManagerUseCase,
     private val transferUserDataUseCase: TransferUserDataUseCase,
-    private val insertUserUseCase: InsertUserUseCase,
     private val getMyProfileUseCase: GetMyProfileUseCase,
     private val getOtherProfileUseCase: GetOtherProfileUseCase,
     private val editUserProfileUseCase: EditUserProfileUseCase
@@ -190,14 +189,6 @@ class UserPageViewModel @Inject constructor(
             }
         }
     }
-
-    // TESTCODE
-    fun insertUser(user: DomainUserDTO) {
-        viewModelScope.launch(Dispatchers.IO) {
-            insertUserUseCase.execute(user)
-        }
-    }
-
 
     // 에디트 텍스트 세팅
     fun setData() {

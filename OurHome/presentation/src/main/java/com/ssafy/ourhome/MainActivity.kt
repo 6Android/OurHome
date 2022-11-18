@@ -2,7 +2,6 @@ package com.ssafy.ourhome
 
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -72,30 +71,17 @@ class MainActivity : ComponentActivity() {
                 ExistingPeriodicWorkPolicy.KEEP,
                 locationWorkRequest
             )
-
-            val workState = workManager.getWorkInfosForUniqueWork(LOCATION).get()
-            for (i in workState) {
-                Log.d("test5", "WorkState: $i")
-            }
         }
 
         // 위치 정보 갱신 워크매니저 종료
         fun stopWorkManager() {
             workManager.cancelUniqueWork(LOCATION)
-
-            val workState = workManager.getWorkInfosForUniqueWork(LOCATION).get()
-            for (i in workState) {
-                Log.d("test5", "WorkState: $i")
-            }
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         workManager = WorkManager.getInstance(applicationContext)
-
-//        stopWorkManager()
-//        startWorkManager()
 
         setContent {
             OurHomeTheme {

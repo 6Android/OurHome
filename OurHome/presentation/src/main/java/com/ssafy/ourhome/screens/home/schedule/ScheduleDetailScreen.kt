@@ -59,7 +59,6 @@ fun ScheduleDetailScreen(navController: NavHostController, vm: HomeViewModel) {
             icon = rememberVectorPainter(Icons.Default.Delete),
             onBackClick = { navController.popBackStack() },
             onIconClick = {
-                // todo: 일정 삭제 버튼 클릭시
                 vm.deleteScheduleDetail()
             })
     }) {

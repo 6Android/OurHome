@@ -2,7 +2,6 @@ package com.ssafy.ourhome.screens.album
 
 import android.content.Context
 import android.net.Uri
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -39,8 +38,6 @@ import com.ssafy.ourhome.utils.CHATTING_ICON_BLACK
 import com.ssafy.ourhome.utils.State
 import com.ssafy.ourhome.utils.optimizeBitmap
 import java.io.File
-import java.net.URLEncoder
-import java.nio.charset.StandardCharsets
 
 @Composable
 fun AlbumScreen(navController: NavController, vm: AlbumViewModel) {
@@ -50,7 +47,7 @@ fun AlbumScreen(navController: NavController, vm: AlbumViewModel) {
 
     val context = LocalContext.current
 
-    LaunchedEffect(key1 = true){
+    LaunchedEffect(key1 = true) {
         initAlbumScreen(vm)
     }
     initAlbumViewModelCallback(vm, context)
@@ -59,12 +56,9 @@ fun AlbumScreen(navController: NavController, vm: AlbumViewModel) {
         contract = ActivityResultContracts.GetContent(),
         onResult = { uri ->
             if (uri != null) {
-                Log.d("test5", "EditProfileScreen: $uri")
                 var file = Uri.fromFile(optimizeBitmap(context, uri)?.let { File(it) })
-                Log.d("test5", "EditProfileScreen: ${file}")
 
                 vm.uploadAlbum(file)
-//                vm.imageUri.value = uri.toString()
             }
         }
     )
@@ -85,7 +79,7 @@ fun AlbumScreen(navController: NavController, vm: AlbumViewModel) {
         }
     }
 
-    Scaffold(topBar = { // TODO 세팅 아이콘 -> 채팅 아이콘
+    Scaffold(topBar = {
         MainAppBar(
             title = "앨범",
             backIconEnable = false,
@@ -146,20 +140,13 @@ fun initAlbumViewModelCallback(vm: AlbumViewModel, context: Context) {
 fun AlbumLazyVerticalGrid(
     vm: AlbumViewModel,
     navController: NavController
-) { // 사진은 id값, 날짜, 이미지 링크 필요
-
-//    LazyVerticalGrid(columns = GridCells.Fixed(3)){
-//        items(span = ) {
-//
-//        }
-//    }
-
+) {
     LazyVerticalGrid(
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 8.dp), columns = GridCells.Fixed(3)
     ) {
-        vm.albumImages.forEach { mapping_date, images ->
+        vm.albumImages.forEach { (mapping_date, images) ->
             placeGridLine {
                 AlbumDate(mapping_date)
             }
@@ -180,7 +167,7 @@ fun AlbumLazyVerticalGrid(
 }
 
 /** 앨범 디테일 이동 **/
-fun navigateAlbumDetail(navController: NavController) {//https://i.pinimg.com/222x/36/30/f7/3630f7d930f91e495d93c02833b4abfc.jpg
+fun navigateAlbumDetail(navController: NavController) {
     navController.navigate(
         OurHomeScreens.AlbumDetailScreen.name
     )
@@ -226,9 +213,4 @@ fun LazyGridScope.placeGridLine(
     content: @Composable LazyGridItemScope.() -> Unit
 ) {
     item(span = { GridItemSpan(this.maxLineSpan) }, content = content)
-}
-
-
-fun encodeUrlForNavigate(url: String): String {
-    return URLEncoder.encode(url, StandardCharsets.UTF_8.toString())
 }

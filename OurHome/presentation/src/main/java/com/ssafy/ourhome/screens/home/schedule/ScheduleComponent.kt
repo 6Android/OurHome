@@ -106,7 +106,6 @@ fun PersonList(personList: List<DomainUserDTO>, isEditable: Boolean = true, onAd
                             .border(width = 1.dp, color = Color.Gray, shape = CircleShape)
                             .clip(CircleShape)
                             .clickable {
-                                // todo: 가족 구성원 추가 화면으로 이동
                                 onAddClick()
                             }
                             .padding(12.dp),
@@ -148,7 +147,6 @@ fun PersonListItem(item: DomainUserDTO, isEditable: Boolean = true, onDeleteClic
                         .clip(CircleShape)
                         .border(width = 1.dp, color = Color.Black, shape = CircleShape)
                         .clickable {
-                            // todo: 구성원 삭제
                             onDeleteClick(item.email)
                         }
                         .background(Color.White)

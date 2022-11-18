@@ -1,6 +1,5 @@
 package com.ssafy.ourhome.screens.question
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -18,11 +17,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -49,8 +45,6 @@ fun QuestionScreen(navController: NavController, vm: QuestionViewModel) {
     }
 
     initQuestionScreenViewModelCallback(vm)
-
-    Log.d("TAG", "QuestionScreen() recomposition")
 
     Scaffold(topBar = {
         MainAppBar(
@@ -129,22 +123,22 @@ fun initQuestionScreen(vm: QuestionViewModel) {
     vm.getLast3Questions()
 }
 
-fun initQuestionScreenViewModelCallback(vm: QuestionViewModel){
-    when(vm.familyAnswersGetState){
-        State.SUCCESS ->{
+fun initQuestionScreenViewModelCallback(vm: QuestionViewModel) {
+    when (vm.familyAnswersGetState) {
+        State.SUCCESS -> {
             vm.familyAnswersGetState = State.DEFAULT
         }
     }
 
-    when(vm.getTodayQuestionState){
-        State.SUCCESS ->{
+    when (vm.getTodayQuestionState) {
+        State.SUCCESS -> {
             vm.getTodayQuestionAnswers()
             vm.getTodayQuestionState = State.DEFAULT
         }
     }
 
-    when(vm.getTodayQuestionAnswerState){
-        State.SUCCESS ->{
+    when (vm.getTodayQuestionAnswerState) {
+        State.SUCCESS -> {
             vm.checkCompleteAnswerInScreen()
             vm.getTodayQuestionAnswerState = State.DEFAULT
         }
@@ -179,12 +173,20 @@ fun CenterHorizontalColumn(content: @Composable() (ColumnScope.() -> Unit)) {
 /** 오늘의 질문 내용 **/
 @Composable
 fun TodayQuestion(questionNumber: String, questionContent: String) {
-    Row(modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.Center){
-        Text(text = "Q" + questionNumber + ". ", style = MaterialTheme.typography.h2.copy(fontWeight = FontWeight.ExtraBold),
-        color = MainColor)
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = "Q" + questionNumber + ". ",
+            style = MaterialTheme.typography.h2.copy(fontWeight = FontWeight.ExtraBold),
+            color = MainColor
+        )
 
-        Text(text = questionContent, style = MaterialTheme.typography.h3.copy(fontWeight = FontWeight.ExtraBold))
+        Text(
+            text = questionContent,
+            style = MaterialTheme.typography.h3.copy(fontWeight = FontWeight.ExtraBold)
+        )
     }
 }
 

@@ -1,7 +1,6 @@
 package com.ssafy.ourhome.screens.login
 
 import android.content.Intent
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -57,13 +56,6 @@ fun LoginScreen(
     navController: NavController = NavController(LocalContext.current),
     vm: LoginViewModel = hiltViewModel()
 ) {
-    // 자동 로그인
-//    LaunchedEffect("") {
-//        FirebaseAuth.getInstance().currentUser?.let {
-//            vm.checkSocialEmail(it.email!!)
-//        }
-//    }
-
     val context = LocalContext.current
     val token = stringResource(R.string.default_web_client_id)
     val launcher = rememberFirebaseAuthLauncher(
@@ -71,7 +63,6 @@ fun LoginScreen(
             vm.checkSocialEmail(result.user?.email!!)
         },
         onAuthError = {
-            Log.d("loginscreen_google", "$it")
         }
     )
 
@@ -157,7 +148,6 @@ fun LoginScreen(
                     painterResource =
                     painterResource(id = R.drawable.ic_google)
                 ) {
-                    // todo: 구글 로그인
                     val gso =
                         GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                             .requestIdToken(token)
@@ -170,13 +160,13 @@ fun LoginScreen(
                     painterResource =
                     painterResource(id = R.drawable.ic_facebook)
                 ) {
-                    // todo: 페이스북 로그인
+                    Toast.makeText(context, "현재 버전에서 지원하지 않는 기능입니다.", Toast.LENGTH_SHORT).show()
                 }
                 SocialLoginButton(
                     painterResource =
                     painterResource(id = R.drawable.ic_twiter)
                 ) {
-                    // todo: 트위터 로그인
+                    Toast.makeText(context, "현재 버전에서 지원하지 않는 기능입니다.", Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -211,7 +201,6 @@ private fun Join(onClick: () -> Unit) {
     Text(
         modifier = Modifier
             .clickable {
-                // todo: 회원가입 클릭
                 onClick()
             }
             .padding(8.dp),
@@ -250,7 +239,6 @@ private fun Login(
             .fillMaxWidth(0.95f)
             .height(48.dp), label = "로그인"
     ) {
-        // todo: 로그인 클릭
         onClick()
 
     }

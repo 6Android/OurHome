@@ -72,7 +72,7 @@ fun EnterHomeScreen(navController: NavController, vm: LoginViewModel = hiltViewM
             modifier = Modifier
                 .padding(top = 24.dp, end = 24.dp)
                 .size(32.dp)
-                .clickable { //todo : 로그아웃
+                .clickable {
                     vm.logout()
                     val intent = Intent(context, MainActivity::class.java)
                     context.startActivity(intent)
@@ -96,7 +96,6 @@ fun EnterHomeScreen(navController: NavController, vm: LoginViewModel = hiltViewM
                 image = painterResource(id = R.drawable.img_house),
                 backgroundColor = Color.White
             ) {
-                // todo: 우리 집 생성
                 vm.insertFamily()
             }
 
@@ -109,7 +108,6 @@ fun EnterHomeScreen(navController: NavController, vm: LoginViewModel = hiltViewM
                 image = painterResource(id = R.drawable.img_truck),
                 backgroundColor = MainColor
             ) {
-                // todo: 우리 집 코드 입력 다이얼로그 생성
                 visibleState.value = true
             }
         }
@@ -119,7 +117,6 @@ fun EnterHomeScreen(navController: NavController, vm: LoginViewModel = hiltViewM
             EnterDialog(
                 vm.enterFamilyCodeState,
                 onDismissRequest = { visibleState.value = false }) {
-                // todo: 입주하기 버튼 클릭
                 vm.enterFamily()
             }
         }

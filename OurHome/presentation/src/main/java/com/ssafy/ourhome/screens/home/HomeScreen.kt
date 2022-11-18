@@ -162,7 +162,6 @@ fun HomeScreen(navController: NavController, vm: HomeViewModel) {
 
                 /** 홈 툴바 */
                 HomeToolBar {
-                    // todo: 채팅 아이콘 클릭
                     navigateChatScreen(navController)
                 }
 
@@ -226,7 +225,6 @@ fun HomeScreen(navController: NavController, vm: HomeViewModel) {
                             id = R.drawable.ic_invite
                         )
                     ) {
-                        // todo: 초대하기 클릭
                         visibleInviteDialogState.value = true
                     }
                 }
@@ -273,7 +271,6 @@ fun HomeScreen(navController: NavController, vm: HomeViewModel) {
                     InviteDialog(
                         familyCode = Prefs.familyCode,
                         onShareClick = {
-                            // todo: 카카오톡을 공유
                             shareFamilyCode(context, Prefs.familyCode)
                         },
                         onDismissRequest = { visibleInviteDialogState.value = false }

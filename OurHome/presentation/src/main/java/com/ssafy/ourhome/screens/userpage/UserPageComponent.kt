@@ -334,7 +334,6 @@ fun UserInfoCard(
             Spacer(modifier = Modifier.height(6.dp))
 
             Row(
-                // TODO : 전화걸기 기능 추가
                 modifier = Modifier.clickable {
 
                     val u = Uri.parse("tel:" + userDTO.phone)

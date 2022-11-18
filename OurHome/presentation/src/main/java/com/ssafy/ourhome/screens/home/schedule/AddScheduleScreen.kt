@@ -51,7 +51,6 @@ fun AddScheduleScreen(navController: NavController, vm: HomeViewModel) {
             icon = rememberVectorPainter(Icons.Default.Check),
             onBackClick = { navController.popBackStack() },
             onIconClick = {
-                // todo: 일정 추가 버튼 클릭시
                 if (vm.addScheduleTitleState.value.isBlank()) {
                     Toast.makeText(context, "일정 제목을 입력해주세요", Toast.LENGTH_SHORT).show()
                     return@MainAppBar

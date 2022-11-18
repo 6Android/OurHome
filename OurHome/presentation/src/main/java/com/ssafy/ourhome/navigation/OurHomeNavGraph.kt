@@ -10,7 +10,6 @@ import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
-import com.ssafy.ourhome.screens.NextScreen
 import com.ssafy.ourhome.screens.SplashScreen
 import com.ssafy.ourhome.screens.album.AlbumDetailScreen
 import com.ssafy.ourhome.screens.album.AlbumScreen
@@ -84,10 +83,6 @@ fun OurHomeNavGraph(navController: NavHostController) {
         }
         composable(BottomNavItem.MyPage.screenRoute) {
             MyPageScreen(navController = navController, vm = userPageViewModel)
-        }
-
-        composable(OurHomeScreens.NextScreen.name) {
-            NextScreen(navController = navController)
         }
 
         composable(OurHomeScreens.LoginScreen.name) {
