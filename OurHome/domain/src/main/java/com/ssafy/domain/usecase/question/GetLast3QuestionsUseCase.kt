@@ -8,5 +8,5 @@ import javax.inject.Singleton
 class GetLast3QuestionsUseCase @Inject constructor(
     private val questionRepository: QuestionRepository
 ){
-    fun execute(familyCode: String) = questionRepository.getLast3Questions(familyCode)
+    fun execute(familyCode: String, today: String) = questionRepository.getLast3Questions(familyCode, today)
 }

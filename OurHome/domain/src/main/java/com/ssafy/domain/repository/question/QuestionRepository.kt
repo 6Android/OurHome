@@ -18,9 +18,9 @@ interface QuestionRepository {
 
     fun getQuestionAnswers(familyCode: String, questionSeq: Int) : Flow<QuestionAnswerResponse>
 
-    fun getLast3Questions(familyCode: String) : Flow<QuestionResponse>
+    fun getLast3Questions(familyCode: String, today: String) : Flow<QuestionResponse>
 
-    fun getLastAllQuestions(familyCode: String) : Flow<QuestionResponse>
+    fun getLastAllQuestions(familyCode: String, today: String) : Flow<QuestionResponse>
 
     fun updateTodayQuestion(familyCode: String, newQuestionSeq: Int) : Flow<ResultType<Unit>>
 

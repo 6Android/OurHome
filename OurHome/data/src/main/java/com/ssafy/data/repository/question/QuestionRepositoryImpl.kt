@@ -48,9 +48,9 @@ class QuestionRepositoryImpl @Inject constructor(
         awaitClose {  }
     }
 
-    override fun getLast3Questions(familyCode: String): Flow<QuestionResponse> = callbackFlow {
+    override fun getLast3Questions(familyCode: String, today: String): Flow<QuestionResponse> = callbackFlow {
         val snapshotListener =
-            questionDataSource.getLast3Questions(familyCode).addSnapshotListener { snapshot, e ->
+            questionDataSource.getLast3Questions(familyCode, today).addSnapshotListener { snapshot, e ->
                 val response = if (snapshot != null) {
                     val questions = snapshot.toObjects(DomainQuestionDTO::class.java)
                     ResultType.Success(questions)
@@ -64,9 +64,9 @@ class QuestionRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getLastAllQuestions(familyCode: String): Flow<QuestionResponse> = callbackFlow {
+    override fun getLastAllQuestions(familyCode: String, today: String): Flow<QuestionResponse> = callbackFlow {
         val snapshotListener =
-            questionDataSource.getLastAllQuestions(familyCode).addSnapshotListener { snapshot, e ->
+            questionDataSource.getLastAllQuestions(familyCode, today).addSnapshotListener { snapshot, e ->
                 val response = if (snapshot != null) {
                     val questions = snapshot.toObjects(DomainQuestionDTO::class.java)
                     ResultType.Success(questions)

@@ -54,9 +54,9 @@ class AlbumViewModel @Inject constructor(
             when (it) {
                 is ResultType.Uninitialized -> {}
                 is ResultType.Success -> {
-
+                    if(it.data == Prefs.email) {
                         visibleDeleteIconState.value = true
-
+                    }
                 }
                 is ResultType.Error -> {
 

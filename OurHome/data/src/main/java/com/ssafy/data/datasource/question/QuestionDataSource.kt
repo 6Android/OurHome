@@ -12,9 +12,9 @@ interface QuestionDataSource {
 
     fun getQuestionAnswers(familyCode: String, questionSeq: Int): Task<QuerySnapshot>
 
-    fun getLast3Questions(familyCode: String): Query
+    fun getLast3Questions(familyCode: String, today: String): Query
 
-    fun getLastAllQuestions(familyCode: String): Query
+    fun getLastAllQuestions(familyCode: String, today: String): Query
 
     fun updateTodayQuestion(familyCode: String, newQuestionSeq: Int): Task<Unit>
 
